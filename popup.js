@@ -73,7 +73,7 @@ function renderTools(tools) {
   resultsEl.appendChild(fragment);
 }
 
-function sendScan(tabId) {
+function sendMessageToTab(tabId) {
   return new Promise((resolve, reject) => {
     chrome.tabs.sendMessage(tabId, { action: 'SCAN_PAGE' }, response => {
       if (chrome.runtime.lastError || !response) {
@@ -83,6 +83,18 @@ function sendScan(tabId) {
       resolve(response);
     });
   });
+}
+
+async function sendScan(tabId) {
+  try {
+    return await sendMessageToTab(tabId);
+  } catch (error) {
+    if (chrome.scripting?.executeScript) {
+      await chrome.scripting.executeScript({ target: { tabId }, files: ['dist/content.js'] });
+      return await sendMessageToTab(tabId);
+    }
+    throw error;
+  }
 }
 
 function isHttpUrl(url) {

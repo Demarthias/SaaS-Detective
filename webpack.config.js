@@ -1,7 +1,6 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'production',
   entry: {
     popup: './src/popup.ts',
     content: './src/content.ts'
@@ -21,8 +20,5 @@ module.exports = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
-  },
-  optimization: {
-    minimize: false
   },
 };

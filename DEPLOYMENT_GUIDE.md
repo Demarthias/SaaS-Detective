@@ -43,8 +43,13 @@
 ✅ popup.html              - Professional UI with styling
 ✅ popup.js                - Auto-scan, error handling
 ✅ background.js           - Service worker (ready for future features)
+✅ options.html            - Category toggles UI
+✅ options.js              - Options state and persistence
+✅ onboarding.html         - First-run guide
+✅ affiliates.json         - Affiliate lookup table
+✅ terms.html              - Terms of service
 ✅ src/content.ts          - Type-safe detection script
-✅ src/signatures.ts       - 26 tools with affiliate links
+✅ src/core/src.signatures.ts - 90+ bundled detection signatures
 ✅ dist/content.js         - Ready to deploy
 ```
 
@@ -80,7 +85,7 @@
 ### Step 2: Prepare Package
 ```bash
 # Navigate to project directory
-cd /home/graysonk/Software/SaaS-Detective
+cd .
 
 # Verify build is clean
 npm run build
@@ -90,6 +95,11 @@ zip -r SaaS-Detective-v1.0.2.zip \
   manifest.json \
   popup.html \
   popup.js \
+  options.html \
+  options.js \
+  onboarding.html \
+  terms.html \
+  affiliates.json \
   privacy.html \
   background.js \
   README.md \
@@ -145,7 +155,7 @@ zip -r SaaS-Detective-v1.0.2.zip \
 - **Detailed Description**: See README.md
 - **Homepage URL**: https://github.com/yourusername/SaaS-Detective
 - **Support Email**: gkube16@protonmail.com
-- **Privacy Policy**: https://github.com/yourusername/SaaS-Detective/blob/main/privacy.html
+- **Privacy Policy**: https://github.com/Demarthias/SaaS-Detective-/blob/main/privacy.html
 
 ### Step 5: Add Graphics
 
@@ -197,7 +207,7 @@ Click "Publish" and wait for review (typically 24-72 hours)
 
 ```bash
 # Run all checks
-cd /home/graysonk/Software/SaaS-Detective
+cd .
 
 # 1. Verify manifest
 echo "Checking manifest..."

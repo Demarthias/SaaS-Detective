@@ -1,4 +1,0 @@
-export const API_CONFIG = {
-  BUILTWITH_KEY: '0dfe4632-4e4b-4860-9d06-69255694206c',
-  VERSION: '2.0.0'
-};

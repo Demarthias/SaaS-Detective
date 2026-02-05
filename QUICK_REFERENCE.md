@@ -69,8 +69,6 @@ PRIVACY: No tracking. No analytics. No external calls. 100% local.
 ```
 SaaS-Detective-v1.0.2.zip (size varies by build)
 ├── manifest.json ✅
-├── popup.html ✅
-├── popup.js ✅
 ├── background.js ✅
 ├── privacy.html ✅
 ├── README.md ✅
@@ -78,8 +76,9 @@ SaaS-Detective-v1.0.2.zip (size varies by build)
 ├── SECURITY_AUDIT.md
 ├── CHROME_STORE_SUBMISSION.md
 ├── dist/
-│   ├── content.js ✅
-│   └── signatures.js ✅
+│   ├── popup.html ✅
+│   ├── popup.js ✅
+│   └── content.js ✅
 └── icons/
     └── icon128.png ✅
 ```

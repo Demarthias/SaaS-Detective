@@ -9,8 +9,6 @@
 				"-r",
 				"SaaS-Detective-v1.0.2.zip",
 				"manifest.json",
-				"popup.html",
-				"popup.js",
 				"privacy.html",
 				"background.js",
 				"README.md",

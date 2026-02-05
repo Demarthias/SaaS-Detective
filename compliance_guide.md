@@ -6,9 +6,10 @@
 ## 2. Permissions Justification
 | Permission | Justification |
 | :--- | :--- |
-| **tabs** | "Used to identify the active tab the user chooses to scan and to open links the user clicks from the popup." |
+| **activeTab** | "Grants temporary access to the current page only after the user clicks the extension to scan." |
 | **storage** | "Used to persist user preferences (e.g. category filters) in Chrome sync storage." |
-| **host permissions (http/https)** | "Required for the detection script to read page markup only on sites the user chooses to scan." |
+| **scripting** | "Injects the detection script into the active tab when the user triggers a scan." |
+| **host permissions (http/https)** | "Allows the detector to read page markup on sites the user chooses to scan." |
 
 ## 3. Remote Code Policy
 * **Does this extension use remote code?** -> **NO**

@@ -1,157 +1,155 @@
-import { signatures, SaasSignature } from './signatures';
-import { hasAffiliateLink } from './affiliateMap';
-import { openAffiliateLink } from './openLink';
+let affiliateTable: Record<string, { status: string; url: string }> = {};
+let sdOptions: Record<string, unknown> = {};
 
-// Helper: Group by Category
-const groupByCategory = (techs: SaasSignature[]) => {
-    return techs.reduce((acc, tech) => {
-        if (!acc[tech.category]) acc[tech.category] = [];
-        acc[tech.category].push(tech);
-        return acc;
-    }, {} as Record<string, SaasSignature[]>);
-};
-
-// --- THE OMNISCIENT PROBE ---
-// Runs inside the web page (World: MAIN)
-function probePage(signatureList: any[]) {
-    const findings: any[] = [];
-    const html = document.documentElement.outerHTML.toLowerCase();
-    
-    // 1. GET ALL NETWORK RESOURCES (The "God Mode" Check)
-    // This finds scripts that were downloaded, even if they aren't in the HTML.
-    const resources = performance.getEntriesByType('resource').map(r => r.name.toLowerCase());
-    const resourceString = resources.join(' '); // Combine into one big string for fast searching
-
-    // 2. SCANNING LOGIC
-    signatureList.forEach((sig: any) => {
-        let found = false;
-
-        // Check A: Global Variables (Window Objects)
-        if (sig.globalVar) {
-            sig.globalVar.forEach((v: string) => {
-                // @ts-ignore
-                if (window[v] !== undefined || (v.includes('.') && v.split('.').reduce((o,i)=>o?o[i]:undefined, window))) found = true;
-            });
-        }
-
-        // Check B: Network Resources (The new "God Mode" check)
-        if (!found && sig.patterns) {
-            sig.patterns.forEach((p: string) => {
-                const pat = p.toLowerCase();
-                if (resourceString.includes(pat)) found = true;
-            });
-        }
-
-        // Check C: HTML Source (Backup for meta tags etc)
-        if (!found && sig.patterns) {
-            sig.patterns.forEach((p: string) => {
-                if (html.includes(p.toLowerCase())) found = true;
-            });
-        }
-
-        if (found) findings.push(sig);
-    });
-
-    // 3. HEURISTIC SCAN (Meta Generators)
-    const metas = document.querySelectorAll('meta[name="generator"]');
-    metas.forEach((meta: any) => {
-        const content = meta.content || "";
-        if (content) {
-            findings.push({
-                id: "heuristic_" + content.replace(/\s/g, '_').toLowerCase(),
-                name: content,
-                category: "CMS (Detected)",
-                patterns: []
-            });
-        }
-    });
-
-    // 4. COMMON FRAMEWORK GUESSING
-    // @ts-ignore
-    if (window.__NEXT_DATA__) findings.push({ id: "nextjs", name: "Next.js", category: "Framework", patterns: [] });
-    // @ts-ignore
-    if (window.__NUXT__) findings.push({ id: "nuxtjs", name: "Nuxt.js", category: "Framework", patterns: [] });
-    // @ts-ignore
-    if (window.Shopify) findings.push({ id: "shopify_var", name: "Shopify", category: "E-Commerce", patterns: [] });
-
-    // Deduplicate results
-    const unique = new Map();
-    findings.forEach(item => unique.set(item.name, item));
-    return Array.from(unique.values());
+async function loadOptions(): Promise<void> {
+  const DEFAULT_OPTIONS = {};
+  const { sd_options } = await chrome.storage.sync.get({ sd_options: DEFAULT_OPTIONS });
+  sdOptions = { ...DEFAULT_OPTIONS, ...(sd_options || {}) };
 }
 
-const detectTechnologies = async (): Promise<SaasSignature[]> => {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab?.id) return [];
+async function loadAffiliates(): Promise<void> {
+  try {
+    const response = await fetch(chrome.runtime.getURL('affiliates.json'));
+    affiliateTable = await response.json();
+  } catch (_) {
+    affiliateTable = {};
+  }
+}
 
-    try {
-        const results = await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            world: "MAIN", 
-            func: probePage,
-            args: [signatures]
-        });
+function resolveLink(toolName: string, fallbackLink?: string): string {
+  const entry = affiliateTable[toolName];
+  if (entry && entry.status === 'active') {
+    return entry.url;
+  }
+  if (fallbackLink && fallbackLink !== '#') {
+    return fallbackLink;
+  }
+  return `https://www.google.com/search?q=${encodeURIComponent(toolName)}`;
+}
 
-        return results[0]?.result || [];
+function setStatus(message: string, isError = false): void {
+  const statusEl = document.getElementById('status');
+  if (!statusEl) {
+    return;
+  }
+  statusEl.textContent = message;
+  statusEl.classList.toggle('error', Boolean(isError));
+}
 
-    } catch (err) {
-        console.error("Detection failed:", err);
-        return [];
+function renderTools(tools: Array<{ name: string; category: string; link?: string }>): void {
+  const resultsEl = document.getElementById('results');
+  if (!resultsEl) {
+    return;
+  }
+  resultsEl.innerHTML = '';
+
+  if (!tools || tools.length === 0) {
+    resultsEl.innerHTML = '<div class="empty">No common SaaS tools detected on this page.</div>';
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  tools.forEach((tool) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const info = document.createElement('div');
+    const name = document.createElement('h4');
+    name.textContent = tool.name;
+    const category = document.createElement('div');
+    category.className = 'category';
+    category.textContent = tool.category;
+    info.appendChild(name);
+    info.appendChild(category);
+
+    const link = resolveLink(tool.name, tool.link);
+    const button = document.createElement('button');
+    button.className = 'visit-btn';
+    button.textContent = 'Visit';
+    button.addEventListener('click', () => {
+      chrome.tabs.create({ url: link });
+    });
+
+    card.appendChild(info);
+    card.appendChild(button);
+    fragment.appendChild(card);
+  });
+
+  resultsEl.appendChild(fragment);
+}
+
+function sendMessageToTab(
+  tabId: number
+): Promise<{ tools?: Array<{ name: string; category: string; link?: string }> }> {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.sendMessage(tabId, { action: 'SCAN_PAGE' }, (response) => {
+      if (chrome.runtime.lastError || !response) {
+        reject(chrome.runtime.lastError || new Error('No response from content script'));
+        return;
+      }
+      resolve(response);
+    });
+  });
+}
+
+async function sendScan(
+  tabId: number
+): Promise<{ tools?: Array<{ name: string; category: string; link?: string }> }> {
+  try {
+    return await sendMessageToTab(tabId);
+  } catch (error) {
+    if (chrome.scripting?.executeScript) {
+      await chrome.scripting.executeScript({
+        target: { tabId },
+        files: ['dist/content.js'],
+      });
+      return await sendMessageToTab(tabId);
     }
-};
+    throw error;
+  }
+}
 
-const render = async () => {
-    const container = document.getElementById('results-container');
-    if (!container) return;
+function isHttpUrl(url?: string): boolean {
+  return Boolean(url && (url.startsWith('http://') || url.startsWith('https://')));
+}
 
-    container.innerHTML = '<div class="loading">Deep scanning network assets...</div>';
+async function scanPage(): Promise<void> {
+  setStatus('Scanning current tab...');
+  const resultsEl = document.getElementById('results');
+  if (resultsEl) {
+    resultsEl.innerHTML = '';
+  }
 
-    // Slight delay to allow scripts to initialize if the user opened popup instantly
-    setTimeout(async () => {
-        const detectedTechs = await detectTechnologies();
-        container.innerHTML = ''; 
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-        if (detectedTechs.length === 0) {
-            container.innerHTML = `
-                <div class="loading">
-                    No stack detected.
-                    <br><br>
-                    <small>Try refreshing the page.</small>
-                </div>`;
-            return;
-        }
+  if (!tab || !isHttpUrl(tab.url)) {
+    setStatus('Open a website tab to scan.', true);
+    return;
+  }
 
-        const grouped = groupByCategory(detectedTechs);
-        
-        Object.keys(grouped).forEach(category => {
-            const catHeader = document.createElement('div');
-            catHeader.className = 'category-header';
-            catHeader.innerText = category;
-            container.appendChild(catHeader);
+  try {
+    const response = await sendScan(tab.id!);
+    const tools = response.tools || [];
+    renderTools(tools);
+    setStatus(tools.length ? 'Scan complete.' : 'Scan complete. Nothing detected.');
+  } catch (_) {
+    setStatus('Unable to scan this page. Please refresh and try again.', true);
+  }
+}
 
-            grouped[category].forEach(tech => {
-                const item = document.createElement('div');
-                item.className = 'tech-item';
-                
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'tech-name';
-                nameSpan.innerText = tech.name;
-                item.appendChild(nameSpan);
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadOptions();
+  await loadAffiliates();
+  scanPage();
 
-                // Check affiliate link (using first word to match generic keys if needed)
-                const lookupKey = tech.name.split(' ')[0]; // "Shopify" from "Shopify (Detected)"
-                if (hasAffiliateLink(tech.name) || hasAffiliateLink(lookupKey)) { 
-                    const btn = document.createElement('button');
-                    btn.className = 'deal-btn';
-                    btn.innerText = 'Get Deal';
-                    btn.onclick = () => openAffiliateLink(hasAffiliateLink(tech.name) ? tech.name : lookupKey);
-                    item.appendChild(btn);
-                }
+  document.getElementById('onboardingLink')?.addEventListener('click', (event) => {
+    event.preventDefault();
+    chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });
+  });
 
-                container.appendChild(item);
-            });
-        });
-    }, 100); // 100ms buffer
-};
-
-document.addEventListener('DOMContentLoaded', render);
+  document.getElementById('optionsLink')?.addEventListener('click', (event) => {
+    event.preventDefault();
+    chrome.runtime.openOptionsPage();
+  });
+});

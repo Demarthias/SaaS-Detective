@@ -12,8 +12,9 @@ SaaS Detective is a lightweight Chrome extension that identifies technology stac
 - Affiliate links shown only when you click a tool
 
 ## Permissions (Why They’re Needed)
-- `tabs`: identify the active tab you choose to scan and open links you click in the popup
+- `activeTab`: identify the active tab you choose to scan and open links you click in the popup
 - `storage`: save category preferences in Chrome sync storage
+- `scripting`: inject the detection script into the active tab when you trigger a scan
 - Host permissions (http/https): allow the detection script to read page markup for sites you choose to scan
 
 ## Build
@@ -29,6 +30,11 @@ zip -r SaaS-Detective-v1.0.2.zip \
 	manifest.json \
 	popup.html \
 	popup.js \
+	options.html \
+	options.js \
+	onboarding.html \
+	terms.html \
+	affiliates.json \
 	privacy.html \
 	background.js \
 	README.md \

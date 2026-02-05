@@ -66,7 +66,7 @@
      - **Category**: Productivity
      - **Language**: English
      - **Content rating**: Free from adult content
-     - **Privacy policy URL**: https://github.com/yourusername/SaaS-Detective/blob/main/privacy.html
+   - **Privacy policy URL**: https://github.com/Demarthias/SaaS-Detective-/blob/main/privacy.html
      - **Support email**: gkube16@protonmail.com
 
 4. **Add Graphics**
@@ -113,8 +113,13 @@ npm run build
 # Create distribution zip
 zip -r SaaS-Detective-v1.0.2.zip \
   manifest.json \
-  popup.html \
-  popup.js \
+   popup.html \
+   popup.js \
+   options.html \
+   options.js \
+   onboarding.html \
+   terms.html \
+   affiliates.json \
   privacy.html \
   background.js \
   dist/ \
