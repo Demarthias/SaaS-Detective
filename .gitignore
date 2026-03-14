@@ -3,3 +3,8 @@ dist/
 *.log
 .DS_Store
 .vscode/
+node_modules/
+SaaS-Detective
+*.zip
+*.tar.gz
+.venv/
