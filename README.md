@@ -1,52 +1,138 @@
-# SaaS Detective | Web Intelligence Engine
-**Version:** 1.0.2 (Manifest V3)
-**Core Logic:** TypeScript + JavaScript
+<<<<<<< HEAD
+# SaaS Detective - Browser Extension
 
-SaaS Detective is a lightweight Chrome extension that identifies technology stacks on the current page using local signature matching. No remote calls. No analytics. No tracking.
+![SaaS Detective](icons/icon128.png)
+
+**Instantly identify the tech stack powering any website.**
+
+## Overview
+
+SaaS Detective is a Chrome extension that instantly reveals the technologies, frameworks, and SaaS tools used to build any website. Click the extension icon, and within seconds, you'll see:
+
+- 🔍 **26+ Tech Signatures** - Detect popular tools across multiple categories
+- 🚀 **Frameworks & Libraries** - React, Vue, Next.js, jQuery, and more
+- 💳 **Payment Processors** - Stripe, PayPal, and other payment solutions
+- 📊 **Analytics Platforms** - Google Analytics, Mixpanel, Segment, Hotjar, and more
+- 💬 **Communication Tools** - Intercom, Drift, HubSpot chat integrations
+- 🎯 **Marketing Tools** - Mailchimp, Klaviyo, Meta Pixel, TikTok Pixel
+- 🛒 **E-Commerce Platforms** - Shopify, Wix, Squarespace, Webflow, and more
 
 ## Features
-- Instant tech stack detection from the current tab
-- 90+ signatures across frameworks, analytics, payments, and more
-- Organized categories with per-category toggles
-- Zero data collection (local-only processing)
-- Affiliate links shown only when you click a tool
 
-## Permissions (Why They’re Needed)
-- `activeTab`: identify the active tab you choose to scan and open links you click in the popup
-- `storage`: save category preferences in Chrome sync storage
-- `scripting`: inject the detection script into the active tab when you trigger a scan
-- Host permissions (http/https): allow the detection script to read page markup for sites you choose to scan
+✅ **Zero Data Collection** - All detection happens locally on your device  
+✅ **No Tracking** - We don't track your browsing or collect personal information  
+✅ **Instant Results** - Auto-scans when you open the popup  
+✅ **Affiliate Links** - Visit tool websites directly from detected results  
+✅ **Lightweight** - Only 3.7 KB of optimized code  
+✅ **Open Source Ready** - Clean, maintainable TypeScript codebase  
 
-## Build
+## How It Works
+
+1. **Navigate** to any website
+2. **Click** the SaaS Detective icon
+3. **View** the detected tech stack instantly
+4. **Visit** any tool's official website using the provided links
+
+The extension analyzes script tags and resource URLs loaded on the page to identify technologies. No data leaves your browser.
+
+## Detected Tools
+
+### Site Builders & CMS (7)
+- WordPress
+- Shopify
+- Wix
+- Squarespace
+- Webflow
+- Framer
+- Bubble
+
+### Analytics & Data (5)
+- Google Analytics
+- Segment
+- Mixpanel
+- Hotjar
+- Microsoft Clarity
+
+### Marketing & Chat (5)
+- Intercom
+- Drift
+- HubSpot
+- Mailchimp
+- Klaviyo
+
+### Ads & Tracking (3)
+- Meta Pixel
+- TikTok Pixel
+- LinkedIn Insight
+
+### Frameworks & Libraries (4)
+- React
+- Vue.js
+- jQuery
+- Next.js
+
+### Payments (2)
+- Stripe
+- PayPal
+
+## Privacy & Security
+
+**We take privacy seriously:**
+- ✅ No data collection or storage
+- ✅ No external API calls
+- ✅ No user tracking
+- ✅ Local processing only
+- ✅ No cookies injected
+- ✅ No personal information access
+
+See [Privacy Policy](privacy.html) for complete details.
+
+## Permissions
+
+| Permission | Purpose |
+|-----------|---------|
+| `activeTab` | Access the current website |
+| `scripting` | Inject detection script into pages |
+| `https://*/* and http://*/*` | Run on all websites |
+
+## Development
+
+Built with:
+- **TypeScript** - Type-safe code
+- **Webpack** - Bundling and optimization
+- **Manifest V3** - Modern Chrome extension standard
+
+### Build
 ```bash
 npm install
 npm run build
 ```
 
-## Package for Chrome Web Store
+### Development Watch
 ```bash
-# From project root
-zip -r SaaS-Detective-v1.0.2.zip \
-	manifest.json \
-	popup.html \
-	popup.js \
-	options.html \
-	options.js \
-	onboarding.html \
-	terms.html \
-	affiliates.json \
-	privacy.html \
-	background.js \
-	README.md \
-	dist/ \
-	icons/
+npm run watch
 ```
 
-## Privacy & Affiliate Disclosure
-- All detection runs locally on your device
-- No browsing history is collected or transmitted
-- Clicking a tool may open an affiliate link (clearly disclosed in the UI)
-
 ## Support
-- Privacy policy: privacy.html
-- Terms: terms.html
+
+For questions or issues:
+- 📧 Email: gkube16@protonmail.com
+- 🐛 Report bugs via Chrome Web Store
+
+## License
+
+Copyright © 2026 Venom Industries. All rights reserved.
+
+## Affiliate Disclosure
+
+SaaS Detective may include affiliate links to services we detect. Using these links helps support extension development. You are never required to use them, and they are clearly labeled.
+
+---
+
+**Download SaaS Detective from the [Chrome Web Store](https://chrome.google.com/webstore)**
+
+Made with ❤️ by Venom Industries
+=======
+# SaaS-Detective-
+Chrome Extension designed for entrepreneurs and B2B professionals. The tool identifies the technology stacks of successful websites (E-Commerce platforms,  Analytics and marketing Automation) and recommends the industry-leading tools to help users build their own versions.  
+>>>>>>> 14e94064723019a8e457faa08ac33148bcc11ce6

@@ -1,24 +1,31 @@
 const path = require('path');
 
 module.exports = {
-  entry: {
-    popup: './src/popup.ts',
-    content: './src/content.ts'
+  // Entry point: The main file that kicks off your script
+  entry: './src/content.ts', 
+  
+  // Output: Where the bundled file goes
+  output: {
+    filename: 'content.js',
+    path: path.resolve(__dirname, 'dist'),
   },
+
+  // File resolution rules
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+
+  // How to handle different file types
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.ts$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
     ],
   },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-  output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist'),
-  },
+  
+  // Disable optimization if you need to debug the output file easily
+  // optimization: { minimize: false },
 };
