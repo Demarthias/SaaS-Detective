@@ -15,11 +15,35 @@
     button { border: none; background: #2563eb; color: #fff; font-weight: 700; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
     button.secondary { background: #e2e8f0; color: #0f172a; }
     .status { margin-top: 8px; font-size: 13px; color: #475569; }
+    .pro-badge { display: inline-block; background: #2563eb; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; margin-left: 8px; vertical-align: middle; }
+    .license-row { display: flex; gap: 8px; margin-top: 8px; }
+    .license-row input { flex: 1; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: monospace; }
+    .license-status { margin-top: 6px; font-size: 13px; }
+    .license-status.valid { color: #16a34a; font-weight: 600; }
+    .license-status.invalid { color: #dc2626; }
   </style>
 </head>
 <body>
   <h1>SaaS Detective Options</h1>
   <p class="sub">Control detections by category.</p>
+
+  <div class="card">
+    <h2 style="font-size:18px;margin:0 0 8px">Pro License <span id="proBadge" class="pro-badge" style="display:none">Active</span></h2>
+    <p style="margin:0 0 4px;font-size:13px;color:#64748b;">Free plan shows up to 5 detections per site. Pro unlocks all detections for $4.99/mo.</p>
+    <div class="license-row">
+      <input type="text" id="licenseKey" placeholder="Enter your license key" spellcheck="false" />
+      <button id="activateBtn">Activate</button>
+      <button id="removeBtn" class="secondary" style="display:none">Remove</button>
+    </div>
+    <div id="licenseStatus" class="license-status"></div>
+    <div style="margin-top:10px;font-size:12px;color:#94a3b8;">
+      Don't have a key? Choose a plan:
+      <a href="https://buy.stripe.com/test_eVqbJ1g5m3Gm2X97uJ9fW01" target="_blank" style="color:#2563eb;">$8.99/mo</a> ·
+      <a href="https://buy.stripe.com/test_8x23cv06o3GmbtFbKZ9fW02" target="_blank" style="color:#2563eb;">$15/3mo</a> ·
+      <a href="https://buy.stripe.com/test_5kQ28rdXe1ye69l2ap9fW03" target="_blank" style="color:#2563eb;">$45/6mo</a> ·
+      <a href="https://buy.stripe.com/test_7sYbJ1f1i4KqdBN2ap9fW04" target="_blank" style="color:#2563eb;">$90/yr</a>
+    </div>
+  </div>
 
   <div class="card">
     <h2 style="font-size:18px;margin:0 0 8px">Enabled Categories</h2>

@@ -1,3 +1,7 @@
+const FREE_TOOL_LIMIT = 5;
+const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/test_eVqbJ1g5m3Gm2X97uJ9fW01'; // Monthly $8.99/mo
+const WORKER_URL = 'https://saas-detective-license.YOUR_SUBDOMAIN.workers.dev'; // Replace after deploying worker
+
 let affiliateTable = {};
 let sdOptions = {};
 
@@ -14,6 +18,28 @@ async function loadAffiliates() {
   } catch (_) {
     affiliateTable = {};
   }
+}
+
+async function checkProStatus() {
+  const { sd_license: key, sd_pro_cache: cache } = await chrome.storage.sync.get({
+    sd_license: null,
+    sd_pro_cache: 0,
+  });
+  if (!key) return false;
+  if (cache > Date.now()) return true;
+  try {
+    const resp = await fetch(`${WORKER_URL}/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key }),
+    });
+    const data = await resp.json();
+    if (data.valid) {
+      await chrome.storage.sync.set({ sd_pro_cache: Date.now() + 86400000 });
+      return true;
+    }
+  } catch (_) {}
+  return false;
 }
 
 function resolveLink(toolName, fallbackLink) {
@@ -33,7 +59,7 @@ function setStatus(message, isError = false) {
   statusEl.classList.toggle('error', Boolean(isError));
 }
 
-function renderTools(tools) {
+function renderTools(tools, isPro) {
   const resultsEl = document.getElementById('results');
   resultsEl.innerHTML = '';
 
@@ -42,9 +68,11 @@ function renderTools(tools) {
     return;
   }
 
+  const visibleTools = isPro ? tools : tools.slice(0, FREE_TOOL_LIMIT);
+  const hiddenCount = isPro ? 0 : Math.max(0, tools.length - visibleTools.length);
   const fragment = document.createDocumentFragment();
 
-  tools.forEach(tool => {
+  visibleTools.forEach(tool => {
     const card = document.createElement('div');
     card.className = 'card';
 
@@ -70,7 +98,22 @@ function renderTools(tools) {
     fragment.appendChild(card);
   });
 
+  if (hiddenCount > 0) {
+    const banner = document.createElement('div');
+    banner.className = 'upgrade-banner';
+    banner.innerHTML = `
+      <div class="upgrade-count">+${hiddenCount} more tool${hiddenCount > 1 ? 's' : ''} detected</div>
+      <div class="upgrade-sub">Upgrade to Pro to unlock all detections</div>
+      <button class="upgrade-btn" id="upgradeBtn">Upgrade to Pro &mdash; $4.99/mo</button>
+    `;
+    fragment.appendChild(banner);
+  }
+
   resultsEl.appendChild(fragment);
+
+  document.getElementById('upgradeBtn')?.addEventListener('click', () => {
+    chrome.tabs.create({ url: STRIPE_PAYMENT_LINK });
+  });
 }
 
 function sendMessageToTab(tabId) {
@@ -114,9 +157,9 @@ async function scanPage() {
   }
 
   try {
-    const response = await sendScan(tab.id);
+    const [response, isPro] = await Promise.all([sendScan(tab.id), checkProStatus()]);
     const tools = response.tools || [];
-    renderTools(tools);
+    renderTools(tools, isPro);
     setStatus(tools.length ? 'Scan complete.' : 'Scan complete. Nothing detected.');
   } catch (_) {
     setStatus('Unable to scan this page. Please refresh and try again.', true);
@@ -128,7 +171,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadAffiliates();
   scanPage();
 
-  // Wire footer links
   document.getElementById('onboardingLink')?.addEventListener('click', (e) => {
     e.preventDefault();
     chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });

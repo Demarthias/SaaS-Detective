@@ -60,10 +60,28 @@
     "notes": "Ghost Pro referral — sign up at ghost.org/partners"
   },
   "HubSpot": {
-    "status": "active",
+    "status": "ineligible",
     "url": "https://hubspot.sjv.io/saasdetective",
     "program": "Impact (HubSpot)",
-    "notes": "Replace with your Impact affiliate link for HubSpot"
+    "notes": "Extensions do not qualify as a promotion channel. Newsletter with 1000+ subscribers required. Revisit when newsletter threshold is met."
+  },
+  "Pipedrive": {
+    "status": "active",
+    "url": "https://www.pipedrive.com/en/partners?ref=saasdetective",
+    "program": "Pipedrive Affiliate",
+    "notes": "Sign up at pipedrive.com/en/partners — no traffic minimums, extension-friendly"
+  },
+  "Close CRM": {
+    "status": "active",
+    "url": "https://close.com/partners/?ref=saasdetective",
+    "program": "Close Affiliate Program",
+    "notes": "Sign up at close.com/partners — startup-focused, strong commissions"
+  },
+  "Monday.com": {
+    "status": "active",
+    "url": "https://monday.com/affiliates/?ref=saasdetective",
+    "program": "Monday.com Affiliate",
+    "notes": "Sign up at monday.com/affiliates — high commissions, broad appeal, no extension restrictions"
   },
   "Mailchimp": {
     "status": "active",
@@ -184,5 +202,71 @@
     "url": "https://www.freshworks.com/live-chat-software/?ref=saasdetective",
     "program": "Freshworks Partner",
     "notes": "Sign up at freshworks.com/partners"
+  },
+  "Stripe": {
+    "status": "active",
+    "url": "https://stripe.com/partners/become-a-partner?ref=saasdetective",
+    "program": "Stripe Partner Ecosystem",
+    "notes": "Sign up at stripe.com/partners — revenue share on referred accounts"
+  },
+  "Klarna": {
+    "status": "active",
+    "url": "https://www.klarna.com/us/business/become-a-partner/?ref=saasdetective",
+    "program": "Klarna Partner Program (Impact)",
+    "notes": "Sign up via klarna.com/us/business/become-a-partner — also available on Impact network"
+  },
+  "Tawk.to": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Tawk.to is a free product — no affiliate program exists."
+  },
+  "Drift": {
+    "status": "active",
+    "url": "https://www.salesloft.com/partners/?ref=saasdetective",
+    "program": "Salesloft (Drift) Partner Program",
+    "notes": "Drift acquired by Salesloft — sign up at salesloft.com/partners"
+  },
+  "Sentry": {
+    "status": "active",
+    "url": "https://sentry.io/partners/?ref=saasdetective",
+    "program": "Sentry Partner Program",
+    "notes": "Sign up at sentry.io/partners — revenue share on referred accounts"
+  },
+  "FullStory": {
+    "status": "active",
+    "url": "https://www.fullstory.com/partners/?ref=saasdetective",
+    "program": "FullStory Partner Program",
+    "notes": "Sign up at fullstory.com/partners — referral commissions on new accounts"
+  },
+  "LogRocket": {
+    "status": "active",
+    "url": "https://logrocket.com/?ref=saasdetective",
+    "program": "LogRocket Referral",
+    "notes": "Contact LogRocket at logrocket.com for partner/referral terms"
+  },
+  "OneSignal": {
+    "status": "active",
+    "url": "https://onesignal.com/partnerships?ref=saasdetective",
+    "program": "OneSignal Partnership Program",
+    "notes": "Sign up at onesignal.com/partnerships"
+  },
+  "Datadog": {
+    "status": "active",
+    "url": "https://www.datadoghq.com/partner/referral/?ref=saasdetective",
+    "program": "Datadog Partner Network",
+    "notes": "Sign up at datadoghq.com/partner — referral program for technology partners"
+  },
+  "New Relic": {
+    "status": "active",
+    "url": "https://newrelic.com/partners/referral?ref=saasdetective",
+    "program": "New Relic Partner Program",
+    "notes": "Sign up at newrelic.com/partners — referral credits/commission on new accounts"
+  },
+  "OneTrust": {
+    "status": "active",
+    "url": "https://www.onetrust.com/partners/?ref=saasdetective",
+    "program": "OneTrust Partner Program",
+    "notes": "Sign up at onetrust.com/partners — enterprise compliance tool, high ACV"
   }
 }

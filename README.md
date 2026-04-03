@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # SaaS Detective - Browser Extension
 
 ![SaaS Detective](icons/icon128.png)
@@ -9,13 +8,13 @@
 
 SaaS Detective is a Chrome extension that instantly reveals the technologies, frameworks, and SaaS tools used to build any website. Click the extension icon, and within seconds, you'll see:
 
-- 🔍 **26+ Tech Signatures** - Detect popular tools across multiple categories
-- 🚀 **Frameworks & Libraries** - React, Vue, Next.js, jQuery, and more
-- 💳 **Payment Processors** - Stripe, PayPal, and other payment solutions
-- 📊 **Analytics Platforms** - Google Analytics, Mixpanel, Segment, Hotjar, and more
-- 💬 **Communication Tools** - Intercom, Drift, HubSpot chat integrations
-- 🎯 **Marketing Tools** - Mailchimp, Klaviyo, Meta Pixel, TikTok Pixel
-- 🛒 **E-Commerce Platforms** - Shopify, Wix, Squarespace, Webflow, and more
+- 🔍 **92 Tech Signatures** - Detect tools across 30+ categories
+- 🚀 **Frameworks & Libraries** - React, Vue, Next.js, Angular, Svelte, and more
+- 💳 **Payment Processors** - Stripe, PayPal, Paddle, Klarna, Braintree, and more
+- 📊 **Analytics Platforms** - Google Analytics, Mixpanel, Amplitude, Heap, and more
+- 💬 **Communication Tools** - Intercom, Drift, Crisp, Tidio, LiveChat, and more
+- 🎯 **Marketing & Ads** - Meta Pixel, TikTok, LinkedIn, Google Ads, and more
+- 🛒 **E-Commerce Platforms** - Shopify, WooCommerce, BigCommerce, Magento, and more
 
 ## Features
 
@@ -35,45 +34,76 @@ SaaS Detective is a Chrome extension that instantly reveals the technologies, fr
 
 The extension analyzes script tags and resource URLs loaded on the page to identify technologies. No data leaves your browser.
 
-## Detected Tools
+## Detected Tools (92 Signatures)
 
-### Site Builders & CMS (7)
-- WordPress
-- Shopify
-- Wix
-- Squarespace
-- Webflow
-- Framer
+### Analytics (5)
+- Google Analytics, Google Tag Manager, Mixpanel, Amplitude, Heap Analytics
+
+### Heatmap & Session Replay (5)
+- Hotjar, Microsoft Clarity, Crazy Egg, FullStory, LogRocket
+
+### Observability & Error Tracking (4)
+- New Relic, Datadog, Sentry, Bugsnag
+
+### Ads & Pixels (8)
+- Meta Pixel, TikTok Pixel, LinkedIn Insight, Google Ads, Microsoft Ads, Pinterest Tag, Snap Pixel, X (Twitter) Ads
+
+### Native Ads & Retargeting (3)
+- Taboola, Outbrain, AdRoll
+
+### CRM & Marketing Automation (4)
+- HubSpot, Salesforce, Marketo, Pardot
+
+### Email Marketing (5)
+- Mailchimp, Klaviyo, ActiveCampaign, ConvertKit, Drip
+
+### Push Notifications (2)
+- OneSignal, VWO (PushCrew)
+
+### Chat & Support (9)
+- Intercom, Drift, Crisp, Freshchat, Tawk.to, Olark, LiveChat, Tidio, Zendesk
+
+### E-Commerce (4)
+- Shopify, WooCommerce, Magento, BigCommerce
+
+### Payments (6)
+- Stripe, PayPal, Braintree, Paddle, Klarna, Afterpay
+
+### Site Builders (4)
+- Wix, Squarespace, Webflow, Framer
+
+### CMS (4)
+- WordPress, Ghost, Drupal, Joomla
+
+### No-Code (1)
 - Bubble
 
-### Analytics & Data (5)
-- Google Analytics
+### Frameworks (6)
+- React, Vue.js, Angular, Next.js, Nuxt.js, Svelte
+
+### Libraries & CSS (4)
+- jQuery, Alpine.js, Tailwind CSS, Bootstrap
+
+### CDN (4)
+- Cloudflare, Akamai, Fastly, Google Hosted Libs
+
+### Hosting (3)
+- Vercel, Netlify, Heroku
+
+### Infrastructure & Storage (1)
+- Amazon S3
+
+### Security & Compliance (5)
+- Google reCAPTCHA, hCaptcha, OneTrust, Cookiebot, Termly
+
+### Fonts & Icons (3)
+- Google Fonts, Adobe Fonts, Font Awesome
+
+### Data Platform (1)
 - Segment
-- Mixpanel
-- Hotjar
-- Microsoft Clarity
 
-### Marketing & Chat (5)
-- Intercom
-- Drift
-- HubSpot
-- Mailchimp
-- Klaviyo
-
-### Ads & Tracking (3)
-- Meta Pixel
-- TikTok Pixel
-- LinkedIn Insight
-
-### Frameworks & Libraries (4)
-- React
-- Vue.js
-- jQuery
-- Next.js
-
-### Payments (2)
-- Stripe
-- PayPal
+### Comments (1)
+- Disqus
 
 ## Privacy & Security
 
@@ -132,7 +162,3 @@ SaaS Detective may include affiliate links to services we detect. Using these li
 **Download SaaS Detective from the [Chrome Web Store](https://chrome.google.com/webstore)**
 
 Made with ❤️ by Venom Industries
-=======
-# SaaS-Detective-
-Chrome Extension designed for entrepreneurs and B2B professionals. The tool identifies the technology stacks of successful websites (E-Commerce platforms,  Analytics and marketing Automation) and recommends the industry-leading tools to help users build their own versions.  
->>>>>>> 14e94064723019a8e457faa08ac33148bcc11ce6
