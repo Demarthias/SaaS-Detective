@@ -73,6 +73,90 @@ function renderCategories(container, options) {
   });
 }
 
+const VALIDATE_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/validate';
+
+async function validateLicenseKey(key) {
+  const res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`);
+  return res.json();
+}
+
+async function loadLicense() {
+  const { sd_license } = await chrome.storage.sync.get({ sd_license: null });
+  return sd_license;
+}
+
+async function saveLicense(data) {
+  await chrome.storage.sync.set({ sd_license: data });
+}
+
+async function removeLicense() {
+  await chrome.storage.sync.remove('sd_license');
+}
+
+function setLicenseStatus(msg, isValid) {
+  const el = document.getElementById('licenseStatus');
+  el.textContent = msg;
+  el.className = 'license-status' + (isValid === true ? ' valid' : isValid === false ? ' invalid' : '');
+}
+
+async function initLicense() {
+  const keyInput = document.getElementById('licenseKey');
+  const activateBtn = document.getElementById('activateBtn');
+  const removeBtn = document.getElementById('removeBtn');
+  const proBadge = document.getElementById('proBadge');
+
+  const existing = await loadLicense();
+  if (existing?.valid) {
+    keyInput.value = existing.key;
+    keyInput.disabled = true;
+    activateBtn.style.display = 'none';
+    removeBtn.style.display = '';
+    proBadge.style.display = '';
+    setLicenseStatus(`Active — ${existing.plan} plan (${existing.email})`, true);
+  }
+
+  activateBtn.addEventListener('click', async () => {
+    const key = keyInput.value.trim();
+    if (!key) {
+      setLicenseStatus('Please enter a license key.', false);
+      return;
+    }
+    activateBtn.textContent = 'Checking...';
+    activateBtn.disabled = true;
+    try {
+      const result = await validateLicenseKey(key);
+      if (result.valid) {
+        await saveLicense({ key, valid: true, plan: result.plan, email: result.email });
+        keyInput.disabled = true;
+        activateBtn.style.display = 'none';
+        removeBtn.style.display = '';
+        proBadge.style.display = '';
+        setLicenseStatus(`Active — ${result.plan} plan (${result.email})`, true);
+      } else {
+        setLicenseStatus('Invalid or inactive key. Please check and try again.', false);
+        activateBtn.textContent = 'Activate';
+        activateBtn.disabled = false;
+      }
+    } catch {
+      setLicenseStatus('Could not reach license server. Check your connection.', false);
+      activateBtn.textContent = 'Activate';
+      activateBtn.disabled = false;
+    }
+  });
+
+  removeBtn.addEventListener('click', async () => {
+    await removeLicense();
+    keyInput.value = '';
+    keyInput.disabled = false;
+    activateBtn.style.display = '';
+    activateBtn.textContent = 'Activate';
+    activateBtn.disabled = false;
+    removeBtn.style.display = 'none';
+    proBadge.style.display = 'none';
+    setLicenseStatus('License removed.', null);
+  });
+}
+
 async function init() {
   const container = document.getElementById('category-list');
   const resetBtn = document.getElementById('reset');
@@ -81,6 +165,7 @@ async function init() {
   let options = await loadOptions();
 
   renderCategories(container, options);
+  await initLicense();
 
   resetBtn.addEventListener('click', async () => {
     options = JSON.parse(JSON.stringify(DEFAULT_OPTIONS));

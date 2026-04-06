@@ -2,11 +2,15 @@ const path = require('path');
 
 module.exports = {
   // Entry point: The main file that kicks off your script
-  entry: './src/content.ts', 
-  
+  entry: {
+    content: './src/content.ts',
+    popup: './src/popup.ts',
+    background: './src/background.ts',
+  },
+
   // Output: Where the bundled file goes
   output: {
-    filename: 'content.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
   },
 

@@ -1,3 +1,5 @@
+import { trackEvent } from './analytics';
+
 let affiliateTable: Record<string, { status: string; url: string }> = {};
 let sdOptions: Record<string, unknown> = {};
 
@@ -36,7 +38,7 @@ function setStatus(message: string, isError = false): void {
   statusEl.classList.toggle('error', Boolean(isError));
 }
 
-function renderTools(tools: Array<{ name: string; category: string; link?: string }>): void {
+function renderTools(tools: Array<{ name: string; category: string; link?: string }>, locked = 0): void {
   const resultsEl = document.getElementById('results');
   if (!resultsEl) {
     return;
@@ -45,6 +47,9 @@ function renderTools(tools: Array<{ name: string; category: string; link?: strin
 
   if (!tools || tools.length === 0) {
     resultsEl.innerHTML = '<div class="empty">No common SaaS tools detected on this page.</div>';
+    if (locked > 0) {
+      appendUpgradeBanner(resultsEl, locked);
+    }
     return;
   }
 
@@ -77,6 +82,25 @@ function renderTools(tools: Array<{ name: string; category: string; link?: strin
   });
 
   resultsEl.appendChild(fragment);
+
+  if (locked > 0) {
+    appendUpgradeBanner(resultsEl, locked);
+  }
+}
+
+function appendUpgradeBanner(container: HTMLElement, locked: number): void {
+  const banner = document.createElement('div');
+  banner.className = 'upgrade-banner';
+  banner.innerHTML = `
+    <div class="upgrade-count">+${locked} more tool${locked !== 1 ? 's' : ''} detected</div>
+    <div class="upgrade-sub">Upgrade to Pro to reveal all 92 signatures</div>
+    <button class="upgrade-btn" id="upgradeBannerBtn">Upgrade — from $7/mo</button>
+  `;
+  container.appendChild(banner);
+  banner.querySelector('#upgradeBannerBtn')?.addEventListener('click', () => {
+    trackEvent('upgrade_clicked', { location: 'popup_banner' });
+    chrome.tabs.create({ url: 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00' });
+  });
 }
 
 function sendMessageToTab(
@@ -131,8 +155,10 @@ async function scanPage(): Promise<void> {
   try {
     const response = await sendScan(tab.id!);
     const tools = response.tools || [];
-    renderTools(tools);
-    setStatus(tools.length ? 'Scan complete.' : 'Scan complete. Nothing detected.');
+    const locked = (response as { locked?: number }).locked || 0;
+    renderTools(tools, locked);
+    setStatus(tools.length || locked ? 'Scan complete.' : 'Scan complete. Nothing detected.');
+    trackEvent('scan_complete', { tools_detected: tools.length, tools_locked: locked });
   } catch (_) {
     setStatus('Unable to scan this page. Please refresh and try again.', true);
   }
@@ -141,6 +167,7 @@ async function scanPage(): Promise<void> {
 document.addEventListener('DOMContentLoaded', async () => {
   await loadOptions();
   await loadAffiliates();
+  trackEvent('popup_opened');
   scanPage();
 
   document.getElementById('onboardingLink')?.addEventListener('click', (event) => {
