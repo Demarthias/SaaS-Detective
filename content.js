@@ -83,7 +83,7 @@ const signatures = [
 
   // --- E-COMMERCE ---
   {id:"shopify",name:"Shopify",category:"E-Commerce",free:true,patterns:["cdn.shopify.com","shopify.com"],globalVar:["Shopify"],description:"All-in-one e-commerce and retail platform",alternatives:["BigCommerce","WooCommerce","Wix Commerce"]},
-  {id:"woocommerce",name:"WooCommerce",category:"E-Commerce",free:true,patterns:["woocommerce","wc-ajax"],globalVar:["wc_add_to_cart_params","woocommerce_params"],description:"Open-source WordPress e-commerce plugin",alternatives:["Shopify","BigCommerce","Magento"]},
+  {id:"woocommerce",name:"WooCommerce",category:"E-Commerce",free:true,patterns:["wp-content/plugins/woocommerce","wc-ajax"],globalVar:["wc_add_to_cart_params","woocommerce_params"],description:"Open-source WordPress e-commerce plugin",alternatives:["Shopify","BigCommerce","Magento"]},
   {id:"magento",name:"Magento",category:"E-Commerce",patterns:["mage/cookies","mage/translate","mage-init"],globalVar:["Magento"],description:"Enterprise e-commerce platform by Adobe",alternatives:["Shopify","BigCommerce","WooCommerce"]},
   {id:"bigcommerce",name:"BigCommerce",category:"E-Commerce",free:true,patterns:["cdn11.bigcommerce.com"],globalVar:["BCData"],description:"Enterprise e-commerce SaaS platform",alternatives:["Shopify","Magento","WooCommerce"]},
   {id:"recharge",name:"Recharge",category:"E-Commerce",patterns:["cdn.recharge.com","rechargepayments.com"],globalVar:["ReCharge"],description:"Subscription billing and management for e-commerce",alternatives:["Bold Subscriptions","Recurly","Chargebee"]},

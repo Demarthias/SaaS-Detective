@@ -66,9 +66,12 @@
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>SaaS Detective</h1>
-    <p>200+ signatures across 25+ categories</p>
+  <div class="header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <h1>SaaS Detective</h1>
+      <p>200+ signatures across 25+ categories</p>
+    </div>
+    <button id="rescanBtn" title="Rescan page" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:18px;padding:4px 0 4px 8px;line-height:1;flex-shrink:0;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">↻</button>
   </div>
 
   <div id="status"></div>

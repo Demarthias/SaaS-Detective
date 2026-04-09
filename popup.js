@@ -17,10 +17,9 @@ async function trackEvent(name, params = {}) {
 
 let affiliateTable = {};
 
-function resolveLink(toolName, fallback) {
+function resolveLink(toolName) {
   const entry = affiliateTable[toolName];
   if (entry && entry.status === 'active') return entry.url;
-  if (fallback && fallback !== '#') return fallback;
   return `https://www.google.com/search?q=${encodeURIComponent(toolName + ' software')}`;
 }
 
@@ -168,8 +167,17 @@ async function sendScan(tabId) {
 
 const SCAN_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+function getCacheKey(url) {
+  try {
+    const u = new URL(url);
+    return `sd_scan_${u.origin}${u.pathname}`;
+  } catch (_) {
+    return `sd_scan_${url}`;
+  }
+}
+
 async function getCachedScan(url) {
-  const key = `sd_scan_${url}`;
+  const key = getCacheKey(url);
   const result = await chrome.storage.local.get(key);
   const cached = result[key];
   if (cached && Date.now() - cached.ts < SCAN_CACHE_TTL) return cached.data;
@@ -177,11 +185,18 @@ async function getCachedScan(url) {
 }
 
 async function setCachedScan(url, data) {
-  const key = `sd_scan_${url}`;
-  await chrome.storage.local.set({ [key]: { ts: Date.now(), data } });
+  const key = getCacheKey(url);
+  const now = Date.now();
+  // Prune expired entries on every write
+  const all = await chrome.storage.local.get(null);
+  const toRemove = Object.keys(all).filter(k =>
+    k.startsWith('sd_scan_') && all[k]?.ts && now - all[k].ts > SCAN_CACHE_TTL
+  );
+  if (toRemove.length > 0) await chrome.storage.local.remove(toRemove);
+  await chrome.storage.local.set({ [key]: { ts: now, data } });
 }
 
-async function scanPage() {
+async function scanPage(forceRefresh = false) {
   setStatus('Scanning current tab...');
   const resultsEl = document.getElementById('results');
   if (resultsEl) resultsEl.innerHTML = '';
@@ -192,11 +207,13 @@ async function scanPage() {
     return;
   }
 
-  const cached = await getCachedScan(tab.url);
-  if (cached) {
-    renderTools(cached.tools, cached.locked);
-    setStatus('Scan complete.');
-    return;
+  if (!forceRefresh) {
+    const cached = await getCachedScan(tab.url);
+    if (cached) {
+      renderTools(cached.tools, cached.locked);
+      setStatus('Scan complete.');
+      return;
+    }
   }
 
   try {
@@ -221,6 +238,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   trackEvent('popup_opened');
   scanPage();
+
+  document.getElementById('rescanBtn')?.addEventListener('click', () => {
+    scanPage(true);
+  });
 
   document.getElementById('onboardingLink')?.addEventListener('click', (e) => {
     e.preventDefault();

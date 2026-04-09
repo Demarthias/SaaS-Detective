@@ -124,11 +124,17 @@ async function initLicense() {
       btn.style.color = '';
       statusEl.textContent = 'License removed.';
       statusEl.style.color = '#475569';
+      // Re-attach activation listener so user can immediately re-enter a key
+      attachActivationListener(input, btn, statusEl);
     }, { once: true });
 
     return;
   }
 
+  attachActivationListener(input, btn, statusEl);
+}
+
+function attachActivationListener(input, btn, statusEl) {
   btn.addEventListener('click', async () => {
     const key = input.value.trim();
     if (!key) return;
@@ -177,7 +183,7 @@ async function initLicense() {
       btn.textContent = 'Activate';
       btn.disabled = false;
     }
-  });
+  }, { once: true });
 }
 
 async function init() {
@@ -197,7 +203,7 @@ async function init() {
   });
 
   openPopupBtn.addEventListener('click', () => {
-    chrome.runtime.openOptionsPage ? window.open('popup.html', '_blank') : window.open('popup.html', '_blank');
+    window.open(chrome.runtime.getURL('popup.html'), '_blank');
   });
 }
 
