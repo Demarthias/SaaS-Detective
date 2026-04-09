@@ -33,6 +33,20 @@ const DEFAULT_OPTIONS = {
     'Icons': true,
     'Fonts': true,
     'Comments': true,
+    'Scheduling': true,
+    'Video': true,
+    'Forms': true,
+    'A/B Testing': true,
+    'Automation': true,
+    'Maps': true,
+    'Reviews': true,
+    'Referral': true,
+    'Sales Intelligence': true,
+    'Customer Success': true,
+    'Search': true,
+    'Communications': true,
+    'Courses': true,
+    'Community': true,
   },
 };
 
@@ -74,86 +88,95 @@ function renderCategories(container, options) {
 }
 
 const VALIDATE_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/validate';
+const LICENSE_TTL_MS = 48 * 60 * 60 * 1000;    // 48 hours before re-validation needed
+const LICENSE_GRACE_MS = 7 * 24 * 60 * 60 * 1000; // 7 day grace if server unreachable
 
-async function validateLicenseKey(key) {
-  const res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`);
-  return res.json();
-}
-
-async function loadLicense() {
-  const { sd_license } = await chrome.storage.sync.get({ sd_license: null });
-  return sd_license;
-}
-
-async function saveLicense(data) {
-  await chrome.storage.sync.set({ sd_license: data });
-}
-
-async function removeLicense() {
-  await chrome.storage.sync.remove('sd_license');
-}
-
-function setLicenseStatus(msg, isValid) {
-  const el = document.getElementById('licenseStatus');
-  el.textContent = msg;
-  el.className = 'license-status' + (isValid === true ? ' valid' : isValid === false ? ' invalid' : '');
+function isLicenseCurrentlyValid(lic) {
+  if (!lic || !lic.valid || !lic.validated_at) return false;
+  const grace = Date.now() < lic.validated_at + LICENSE_TTL_MS + LICENSE_GRACE_MS;
+  return grace;
 }
 
 async function initLicense() {
-  const keyInput = document.getElementById('licenseKey');
-  const activateBtn = document.getElementById('activateBtn');
-  const removeBtn = document.getElementById('removeBtn');
-  const proBadge = document.getElementById('proBadge');
+  const input = document.getElementById('license-input');
+  const btn = document.getElementById('activate-btn');
+  const statusEl = document.getElementById('license-status');
 
-  const existing = await loadLicense();
-  if (existing?.valid) {
-    keyInput.value = existing.key;
-    keyInput.disabled = true;
-    activateBtn.style.display = 'none';
-    removeBtn.style.display = '';
-    proBadge.style.display = '';
-    setLicenseStatus(`Active — ${existing.plan} plan (${existing.email})`, true);
+  const { sd_license } = await chrome.storage.sync.get({ sd_license: null });
+
+  if (isLicenseCurrentlyValid(sd_license)) {
+    input.value = sd_license.key || '';
+    input.disabled = true;
+    btn.textContent = 'Remove';
+    btn.style.background = '#e2e8f0';
+    btn.style.color = '#0f172a';
+    const plan = sd_license.plan ? ` · ${sd_license.plan}` : '';
+    const email = sd_license.email ? ` (${sd_license.email})` : '';
+    statusEl.textContent = `✓ License active${plan}${email}`;
+    statusEl.style.color = '#16a34a';
+
+    btn.addEventListener('click', async () => {
+      await chrome.storage.sync.remove('sd_license');
+      input.value = '';
+      input.disabled = false;
+      btn.textContent = 'Activate';
+      btn.style.background = '';
+      btn.style.color = '';
+      statusEl.textContent = 'License removed.';
+      statusEl.style.color = '#475569';
+    }, { once: true });
+
+    return;
   }
 
-  activateBtn.addEventListener('click', async () => {
-    const key = keyInput.value.trim();
-    if (!key) {
-      setLicenseStatus('Please enter a license key.', false);
-      return;
-    }
-    activateBtn.textContent = 'Checking...';
-    activateBtn.disabled = true;
-    try {
-      const result = await validateLicenseKey(key);
-      if (result.valid) {
-        await saveLicense({ key, valid: true, plan: result.plan, email: result.email });
-        keyInput.disabled = true;
-        activateBtn.style.display = 'none';
-        removeBtn.style.display = '';
-        proBadge.style.display = '';
-        setLicenseStatus(`Active — ${result.plan} plan (${result.email})`, true);
-      } else {
-        setLicenseStatus('Invalid or inactive key. Please check and try again.', false);
-        activateBtn.textContent = 'Activate';
-        activateBtn.disabled = false;
-      }
-    } catch {
-      setLicenseStatus('Could not reach license server. Check your connection.', false);
-      activateBtn.textContent = 'Activate';
-      activateBtn.disabled = false;
-    }
-  });
+  btn.addEventListener('click', async () => {
+    const key = input.value.trim();
+    if (!key) return;
 
-  removeBtn.addEventListener('click', async () => {
-    await removeLicense();
-    keyInput.value = '';
-    keyInput.disabled = false;
-    activateBtn.style.display = '';
-    activateBtn.textContent = 'Activate';
-    activateBtn.disabled = false;
-    removeBtn.style.display = 'none';
-    proBadge.style.display = 'none';
-    setLicenseStatus('License removed.', null);
+    btn.textContent = 'Checking...';
+    btn.disabled = true;
+    statusEl.textContent = '';
+    statusEl.style.color = '#475569';
+
+    try {
+      const res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, {
+        cache: 'no-store',
+      });
+
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+      const data = await res.json();
+
+      if (data.valid) {
+        const licenseData = {
+          key,
+          valid: true,
+          plan: data.plan || 'Pro',
+          email: data.email || '',
+          validated_at: Date.now(),
+        };
+        await chrome.storage.sync.set({ sd_license: licenseData });
+        const plan = licenseData.plan ? ` · ${licenseData.plan}` : '';
+        const email = licenseData.email ? ` (${licenseData.email})` : '';
+        statusEl.textContent = `✓ License activated${plan}${email}`;
+        statusEl.style.color = '#16a34a';
+        input.disabled = true;
+        btn.textContent = 'Remove';
+        btn.style.background = '#e2e8f0';
+        btn.style.color = '#0f172a';
+        btn.disabled = false;
+      } else {
+        statusEl.textContent = '✗ Invalid or expired license key.';
+        statusEl.style.color = '#dc2626';
+        btn.textContent = 'Activate';
+        btn.disabled = false;
+      }
+    } catch (e) {
+      statusEl.textContent = '✗ Could not reach license server. Check your connection and try again.';
+      statusEl.style.color = '#dc2626';
+      btn.textContent = 'Activate';
+      btn.disabled = false;
+    }
   });
 }
 
@@ -165,7 +188,6 @@ async function init() {
   let options = await loadOptions();
 
   renderCategories(container, options);
-  await initLicense();
 
   resetBtn.addEventListener('click', async () => {
     options = JSON.parse(JSON.stringify(DEFAULT_OPTIONS));
@@ -179,4 +201,4 @@ async function init() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => { init(); initLicense(); });

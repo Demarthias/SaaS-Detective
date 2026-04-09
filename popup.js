@@ -1,126 +1,152 @@
-const FREE_TOOL_LIMIT = 5;
-const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/test_eVqbJ1g5m3Gm2X97uJ9fW01'; // Monthly $8.99/mo
-const WORKER_URL = 'https://saas-detective-license.YOUR_SUBDOMAIN.workers.dev'; // Replace after deploying worker
+(()=>{"use strict";
 
-let affiliateTable = {};
-let sdOptions = {};
-
-async function loadOptions() {
-  const DEFAULT_OPTIONS = {};
-  const { sd_options } = await chrome.storage.sync.get({ sd_options: DEFAULT_OPTIONS });
-  sdOptions = { ...DEFAULT_OPTIONS, ...(sd_options || {}) };
-}
-
-async function loadAffiliates() {
+async function trackEvent(name, params = {}) {
   try {
-    const response = await fetch(chrome.runtime.getURL('affiliates.json'));
-    affiliateTable = await response.json();
-  } catch (_) {
-    affiliateTable = {};
-  }
-}
-
-async function checkProStatus() {
-  const { sd_license: key, sd_pro_cache: cache } = await chrome.storage.sync.get({
-    sd_license: null,
-    sd_pro_cache: 0,
-  });
-  if (!key) return false;
-  if (cache > Date.now()) return true;
-  try {
-    const resp = await fetch(`${WORKER_URL}/validate`, {
+    let clientId = (await chrome.storage.local.get('ga_client_id')).ga_client_id;
+    if (!clientId) {
+      clientId = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
+      await chrome.storage.local.set({ ga_client_id: clientId });
+    }
+    await fetch('https://saas-detective-licensing.kubegrayson.workers.dev/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key }),
+      body: JSON.stringify({ client_id: clientId, events: [{ name, params }] }),
     });
-    const data = await resp.json();
-    if (data.valid) {
-      await chrome.storage.sync.set({ sd_pro_cache: Date.now() + 86400000 });
-      return true;
-    }
   } catch (_) {}
-  return false;
 }
 
-function resolveLink(toolName, fallbackLink) {
+let affiliateTable = {};
+
+function resolveLink(toolName, fallback) {
   const entry = affiliateTable[toolName];
-  if (entry && entry.status === 'active') {
-    return entry.url;
-  }
-  if (fallbackLink && fallbackLink !== '#') {
-    return fallbackLink;
-  }
-  return `https://www.google.com/search?q=${encodeURIComponent(toolName)}`;
+  if (entry && entry.status === 'active') return entry.url;
+  if (fallback && fallback !== '#') return fallback;
+  return `https://www.google.com/search?q=${encodeURIComponent(toolName + ' software')}`;
 }
 
-function setStatus(message, isError = false) {
-  const statusEl = document.getElementById('status');
-  statusEl.textContent = message;
-  statusEl.classList.toggle('error', Boolean(isError));
+function setStatus(msg, isError = false) {
+  const el = document.getElementById('status');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.toggle('error', Boolean(isError));
 }
 
-function renderTools(tools, isPro) {
+function renderTools(tools, locked = 0) {
   const resultsEl = document.getElementById('results');
+  if (!resultsEl) return;
   resultsEl.innerHTML = '';
 
   if (!tools || tools.length === 0) {
     resultsEl.innerHTML = '<div class="empty">No common SaaS tools detected on this page.</div>';
+    if (locked > 0) appendUpgradeBanner(resultsEl, locked);
     return;
   }
 
-  const visibleTools = isPro ? tools : tools.slice(0, FREE_TOOL_LIMIT);
-  const hiddenCount = isPro ? 0 : Math.max(0, tools.length - visibleTools.length);
+  // Group by category
+  const groups = new Map();
+  for (const tool of tools) {
+    if (!groups.has(tool.category)) groups.set(tool.category, []);
+    groups.get(tool.category).push(tool);
+  }
+
   const fragment = document.createDocumentFragment();
 
-  visibleTools.forEach(tool => {
-    const card = document.createElement('div');
-    card.className = 'card';
+  for (const [cat, catTools] of groups) {
+    const header = document.createElement('div');
+    header.className = 'category-header';
+    header.textContent = `${cat} · ${catTools.length}`;
+    fragment.appendChild(header);
 
-    const info = document.createElement('div');
-    const name = document.createElement('h4');
-    name.textContent = tool.name;
-    const category = document.createElement('div');
-    category.className = 'category';
-    category.textContent = tool.category;
-    info.appendChild(name);
-    info.appendChild(category);
+    for (const tool of catTools) {
+      const card = document.createElement('div');
+      card.className = 'card';
 
-    const link = resolveLink(tool.name, tool.link);
-    const button = document.createElement('button');
-    button.className = 'visit-btn';
-    button.textContent = 'Visit';
-    button.addEventListener('click', () => {
-      chrome.tabs.create({ url: link });
-    });
+      const info = document.createElement('div');
+      info.className = 'card-info';
 
-    card.appendChild(info);
-    card.appendChild(button);
-    fragment.appendChild(card);
-  });
+      const name = document.createElement('h4');
+      name.textContent = tool.name;
+      info.appendChild(name);
 
-  if (hiddenCount > 0) {
-    const banner = document.createElement('div');
-    banner.className = 'upgrade-banner';
-    banner.innerHTML = `
-      <div class="upgrade-count">+${hiddenCount} more tool${hiddenCount > 1 ? 's' : ''} detected</div>
-      <div class="upgrade-sub">Upgrade to Pro to unlock all detections</div>
-      <button class="upgrade-btn" id="upgradeBtn">Upgrade to Pro &mdash; $4.99/mo</button>
-    `;
-    fragment.appendChild(banner);
+      if (tool.description) {
+        const desc = document.createElement('div');
+        desc.className = 'tool-description';
+        desc.textContent = tool.description;
+        info.appendChild(desc);
+      }
+
+      if (tool.alternatives && tool.alternatives.length > 0) {
+        const altRow = document.createElement('div');
+        altRow.className = 'alternatives';
+        const altLabel = document.createElement('span');
+        altLabel.className = 'alt-label';
+        altLabel.textContent = 'vs:';
+        altRow.appendChild(altLabel);
+        for (const alt of tool.alternatives) {
+          const chip = document.createElement('button');
+          chip.className = 'alt-chip';
+          chip.textContent = alt;
+          chip.title = `Open ${alt}`;
+          chip.addEventListener('click', (e) => {
+            e.stopPropagation();
+            chrome.tabs.create({ url: resolveLink(alt) });
+            trackEvent('alternative_clicked', { from_tool: tool.name, to_tool: alt });
+          });
+          altRow.appendChild(chip);
+        }
+        info.appendChild(altRow);
+      }
+
+      const link = resolveLink(tool.name);
+      const btn = document.createElement('button');
+      btn.className = 'visit-btn';
+      btn.textContent = 'Visit';
+      btn.addEventListener('click', () => {
+        chrome.tabs.create({ url: link });
+        trackEvent('tool_visit_clicked', { tool: tool.name });
+      });
+
+      card.appendChild(info);
+      card.appendChild(btn);
+      fragment.appendChild(card);
+    }
   }
 
   resultsEl.appendChild(fragment);
+  if (locked > 0) appendUpgradeBanner(resultsEl, locked);
+}
 
-  document.getElementById('upgradeBtn')?.addEventListener('click', () => {
-    chrome.tabs.create({ url: STRIPE_PAYMENT_LINK });
+function appendUpgradeBanner(container, locked) {
+  const banner = document.createElement('div');
+  banner.className = 'upgrade-banner';
+
+  const count = document.createElement('div');
+  count.className = 'upgrade-count';
+  count.textContent = `+${locked} more tool${locked !== 1 ? 's' : ''} detected`;
+
+  const sub = document.createElement('div');
+  sub.className = 'upgrade-sub';
+  sub.textContent = 'Upgrade to Pro to reveal all 200+ signatures';
+
+  const btn = document.createElement('button');
+  btn.className = 'upgrade-btn';
+  btn.textContent = 'Upgrade — from $7.99/mo';
+  btn.addEventListener('click', () => {
+    trackEvent('upgrade_clicked', { location: 'popup_banner' });
+    chrome.tabs.create({ url: 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00' });
   });
+
+  banner.appendChild(count);
+  banner.appendChild(sub);
+  banner.appendChild(btn);
+  container.appendChild(banner);
 }
 
 function sendMessageToTab(tabId) {
   return new Promise((resolve, reject) => {
-    chrome.tabs.sendMessage(tabId, { action: 'SCAN_PAGE' }, response => {
+    chrome.tabs.sendMessage(tabId, { action: 'SCAN_PAGE' }, (response) => {
       if (chrome.runtime.lastError || !response) {
-        reject(chrome.runtime.lastError || new Error('No response from content script'));
+        reject(chrome.runtime.lastError || new Error('No response'));
         return;
       }
       resolve(response);
@@ -131,53 +157,79 @@ function sendMessageToTab(tabId) {
 async function sendScan(tabId) {
   try {
     return await sendMessageToTab(tabId);
-  } catch (error) {
+  } catch (e) {
     if (chrome.scripting?.executeScript) {
-      await chrome.scripting.executeScript({ target: { tabId }, files: ['dist/content.js'] });
+      await chrome.scripting.executeScript({ target: { tabId }, files: ['content.js'] });
       return await sendMessageToTab(tabId);
     }
-    throw error;
+    throw e;
   }
 }
 
-function isHttpUrl(url) {
-  return Boolean(url && (url.startsWith('http://') || url.startsWith('https://')));
+const SCAN_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function getCachedScan(url) {
+  const key = `sd_scan_${url}`;
+  const result = await chrome.storage.local.get(key);
+  const cached = result[key];
+  if (cached && Date.now() - cached.ts < SCAN_CACHE_TTL) return cached.data;
+  return null;
+}
+
+async function setCachedScan(url, data) {
+  const key = `sd_scan_${url}`;
+  await chrome.storage.local.set({ [key]: { ts: Date.now(), data } });
 }
 
 async function scanPage() {
   setStatus('Scanning current tab...');
   const resultsEl = document.getElementById('results');
-  resultsEl.innerHTML = '';
+  if (resultsEl) resultsEl.innerHTML = '';
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-  if (!tab || !isHttpUrl(tab.url)) {
+  if (!tab || !tab.url || (!tab.url.startsWith('http://') && !tab.url.startsWith('https://'))) {
     setStatus('Open a website tab to scan.', true);
     return;
   }
 
+  const cached = await getCachedScan(tab.url);
+  if (cached) {
+    renderTools(cached.tools, cached.locked);
+    setStatus('Scan complete.');
+    return;
+  }
+
   try {
-    const [response, isPro] = await Promise.all([sendScan(tab.id), checkProStatus()]);
+    const response = await sendScan(tab.id);
     const tools = response.tools || [];
-    renderTools(tools, isPro);
-    setStatus(tools.length ? 'Scan complete.' : 'Scan complete. Nothing detected.');
+    const locked = response.locked || 0;
+    renderTools(tools, locked);
+    setStatus(tools.length || locked ? 'Scan complete.' : 'Scan complete. Nothing detected.');
+    await setCachedScan(tab.url, { tools, locked });
+    trackEvent('scan_complete', { tools_detected: tools.length, tools_locked: locked });
   } catch (_) {
     setStatus('Unable to scan this page. Please refresh and try again.', true);
   }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await loadOptions();
-  await loadAffiliates();
+  // load affiliates
+  try {
+    const r = await fetch(chrome.runtime.getURL('affiliates.json'));
+    affiliateTable = await r.json();
+  } catch (_) { affiliateTable = {}; }
+
+  trackEvent('popup_opened');
   scanPage();
 
   document.getElementById('onboardingLink')?.addEventListener('click', (e) => {
     e.preventDefault();
     chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });
   });
-
   document.getElementById('optionsLink')?.addEventListener('click', (e) => {
     e.preventDefault();
     chrome.runtime.openOptionsPage();
   });
 });
+
+})();
