@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaaS Detective</title>
+  <style>
+    :root { --bg: #0f172a; --card: #ffffff; --text: #0f172a; --muted: #6b7280; --accent: #2563eb; --border: #e5e7eb; }
+    * { box-sizing: border-box; }
+    body { width: 360px; font-family: -apple-system, system-ui, sans-serif; padding: 0; margin: 0; background: #f8fafc; color: var(--text); }
+
+    .header { background: var(--bg); color: #fff; padding: 14px 16px; }
+    .header h1 { margin: 0; font-size: 16px; font-weight: 700; }
+    .header p { margin: 4px 0 0; font-size: 11px; opacity: 0.65; }
+
+    #status { margin: 8px 16px 0; font-size: 12px; color: var(--muted); }
+    #status.error { color: #b91c1c; }
+
+    #results { padding: 8px 16px 8px; min-height: 120px; max-height: 480px; overflow-y: auto; }
+
+    .category-header {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #94a3b8;
+      padding: 10px 0 4px; border-bottom: 1px solid #f1f5f9; margin-bottom: 4px;
+    }
+
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      padding: 10px 12px; margin-bottom: 6px; border-radius: 8px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .card-info { flex: 1; min-width: 0; }
+    .card h4 { margin: 0; font-size: 13px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .tool-description { font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+
+    .alternatives { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 6px; }
+    .alt-label { font-size: 10px; color: #9ca3af; font-weight: 600; flex-shrink: 0; }
+    .alt-chip {
+      font-size: 10px; background: #f1f5f9; color: #475569;
+      border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: 99px;
+      cursor: pointer; font-family: inherit; white-space: nowrap;
+    }
+    .alt-chip:hover { background: #e2e8f0; color: #1e293b; }
+
+    .visit-btn {
+      background: var(--accent); color: #fff; border: none;
+      padding: 6px 10px; border-radius: 6px; font-size: 11px;
+      cursor: pointer; font-weight: 600; font-family: inherit;
+      flex-shrink: 0; align-self: flex-start; margin-top: 1px;
+    }
+    .visit-btn:hover { background: #1d4ed8; }
+
+    .empty { text-align: center; color: var(--muted); font-size: 13px; margin-top: 24px; }
+
+    .upgrade-banner { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-top: 8px; text-align: center; }
+    .upgrade-count { font-size: 13px; font-weight: 700; color: #1e40af; }
+    .upgrade-sub { font-size: 11px; color: #3b82f6; margin: 3px 0 8px; }
+    .upgrade-btn { background: #2563eb; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%; font-family: inherit; }
+    .upgrade-btn:hover { background: #1d4ed8; }
+
+    .footer { padding: 10px 12px 12px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid var(--border); background: #fff; }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <h1>SaaS Detective</h1>
+      <p>200+ signatures across 25+ categories</p>
+    </div>
+    <button id="rescanBtn" title="Rescan page" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:18px;padding:4px 0 4px 8px;line-height:1;flex-shrink:0;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">↻</button>
+  </div>
+
+  <div id="status"></div>
+  <div id="results">
+    <div class="empty">Initializing...</div>
+  </div>
+
+  <div class="footer">
+    Powered by Venom Industries LLC
+    <div title="We may earn a commission from partner links." style="cursor:help;margin-top:4px;">ⓘ Affiliate Disclosure</div>
+    <div style="margin-top:6px;">
+      <a href="#" id="onboardingLink">How it works</a> ·
+      <a href="#" id="optionsLink">Options</a> ·
+      <a href="privacy.html" target="_blank">Privacy</a>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

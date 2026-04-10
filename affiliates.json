@@ -1,0 +1,272 @@
+{
+  "Shopify": {
+    "status": "active",
+    "url": "https://shopify.pxf.io/c/saasdetective",
+    "program": "Impact Radius",
+    "notes": "Replace saasdetective with your Impact publisher ID"
+  },
+  "BigCommerce": {
+    "status": "active",
+    "url": "https://www.bigcommerce.com/essentials/?ref=saasdetective",
+    "program": "Impact",
+    "notes": "Replace ref value with your Impact affiliate ID"
+  },
+  "WooCommerce": {
+    "status": "active",
+    "url": "https://woocommerce.com/?aff=saasdetective",
+    "program": "WooCommerce Affiliate",
+    "notes": "Sign up at woocommerce.com/affiliate-program"
+  },
+  "WordPress": {
+    "status": "active",
+    "url": "https://wordpress.com/refer-a-friend/saasdetective",
+    "program": "WordPress.com Referral",
+    "notes": "Replace with your actual WP.com referral code"
+  },
+  "Wix": {
+    "status": "active",
+    "url": "https://www.wix.com/upgrade/website?utm_source=affiliate&utm_medium=affiliates&utm_campaign=INT_Affiliatly_saasdetective",
+    "program": "Wix Affiliate",
+    "notes": "Sign up at support.wix.com/en/article/wix-affiliate-program"
+  },
+  "Squarespace": {
+    "status": "active",
+    "url": "https://squarespace.com/?channel=affiliate&subchannel=saasdetective",
+    "program": "Impact",
+    "notes": "Replace with your Impact affiliate link for Squarespace"
+  },
+  "Webflow": {
+    "status": "active",
+    "url": "https://webflow.com?r=saasdetective",
+    "program": "Webflow Affiliate",
+    "notes": "Sign up at webflow.com/affiliates"
+  },
+  "Framer": {
+    "status": "active",
+    "url": "https://www.framer.com/?via=saasdetective",
+    "program": "Framer Referral",
+    "notes": "Sign up at framer.com/referral"
+  },
+  "Bubble": {
+    "status": "active",
+    "url": "https://bubble.io/?ref=saasdetective",
+    "program": "Bubble Affiliate",
+    "notes": "Sign up at bubble.io/partner"
+  },
+  "Ghost": {
+    "status": "active",
+    "url": "https://ghost.org/?ref=saasdetective",
+    "program": "Ghost Affiliate",
+    "notes": "Ghost Pro referral — sign up at ghost.org/partners"
+  },
+  "HubSpot": {
+    "status": "ineligible",
+    "url": "https://hubspot.sjv.io/saasdetective",
+    "program": "Impact (HubSpot)",
+    "notes": "Extensions do not qualify as a promotion channel. Newsletter with 1000+ subscribers required. Revisit when newsletter threshold is met."
+  },
+  "Pipedrive": {
+    "status": "active",
+    "url": "https://www.pipedrive.com/en/partners?ref=saasdetective",
+    "program": "Pipedrive Affiliate",
+    "notes": "Sign up at pipedrive.com/en/partners — no traffic minimums, extension-friendly"
+  },
+  "Close CRM": {
+    "status": "active",
+    "url": "https://close.com/partners/?ref=saasdetective",
+    "program": "Close Affiliate Program",
+    "notes": "Sign up at close.com/partners — startup-focused, strong commissions"
+  },
+  "Monday.com": {
+    "status": "active",
+    "url": "https://monday.com/affiliates/?ref=saasdetective",
+    "program": "Monday.com Affiliate",
+    "notes": "Sign up at monday.com/affiliates — high commissions, broad appeal, no extension restrictions"
+  },
+  "Mailchimp": {
+    "status": "active",
+    "url": "https://mailchimp.com/?ref=saasdetective",
+    "program": "Mailchimp Partner",
+    "notes": "Intuit/Mailchimp partner program at mailchimp.com/about/partners"
+  },
+  "Klaviyo": {
+    "status": "active",
+    "url": "https://www.klaviyo.com/partner/signup?utm_source=partner&utm_medium=affiliate&utm_campaign=saasdetective",
+    "program": "Klaviyo Partner",
+    "notes": "Klaviyo Solutions Partner at klaviyo.com/partners"
+  },
+  "ActiveCampaign": {
+    "status": "active",
+    "url": "https://www.activecampaign.com/?_r=saasdetective",
+    "program": "ActiveCampaign Affiliate",
+    "notes": "Sign up at activecampaign.com/affiliate"
+  },
+  "ConvertKit": {
+    "status": "active",
+    "url": "https://partners.kit.com/fa2gudf11pfj",
+    "program": "ConvertKit (Kit) Affiliate",
+    "notes": "Approved 2026-04-10 via partners.kit.com"
+  },
+  "Drip": {
+    "status": "active",
+    "url": "https://www.getdrip.com/?ref=saasdetective",
+    "program": "Drip Affiliate",
+    "notes": "Sign up at getdrip.com/affiliate-program"
+  },
+  "Crisp": {
+    "status": "active",
+    "url": "https://crisp.chat/?aff=saasdetective",
+    "program": "Crisp Affiliate",
+    "notes": "Sign up at crisp.chat/en/affiliates"
+  },
+  "Olark": {
+    "status": "active",
+    "url": "https://www.olark.com/?ref=saasdetective",
+    "program": "ShareASale",
+    "notes": "Olark affiliate via ShareASale — replace with your ShareASale link"
+  },
+  "LiveChat": {
+    "status": "active",
+    "url": "https://www.livechat.com/?a=saasdetective&utm_source=PP",
+    "program": "LiveChat Partner",
+    "notes": "Sign up at partners.livechat.com"
+  },
+  "Tidio": {
+    "status": "active",
+    "url": "https://www.tidio.com/?ref=saasdetective",
+    "program": "Tidio Affiliate",
+    "notes": "Sign up at tidio.com/affiliate"
+  },
+  "Hotjar": {
+    "status": "active",
+    "url": "https://www.hotjar.com/?ref=saasdetective",
+    "program": "Hotjar Affiliate",
+    "notes": "Sign up at hotjar.com/affiliates"
+  },
+  "Crazy Egg": {
+    "status": "active",
+    "url": "https://www.shareasale.com/r.cfm?b=1662972&u=saasdetective&m=97846",
+    "program": "ShareASale",
+    "notes": "Replace u= with your ShareASale user ID"
+  },
+  "Paddle": {
+    "status": "active",
+    "url": "https://paddle.com/?ref=saasdetective",
+    "program": "Paddle Affiliate",
+    "notes": "Sign up at paddle.com/partners"
+  },
+  "Cookiebot": {
+    "status": "active",
+    "url": "https://www.cookiebot.com/en/partner/?ref=saasdetective",
+    "program": "Cookiebot Partner",
+    "notes": "Sign up at cookiebot.com/en/partner"
+  },
+  "Termly": {
+    "status": "active",
+    "url": "https://termly.io/?ref=saasdetective",
+    "program": "Termly Affiliate",
+    "notes": "Sign up at termly.io/affiliate-program"
+  },
+  "Intercom": {
+    "status": "active",
+    "url": "https://intercom.com/?ref=saasdetective",
+    "program": "Intercom Partner",
+    "notes": "Sign up at intercom.com/partner-program"
+  },
+  "Zendesk": {
+    "status": "active",
+    "url": "https://www.zendesk.com/partner/?ref=saasdetective",
+    "program": "Zendesk Partner",
+    "notes": "Sign up at zendesk.com/partner"
+  },
+  "Mixpanel": {
+    "status": "active",
+    "url": "https://mixpanel.com/?ref=saasdetective",
+    "program": "Mixpanel Partner",
+    "notes": "Sign up at mixpanel.com/partners"
+  },
+  "Amplitude": {
+    "status": "active",
+    "url": "https://amplitude.com/?ref=saasdetective",
+    "program": "Amplitude Partner",
+    "notes": "Sign up at amplitude.com/partners"
+  },
+  "Heap Analytics": {
+    "status": "active",
+    "url": "https://heap.io/?ref=saasdetective",
+    "program": "Heap Partner",
+    "notes": "Sign up at heap.io/partners"
+  },
+  "Freshchat": {
+    "status": "active",
+    "url": "https://www.freshworks.com/live-chat-software/?ref=saasdetective",
+    "program": "Freshworks Partner",
+    "notes": "Sign up at freshworks.com/partners"
+  },
+  "Stripe": {
+    "status": "active",
+    "url": "https://stripe.com/partners/become-a-partner?ref=saasdetective",
+    "program": "Stripe Partner Ecosystem",
+    "notes": "Sign up at stripe.com/partners — revenue share on referred accounts"
+  },
+  "Klarna": {
+    "status": "active",
+    "url": "https://www.klarna.com/us/business/become-a-partner/?ref=saasdetective",
+    "program": "Klarna Partner Program (Impact)",
+    "notes": "Sign up via klarna.com/us/business/become-a-partner — also available on Impact network"
+  },
+  "Tawk.to": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Tawk.to is a free product — no affiliate program exists."
+  },
+  "Drift": {
+    "status": "active",
+    "url": "https://www.salesloft.com/partners/?ref=saasdetective",
+    "program": "Salesloft (Drift) Partner Program",
+    "notes": "Drift acquired by Salesloft — sign up at salesloft.com/partners"
+  },
+  "Sentry": {
+    "status": "active",
+    "url": "https://sentry.io/partners/?ref=saasdetective",
+    "program": "Sentry Partner Program",
+    "notes": "Sign up at sentry.io/partners — revenue share on referred accounts"
+  },
+  "FullStory": {
+    "status": "active",
+    "url": "https://www.fullstory.com/partners/?ref=saasdetective",
+    "program": "FullStory Partner Program",
+    "notes": "Sign up at fullstory.com/partners — referral commissions on new accounts"
+  },
+  "LogRocket": {
+    "status": "active",
+    "url": "https://logrocket.com/?ref=saasdetective",
+    "program": "LogRocket Referral",
+    "notes": "Contact LogRocket at logrocket.com for partner/referral terms"
+  },
+  "OneSignal": {
+    "status": "active",
+    "url": "https://onesignal.com/partnerships?ref=saasdetective",
+    "program": "OneSignal Partnership Program",
+    "notes": "Sign up at onesignal.com/partnerships"
+  },
+  "Datadog": {
+    "status": "active",
+    "url": "https://www.datadoghq.com/partner/referral/?ref=saasdetective",
+    "program": "Datadog Partner Network",
+    "notes": "Sign up at datadoghq.com/partner — referral program for technology partners"
+  },
+  "New Relic": {
+    "status": "active",
+    "url": "https://newrelic.com/partners/referral?ref=saasdetective",
+    "program": "New Relic Partner Program",
+    "notes": "Sign up at newrelic.com/partners — referral credits/commission on new accounts"
+  },
+  "OneTrust": {
+    "status": "active",
+    "url": "https://www.onetrust.com/partners/?ref=saasdetective",
+    "program": "OneTrust Partner Program",
+    "notes": "Sign up at onetrust.com/partners — enterprise compliance tool, high ACV"
+  }
+}
