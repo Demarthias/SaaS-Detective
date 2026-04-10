@@ -1,0 +1,15 @@
+{
+  "name": "saas-detective",
+  "version": "1.0.2",
+  "scripts": {
+    "build": "webpack --mode production && cp src/popup.html dist/ && cp src/manifest.json dist/ && cp src/icon.png dist/",
+    "watch": "webpack --mode development --watch"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.36",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.0.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.0"
+  }
+}
