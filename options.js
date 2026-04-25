@@ -162,6 +162,11 @@ function attachActivationListener(input, btn, statusEl) {
           validated_at: Date.now(),
         };
         await chrome.storage.sync.set({ sd_license: licenseData });
+        // Google Analytics event for successful activation
+        try {
+          const { trackEvent } = await import('./src/analytics.js');
+          trackEvent('checkout_complete', { plan: licenseData.plan, email: licenseData.email });
+        } catch (_) {}
         const plan = licenseData.plan ? ` · ${licenseData.plan}` : '';
         const email = licenseData.email ? ` (${licenseData.email})` : '';
         statusEl.textContent = `✓ License activated${plan}${email}`;
