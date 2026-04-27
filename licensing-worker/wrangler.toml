@@ -1,0 +1,7 @@
+name = "saas-detective-licensing"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "LICENSES"
+id = "3b85fe4919d64050bd4a784dc0ac1a00"

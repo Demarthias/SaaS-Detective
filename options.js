@@ -164,8 +164,16 @@ function attachActivationListener(input, btn, statusEl) {
         await chrome.storage.sync.set({ sd_license: licenseData });
         // Google Analytics event for successful activation
         try {
-          const { trackEvent } = await import('./src/analytics.js');
-          trackEvent('checkout_complete', { plan: licenseData.plan, email: licenseData.email });
+          let clientId = (await chrome.storage.local.get('ga_client_id')).ga_client_id;
+          if (!clientId) {
+            clientId = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
+            await chrome.storage.local.set({ ga_client_id: clientId });
+          }
+          await fetch('https://saas-detective-licensing.kubegrayson.workers.dev/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ client_id: clientId, events: [{ name: 'checkout_complete', params: { plan: licenseData.plan, email: licenseData.email } }] }),
+          });
         } catch (_) {}
         const plan = licenseData.plan ? ` · ${licenseData.plan}` : '';
         const email = licenseData.email ? ` (${licenseData.email})` : '';

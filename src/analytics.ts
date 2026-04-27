@@ -1,5 +1,4 @@
-const GA_MEASUREMENT_ID = 'G-HVECKYG478';
-const GA_API_SECRET = 'kEY9SzVPS-OtwXuN-ofsEA';
+const TRACK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/track';
 
 async function getClientId(): Promise<string> {
   const result = await chrome.storage.local.get('ga_client_id');
@@ -13,12 +12,10 @@ async function getClientId(): Promise<string> {
 export async function trackEvent(name: string, params: Record<string, unknown> = {}): Promise<void> {
   try {
     const clientId = await getClientId();
-    await fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_API_SECRET}`, {
+    await fetch(TRACK_URL, {
       method: 'POST',
-      body: JSON.stringify({
-        client_id: clientId,
-        events: [{ name, params }],
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_id: clientId, events: [{ name, params }] }),
     });
   } catch (_) {
     // fail silently
