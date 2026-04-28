@@ -2,7 +2,7 @@
   "name": "saas-detective",
   "version": "1.0.2",
   "scripts": {
-    "build": "webpack --mode production && cp src/popup.html dist/ && cp src/manifest.json dist/ && cp src/icon.png dist/",
+    "build": "webpack --mode production && powershell -Command \"Copy-Item src/popup.html dist/; Copy-Item src/manifest.json dist/; Copy-Item src/icon.png dist/\"",
     "watch": "webpack --mode development --watch"
   },
   "devDependencies": {

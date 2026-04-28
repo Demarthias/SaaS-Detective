@@ -242,6 +242,21 @@ const signatures = [
 
   // --- ADDITIONAL COMMUNICATIONS ---
   {id:"slack",name:"Slack",category:"Communications",patterns:["slack.com/api/rtm","edge.slack.com","slack-msgs"],globalVar:[],description:"Business messaging and team collaboration platform",alternatives:["Microsoft Teams","Discord","Google Chat"]},
+
+  // --- ADDITIONAL SALES INTELLIGENCE ---
+  {id:"semrush",name:"Semrush",category:"Sales Intelligence",patterns:["cdn.semrush.com","semrush.com/swa","semrush.com/widget"],globalVar:[],description:"SEO, content marketing, and competitive intelligence platform",alternatives:["Ahrefs","Moz","SpyFu"]},
+
+  // --- ADDITIONAL NO-CODE ---
+  {id:"miro",name:"Miro",category:"No-Code",patterns:["miro.com/app/embed","cdn.miro.com","miro.com/embed"],globalVar:["miro"],description:"Online collaborative whiteboard platform for teams",alternatives:["Figma","Mural","Lucidchart"]},
+
+  // --- ADDITIONAL EMAIL ---
+  {id:"getresponse",name:"GetResponse",category:"Email",patterns:["app.getresponse.com","cdn.getresponse.com","gr-live.com","getresponse.com/js"],globalVar:[],description:"Email marketing, automation, and landing page platform",alternatives:["Mailchimp","ActiveCampaign","ConvertKit"]},
+
+  // --- ADDITIONAL HOSTING ---
+  {id:"netart",name:"netart",category:"Hosting",patterns:["netart.com/js","static.netart.com","netart.com/embed"],globalVar:[],description:"Web hosting, domains, and website builder platform",alternatives:["Hostinger","SiteGround","Bluehost"]},
+
+  // --- VPN ---
+  {id:"nordvpn",name:"NordVPN",category:"Security",patterns:["nordvpn.com/js","cdn.nordvpn.com","nordvpn.com/affiliate"],globalVar:[],description:"Leading VPN service for privacy and security",alternatives:["ExpressVPN","Surfshark","ProtonVPN"]},
 ];
 
 const DEFAULT_OPTIONS = {

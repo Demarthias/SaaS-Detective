@@ -1,9 +1,9 @@
 {
   "Shopify": {
     "status": "active",
-    "url": "https://shopify.pxf.io/c/saasdetective",
+    "url": "https://shopify.pxf.io/xJ21Dx",
     "program": "Impact Radius",
-    "notes": "Replace saasdetective with your Impact publisher ID"
+    "notes": "Real affiliate link — approved"
   },
   "BigCommerce": {
     "status": "active",
@@ -43,9 +43,9 @@
   },
   "Framer": {
     "status": "active",
-    "url": "https://www.framer.com/?via=saasdetective",
+    "url": "https://framer.com/join/grayson-s-Workspace--7cbAEkFSSV0ANG7vxzqG",
     "program": "Framer Referral",
-    "notes": "Sign up at framer.com/referral"
+    "notes": "Real referral link — approved 2026-04-28"
   },
   "Bubble": {
     "status": "active",
@@ -168,46 +168,46 @@
     "notes": "Sign up at termly.io/affiliate-program"
   },
   "Intercom": {
-    "status": "active",
-    "url": "https://intercom.com/?ref=saasdetective",
-    "program": "Intercom Partner",
-    "notes": "Sign up at intercom.com/partner-program"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "No public affiliate program — enterprise sales only."
   },
   "Zendesk": {
-    "status": "active",
-    "url": "https://www.zendesk.com/partner/?ref=saasdetective",
-    "program": "Zendesk Partner",
-    "notes": "Sign up at zendesk.com/partner"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "No public affiliate program — enterprise sales only."
   },
   "Mixpanel": {
-    "status": "active",
-    "url": "https://mixpanel.com/?ref=saasdetective",
-    "program": "Mixpanel Partner",
-    "notes": "Sign up at mixpanel.com/partners"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "No standard affiliate program."
   },
   "Amplitude": {
-    "status": "active",
-    "url": "https://amplitude.com/?ref=saasdetective",
-    "program": "Amplitude Partner",
-    "notes": "Sign up at amplitude.com/partners"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "No standard affiliate program."
   },
   "Heap Analytics": {
-    "status": "active",
-    "url": "https://heap.io/?ref=saasdetective",
-    "program": "Heap Partner",
-    "notes": "Sign up at heap.io/partners"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "No affiliate program."
   },
   "Freshchat": {
-    "status": "active",
-    "url": "https://www.freshworks.com/live-chat-software/?ref=saasdetective",
-    "program": "Freshworks Partner",
-    "notes": "Sign up at freshworks.com/partners"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "No affiliate program."
   },
   "Stripe": {
-    "status": "active",
-    "url": "https://stripe.com/partners/become-a-partner?ref=saasdetective",
-    "program": "Stripe Partner Ecosystem",
-    "notes": "Sign up at stripe.com/partners — revenue share on referred accounts"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "No affiliate program — partner program is agency/tech-only, no referral links."
   },
   "Klarna": {
     "status": "active",
@@ -222,28 +222,28 @@
     "notes": "Tawk.to is a free product — no affiliate program exists."
   },
   "Drift": {
-    "status": "active",
-    "url": "https://www.salesloft.com/partners/?ref=saasdetective",
-    "program": "Salesloft (Drift) Partner Program",
-    "notes": "Drift acquired by Salesloft — sign up at salesloft.com/partners"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Drift acquired by Salesloft — no affiliate program."
   },
   "Sentry": {
-    "status": "active",
-    "url": "https://sentry.io/partners/?ref=saasdetective",
-    "program": "Sentry Partner Program",
-    "notes": "Sign up at sentry.io/partners — revenue share on referred accounts"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "No affiliate program."
   },
   "FullStory": {
-    "status": "active",
-    "url": "https://www.fullstory.com/partners/?ref=saasdetective",
-    "program": "FullStory Partner Program",
-    "notes": "Sign up at fullstory.com/partners — referral commissions on new accounts"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only — no affiliate program."
   },
   "LogRocket": {
-    "status": "active",
-    "url": "https://logrocket.com/?ref=saasdetective",
-    "program": "LogRocket Referral",
-    "notes": "Contact LogRocket at logrocket.com for partner/referral terms"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "No affiliate program."
   },
   "OneSignal": {
     "status": "active",
@@ -252,21 +252,51 @@
     "notes": "Sign up at onesignal.com/partnerships"
   },
   "Datadog": {
-    "status": "active",
-    "url": "https://www.datadoghq.com/partner/referral/?ref=saasdetective",
-    "program": "Datadog Partner Network",
-    "notes": "Sign up at datadoghq.com/partner — referral program for technology partners"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only — no affiliate program."
   },
   "New Relic": {
-    "status": "active",
-    "url": "https://newrelic.com/partners/referral?ref=saasdetective",
-    "program": "New Relic Partner Program",
-    "notes": "Sign up at newrelic.com/partners — referral credits/commission on new accounts"
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only — no affiliate program."
   },
   "OneTrust": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only — no affiliate program."
+  },
+  "GetResponse": {
     "status": "active",
-    "url": "https://www.onetrust.com/partners/?ref=saasdetective",
-    "program": "OneTrust Partner Program",
-    "notes": "Sign up at onetrust.com/partners — enterprise compliance tool, high ACV"
+    "url": "https://www.kqzyfj.com/click-101717325-15733588",
+    "program": "CJ (Commission Junction)",
+    "notes": "Real CJ affiliate link — approved"
+  },
+  "netart": {
+    "status": "active",
+    "url": "https://www.kqzyfj.com/click-101717325-15853293",
+    "program": "CJ (Commission Junction)",
+    "notes": "Real CJ affiliate link — approved"
+  },
+  "NordVPN": {
+    "status": "active",
+    "url": "https://www.jdoqocy.com/click-101717325-13914989",
+    "program": "CJ (Commission Junction)",
+    "notes": "Real CJ affiliate link — approved"
+  },
+  "Semrush": {
+    "status": "active",
+    "url": "https://semrush.sjv.io/saasdetective",
+    "program": "Impact",
+    "notes": "Replace saasdetective with your Impact publisher ID"
+  },
+  "Miro": {
+    "status": "active",
+    "url": "https://miro.com/affiliate/saasdetective",
+    "program": "Impact",
+    "notes": "Replace saasdetective with your Impact publisher ID"
   }
 }
