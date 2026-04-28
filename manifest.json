@@ -3,6 +3,10 @@
   "name": "SaaS Detective",
   "version": "2.5.6",
   "description": "Instantly identify the tech stack and SaaS tools used by any website.",
+  "minimum_chrome_version": "102",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none';"
+  },
   "permissions": [
     "activeTab",
     "scripting",
@@ -28,14 +32,15 @@
   "options_page": "options.html",
   "web_accessible_resources": [
     {
-      "resources": ["affiliates.json", "onboarding.html", "privacy.html"],
+      "resources": ["onboarding.html", "privacy.html"],
       "matches": ["<all_urls>"]
     }
   ],
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ]
 }
