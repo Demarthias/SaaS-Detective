@@ -286,5 +286,17 @@
     "url": "https://www.jdoqocy.com/click-101717325-13914989",
     "program": "CJ (Commission Junction)",
     "notes": "Real CJ affiliate link — approved"
+  },
+  "Semrush": {
+    "status": "active",
+    "url": "https://semrush.sjv.io/saasdetective",
+    "program": "Impact",
+    "notes": "Replace saasdetective with your Impact publisher ID"
+  },
+  "Miro": {
+    "status": "active",
+    "url": "https://miro.com/affiliate/saasdetective",
+    "program": "Impact",
+    "notes": "Replace saasdetective with your Impact publisher ID"
   }
 }

@@ -243,6 +243,12 @@ const signatures = [
   // --- ADDITIONAL COMMUNICATIONS ---
   {id:"slack",name:"Slack",category:"Communications",patterns:["slack.com/api/rtm","edge.slack.com","slack-msgs"],globalVar:[],description:"Business messaging and team collaboration platform",alternatives:["Microsoft Teams","Discord","Google Chat"]},
 
+  // --- ADDITIONAL SALES INTELLIGENCE ---
+  {id:"semrush",name:"Semrush",category:"Sales Intelligence",patterns:["cdn.semrush.com","semrush.com/swa","semrush.com/widget"],globalVar:[],description:"SEO, content marketing, and competitive intelligence platform",alternatives:["Ahrefs","Moz","SpyFu"]},
+
+  // --- ADDITIONAL NO-CODE ---
+  {id:"miro",name:"Miro",category:"No-Code",patterns:["miro.com/app/embed","cdn.miro.com","miro.com/embed"],globalVar:["miro"],description:"Online collaborative whiteboard platform for teams",alternatives:["Figma","Mural","Lucidchart"]},
+
   // --- ADDITIONAL EMAIL ---
   {id:"getresponse",name:"GetResponse",category:"Email",patterns:["app.getresponse.com","cdn.getresponse.com","gr-live.com","getresponse.com/js"],globalVar:[],description:"Email marketing, automation, and landing page platform",alternatives:["Mailchimp","ActiveCampaign","ConvertKit"]},
 
