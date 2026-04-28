@@ -248,6 +248,9 @@ const signatures = [
 
   // --- ADDITIONAL HOSTING ---
   {id:"netart",name:"netart",category:"Hosting",patterns:["netart.com/js","static.netart.com","netart.com/embed"],globalVar:[],description:"Web hosting, domains, and website builder platform",alternatives:["Hostinger","SiteGround","Bluehost"]},
+
+  // --- VPN ---
+  {id:"nordvpn",name:"NordVPN",category:"Security",patterns:["nordvpn.com/js","cdn.nordvpn.com","nordvpn.com/affiliate"],globalVar:[],description:"Leading VPN service for privacy and security",alternatives:["ExpressVPN","Surfshark","ProtonVPN"]},
 ];
 
 const DEFAULT_OPTIONS = {
