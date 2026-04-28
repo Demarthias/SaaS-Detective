@@ -242,6 +242,12 @@ const signatures = [
 
   // --- ADDITIONAL COMMUNICATIONS ---
   {id:"slack",name:"Slack",category:"Communications",patterns:["slack.com/api/rtm","edge.slack.com","slack-msgs"],globalVar:[],description:"Business messaging and team collaboration platform",alternatives:["Microsoft Teams","Discord","Google Chat"]},
+
+  // --- ADDITIONAL EMAIL ---
+  {id:"getresponse",name:"GetResponse",category:"Email",patterns:["app.getresponse.com","cdn.getresponse.com","gr-live.com","getresponse.com/js"],globalVar:[],description:"Email marketing, automation, and landing page platform",alternatives:["Mailchimp","ActiveCampaign","ConvertKit"]},
+
+  // --- ADDITIONAL HOSTING ---
+  {id:"netart",name:"netart",category:"Hosting",patterns:["netart.com/js","static.netart.com","netart.com/embed"],globalVar:[],description:"Web hosting, domains, and website builder platform",alternatives:["Hostinger","SiteGround","Bluehost"]},
 ];
 
 const DEFAULT_OPTIONS = {
