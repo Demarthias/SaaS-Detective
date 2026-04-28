@@ -1,256 +1,151 @@
-(()=>{"use strict";
+(() => {
+(() => {
+    "use strict";
 
-async function trackEvent(name, params = {}) {
-  try {
-    let clientId = (await chrome.storage.local.get('ga_client_id')).ga_client_id;
-    if (!clientId) {
-      clientId = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
-      await chrome.storage.local.set({ ga_client_id: clientId });
+    const STRIPE_LINKS = {
+        'monthly': 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00',
+        '3mo': 'https://buy.stripe.com/your_3mo_id',
+        '6mo': 'https://buy.stripe.com/your_6mo_id',
+        'yearly': 'https://buy.stripe.com/your_yearly_id'
+    };
+
+    window.buy = function(plan) {
+        trackEvent('upgrade_clicked', { plan: plan });
+        const url = STRIPE_LINKS[plan] || STRIPE_LINKS['monthly'];
+        chrome.tabs.create({ url: url });
+    };
+
+    async function trackEvent(name, params = {}) {
+        try {
+            let clientId = (await chrome.storage.local.get('ga_client_id')).ga_client_id;
+            if (!clientId) {
+                clientId = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
+                await chrome.storage.local.set({ ga_client_id: clientId });
+            }
+            await fetch('https://saas-detective-licensing.kubegrayson.workers.dev/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ client_id: clientId, events: [{ name, params }] }),
+            });
+        } catch (_) {}
     }
-    await fetch('https://saas-detective-licensing.kubegrayson.workers.dev/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client_id: clientId, events: [{ name, params }] }),
-    });
-  } catch (_) {}
-}
 
-let affiliateTable = {};
+    let affiliateTable = {};
 
-function resolveLink(toolName) {
-  const entry = affiliateTable[toolName];
-  if (entry && entry.status === 'active') return entry.url;
-  return `https://www.google.com/search?q=${encodeURIComponent(toolName + ' software')}`;
-}
+    function resolveLink(toolName) {
+        const entry = affiliateTable[toolName];
+        if (entry && entry.status === 'active') return entry.url;
+        return `https://www.google.com/search?q=${encodeURIComponent(toolName + ' software')}`;
+    }
 
-function setStatus(msg, isError = false) {
-  const el = document.getElementById('status');
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.toggle('error', Boolean(isError));
-}
-
-function renderTools(tools, locked = 0) {
-  const resultsEl = document.getElementById('results');
-  if (!resultsEl) return;
-  resultsEl.innerHTML = '';
-
-  if (!tools || tools.length === 0) {
-    resultsEl.innerHTML = '<div class="empty">No common SaaS tools detected on this page.</div>';
-    if (locked > 0) appendUpgradeBanner(resultsEl, locked);
-    return;
-  }
-
-  // Group by category
-  const groups = new Map();
-  for (const tool of tools) {
-    if (!groups.has(tool.category)) groups.set(tool.category, []);
-    groups.get(tool.category).push(tool);
-  }
-
-  const fragment = document.createDocumentFragment();
-
-  for (const [cat, catTools] of groups) {
-    const header = document.createElement('div');
-    header.className = 'category-header';
-    header.textContent = `${cat} · ${catTools.length}`;
-    fragment.appendChild(header);
-
-    for (const tool of catTools) {
-      const card = document.createElement('div');
-      card.className = 'card';
-
-      const info = document.createElement('div');
-      info.className = 'card-info';
-
-      const name = document.createElement('h4');
-      name.textContent = tool.name;
-      info.appendChild(name);
-
-      if (tool.description) {
-        const desc = document.createElement('div');
-        desc.className = 'tool-description';
-        desc.textContent = tool.description;
-        info.appendChild(desc);
-      }
-
-      if (tool.alternatives && tool.alternatives.length > 0) {
-        const altRow = document.createElement('div');
-        altRow.className = 'alternatives';
-        const altLabel = document.createElement('span');
-        altLabel.className = 'alt-label';
-        altLabel.textContent = 'vs:';
-        altRow.appendChild(altLabel);
-        for (const alt of tool.alternatives) {
-          const chip = document.createElement('button');
-          chip.className = 'alt-chip';
-          chip.textContent = alt;
-          chip.title = `Open ${alt}`;
-          chip.addEventListener('click', (e) => {
-            e.stopPropagation();
-            chrome.tabs.create({ url: resolveLink(alt) });
-            trackEvent('alternative_clicked', { from_tool: tool.name, to_tool: alt });
-          });
-          altRow.appendChild(chip);
+    function setStatus(msg, isError = false) {
+        const el = document.getElementById('status');
+        if (el) {
+            el.textContent = msg;
+            el.classList.toggle('error', Boolean(isError));
         }
-        info.appendChild(altRow);
-      }
-
-      const link = resolveLink(tool.name);
-      const btn = document.createElement('button');
-      btn.className = 'visit-btn';
-      btn.textContent = 'Visit';
-      btn.addEventListener('click', () => {
-        chrome.tabs.create({ url: link });
-        trackEvent('tool_visit_clicked', { tool: tool.name });
-      });
-
-      card.appendChild(info);
-      card.appendChild(btn);
-      fragment.appendChild(card);
     }
-  }
 
-  resultsEl.appendChild(fragment);
-  if (locked > 0) appendUpgradeBanner(resultsEl, locked);
-}
+    function renderTools(tools, locked = 0) {
+        const resultsEl = document.getElementById('results');
+        const proTitle = document.getElementById('pro-title');
+        if (!resultsEl) return;
+        resultsEl.innerHTML = '';
 
-function appendUpgradeBanner(container, locked) {
-  const banner = document.createElement('div');
-  banner.className = 'upgrade-banner';
+        if (proTitle && locked > 0) {
+            proTitle.innerHTML = `🔓 Unlock ${locked} More Pro Insights`;
+        }
 
-  const count = document.createElement('div');
-  count.className = 'upgrade-count';
-  count.textContent = `+${locked} more tool${locked !== 1 ? 's' : ''} detected`;
+        if (!tools || tools.length === 0) {
+            resultsEl.innerHTML = '<div class="empty">No common SaaS tools detected on this page.</div>';
+            return;
+        }
 
-  const sub = document.createElement('div');
-  sub.className = 'upgrade-sub';
-  sub.textContent = 'Upgrade to Pro to reveal all 200+ signatures';
+        const groups = new Map();
+        for (const tool of tools) {
+            if (!groups.has(tool.category)) groups.set(tool.category, []);
+            groups.get(tool.category).push(tool);
+        }
 
-  const btn = document.createElement('button');
-  btn.className = 'upgrade-btn';
-  btn.textContent = 'Upgrade — from $7.99/mo';
-  btn.addEventListener('click', () => {
-    trackEvent('upgrade_clicked', { location: 'popup_banner' });
-    chrome.tabs.create({ url: 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00' });
-  });
+        const fragment = document.createDocumentFragment();
+        for (const [cat, catTools] of groups) {
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            header.textContent = `${cat} · ${catTools.length}`;
+            fragment.appendChild(header);
 
-  banner.appendChild(count);
-  banner.appendChild(sub);
-  banner.appendChild(btn);
-  container.appendChild(banner);
-}
+            for (const tool of catTools) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                let altsHtml = '';
+                if (tool.alternatives?.length > 0) {
+                    altsHtml = `<div class="alternatives"><span class="alt-label">vs:</span>`;
+                    tool.alternatives.forEach(alt => {
+                        altsHtml += `<button class="alt-chip" data-alt="${alt}">${alt}</button>`;
+                    });
+                    altsHtml += `</div>`;
+                }
 
-function sendMessageToTab(tabId) {
-  return new Promise((resolve, reject) => {
-    chrome.tabs.sendMessage(tabId, { action: 'SCAN_PAGE' }, (response) => {
-      if (chrome.runtime.lastError || !response) {
-        reject(chrome.runtime.lastError || new Error('No response'));
-        return;
-      }
-      resolve(response);
+                card.innerHTML = `
+                    <div class="card-info">
+                        <h4>${tool.name}</h4>
+                        <div class="tool-description">${tool.description || ''}</div>
+                        ${altsHtml}
+                    </div>
+                    <button class="visit-btn">Visit</button>
+                `;
+
+                card.querySelector('.visit-btn').onclick = () => {
+                    chrome.tabs.create({ url: resolveLink(tool.name) });
+                    trackEvent('tool_visit_clicked', { tool: tool.name });
+                };
+
+                card.querySelectorAll('.alt-chip').forEach(btn => {
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        const alt = btn.getAttribute('data-alt');
+                        chrome.tabs.create({ url: resolveLink(alt) });
+                        trackEvent('alternative_clicked', { from_tool: tool.name, to_tool: alt });
+                    };
+                });
+
+                fragment.appendChild(card);
+            }
+        }
+        resultsEl.appendChild(fragment);
+    }
+
+    async function scanPage() {
+        setStatus('Scanning current tab...');
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!tab?.url?.startsWith('http')) {
+            setStatus('Open a website to scan.', true);
+            return;
+        }
+
+        try {
+            const response = await chrome.tabs.sendMessage(tab.id, { action: 'SCAN_PAGE' }).catch(async () => {
+                await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
+                return chrome.tabs.sendMessage(tab.id, { action: 'SCAN_PAGE' });
+            });
+
+            renderTools(response.tools || [], response.locked || 0);
+            setStatus('Scan complete.');
+            trackEvent('scan_complete', { count: response.tools?.length });
+        } catch (e) {
+            setStatus('Scan failed. Refresh page.', true);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const r = await fetch(chrome.runtime.getURL('affiliates.json'));
+            affiliateTable = await r.json();
+        } catch (_) {}
+        scanPage();
+        
+        document.getElementById('onboardingLink')?.onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
+        document.getElementById('optionsLink')?.onclick = () => chrome.runtime.openOptionsPage();
     });
-  });
-}
-
-async function sendScan(tabId) {
-  try {
-    return await sendMessageToTab(tabId);
-  } catch (e) {
-    if (chrome.scripting?.executeScript) {
-      await chrome.scripting.executeScript({ target: { tabId }, files: ['content.js'] });
-      return await sendMessageToTab(tabId);
-    }
-    throw e;
-  }
-}
-
-const SCAN_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-function getCacheKey(url) {
-  try {
-    const u = new URL(url);
-    return `sd_scan_${u.origin}${u.pathname}`;
-  } catch (_) {
-    return `sd_scan_${url}`;
-  }
-}
-
-async function getCachedScan(url) {
-  const key = getCacheKey(url);
-  const result = await chrome.storage.local.get(key);
-  const cached = result[key];
-  if (cached && Date.now() - cached.ts < SCAN_CACHE_TTL) return cached.data;
-  return null;
-}
-
-async function setCachedScan(url, data) {
-  const key = getCacheKey(url);
-  const now = Date.now();
-  // Prune expired entries on every write
-  const all = await chrome.storage.local.get(null);
-  const toRemove = Object.keys(all).filter(k =>
-    k.startsWith('sd_scan_') && all[k]?.ts && now - all[k].ts > SCAN_CACHE_TTL
-  );
-  if (toRemove.length > 0) await chrome.storage.local.remove(toRemove);
-  await chrome.storage.local.set({ [key]: { ts: now, data } });
-}
-
-async function scanPage(forceRefresh = false) {
-  setStatus('Scanning current tab...');
-  const resultsEl = document.getElementById('results');
-  if (resultsEl) resultsEl.innerHTML = '';
-
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab || !tab.url || (!tab.url.startsWith('http://') && !tab.url.startsWith('https://'))) {
-    setStatus('Open a website tab to scan.', true);
-    return;
-  }
-
-  if (!forceRefresh) {
-    const cached = await getCachedScan(tab.url);
-    if (cached) {
-      renderTools(cached.tools, cached.locked);
-      setStatus('Scan complete.');
-      return;
-    }
-  }
-
-  try {
-    const response = await sendScan(tab.id);
-    const tools = response.tools || [];
-    const locked = response.locked || 0;
-    renderTools(tools, locked);
-    setStatus(tools.length || locked ? 'Scan complete.' : 'Scan complete. Nothing detected.');
-    await setCachedScan(tab.url, { tools, locked });
-    trackEvent('scan_complete', { tools_detected: tools.length, tools_locked: locked });
-  } catch (_) {
-    setStatus('Unable to scan this page. Please refresh and try again.', true);
-  }
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-  // load affiliates
-  try {
-    const r = await fetch(chrome.runtime.getURL('affiliates.json'));
-    affiliateTable = await r.json();
-  } catch (_) { affiliateTable = {}; }
-
-  trackEvent('popup_opened');
-  scanPage();
-
-  document.getElementById('rescanBtn')?.addEventListener('click', () => {
-    scanPage(true);
-  });
-
-  document.getElementById('onboardingLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });
-  });
-  document.getElementById('optionsLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    chrome.runtime.openOptionsPage();
-  });
-});
-
 })();
