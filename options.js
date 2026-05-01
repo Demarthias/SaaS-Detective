@@ -99,6 +99,7 @@ function renderCategories(container, options) {
     input.addEventListener('change', async () => {
       options.enabledCategories[cat] = input.checked;
       await saveOptions(options);
+      trackEvent('category_toggled', { category: cat, enabled: input.checked });
       setStatus('Saved');
     });
     const span = document.createElement('span');

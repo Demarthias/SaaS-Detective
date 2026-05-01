@@ -1,5 +1,4 @@
 (() => {
-(() => {
     "use strict";
 
     const STRIPE_LINKS = {
@@ -48,12 +47,18 @@
 
     function renderTools(tools, locked = 0) {
         const resultsEl = document.getElementById('results');
-        const proTitle = document.getElementById('pro-title');
         if (!resultsEl) return;
         resultsEl.innerHTML = '';
 
-        if (proTitle && locked > 0) {
-            proTitle.innerHTML = `🔓 Unlock ${locked} More Pro Insights`;
+        const banner = document.getElementById('upgrade-banner');
+        const bannerCount = document.getElementById('upgrade-count');
+        if (banner && bannerCount) {
+            if (locked > 0) {
+                bannerCount.textContent = `+${locked} pro tool${locked === 1 ? '' : 's'} hidden on this page`;
+                banner.style.display = '';
+            } else {
+                banner.style.display = 'none';
+            }
         }
 
         if (!tools || tools.length === 0) {
@@ -130,22 +135,35 @@
                 return chrome.tabs.sendMessage(tab.id, { action: 'SCAN_PAGE' });
             });
 
-            renderTools(response.tools || [], response.locked || 0);
-            setStatus('Scan complete.');
-            trackEvent('scan_complete', { count: response.tools?.length });
+            const toolCount = response.tools?.length ?? 0;
+            const lockedCount = response.locked ?? 0;
+            renderTools(response.tools || [], lockedCount);
+            setStatus(`${toolCount} tool${toolCount === 1 ? '' : 's'} detected.`);
+            trackEvent('scan_complete', { count: toolCount, locked: lockedCount });
         } catch (e) {
             setStatus('Scan failed. Refresh page.', true);
         }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+        trackEvent('popup_opened');
+
         try {
             const r = await fetch(chrome.runtime.getURL('affiliates.json'));
             affiliateTable = await r.json();
         } catch (_) {}
         scanPage();
-        
-        document.getElementById('onboardingLink')?.onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
-        document.getElementById('optionsLink')?.onclick = () => chrome.runtime.openOptionsPage();
+
+        document.getElementById('rescanBtn')?.addEventListener('click', () => {
+            trackEvent('rescan_clicked');
+            scanPage();
+        });
+
+        document.getElementById('onboardingLink')?.addEventListener('click', () => chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') }));
+        document.getElementById('optionsLink')?.addEventListener('click', () => chrome.runtime.openOptionsPage());
+        document.getElementById('upgradeBannerBtn')?.addEventListener('click', () => {
+            trackEvent('upgrade_clicked', { plan: 'monthly', location: 'popup_banner' });
+            chrome.tabs.create({ url: STRIPE_LINKS['monthly'] });
+        });
     });
 })();
