@@ -73,6 +73,7 @@ function renderTools(tools: Array<{ name: string; category: string; link?: strin
     button.className = 'visit-btn';
     button.textContent = 'Visit';
     button.addEventListener('click', () => {
+      trackEvent('tool_visit_clicked', { tool: tool.name, category: tool.category });
       chrome.tabs.create({ url: link });
     });
 
@@ -126,7 +127,7 @@ async function sendScan(
     if (chrome.scripting?.executeScript) {
       await chrome.scripting.executeScript({
         target: { tabId },
-        files: ['dist/content.js'],
+        files: ['content.js'],
       });
       return await sendMessageToTab(tabId);
     }
@@ -160,6 +161,7 @@ async function scanPage(): Promise<void> {
     setStatus(tools.length || locked ? 'Scan complete.' : 'Scan complete. Nothing detected.');
     trackEvent('scan_complete', { tools_detected: tools.length, tools_locked: locked });
   } catch (_) {
+    trackEvent('scan_error');
     setStatus('Unable to scan this page. Please refresh and try again.', true);
   }
 }

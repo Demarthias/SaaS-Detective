@@ -1,5 +1,27 @@
 // SaaS Detective Options
 
+const TRACK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/track';
+
+async function getClientId() {
+  let { ga_client_id } = await chrome.storage.local.get('ga_client_id');
+  if (!ga_client_id) {
+    ga_client_id = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
+    await chrome.storage.local.set({ ga_client_id });
+  }
+  return ga_client_id;
+}
+
+async function trackEvent(name, params = {}) {
+  try {
+    const client_id = await getClientId();
+    await fetch(TRACK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_id, events: [{ name, params }] }),
+    });
+  } catch (_) {}
+}
+
 const DEFAULT_OPTIONS = {
   enabledCategories: {
     'CMS': true,
@@ -116,6 +138,7 @@ async function initLicense() {
     statusEl.style.color = '#16a34a';
 
     btn.addEventListener('click', async () => {
+      trackEvent('license_removed', { plan: sd_license.plan || 'Pro' });
       await chrome.storage.sync.remove('sd_license');
       input.value = '';
       input.disabled = false;
@@ -139,6 +162,7 @@ function attachActivationListener(input, btn, statusEl) {
     const key = input.value.trim();
     if (!key) return;
 
+    trackEvent('license_activation_attempted');
     btn.textContent = 'Checking...';
     btn.disabled = true;
     statusEl.textContent = '';
@@ -162,19 +186,7 @@ function attachActivationListener(input, btn, statusEl) {
           validated_at: Date.now(),
         };
         await chrome.storage.sync.set({ sd_license: licenseData });
-        // Google Analytics event for successful activation
-        try {
-          let clientId = (await chrome.storage.local.get('ga_client_id')).ga_client_id;
-          if (!clientId) {
-            clientId = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
-            await chrome.storage.local.set({ ga_client_id: clientId });
-          }
-          await fetch('https://saas-detective-licensing.kubegrayson.workers.dev/track', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ client_id: clientId, events: [{ name: 'checkout_complete', params: { plan: licenseData.plan, email: licenseData.email } }] }),
-          });
-        } catch (_) {}
+        trackEvent('license_activated', { plan: licenseData.plan, email: licenseData.email });
         const plan = licenseData.plan ? ` · ${licenseData.plan}` : '';
         const email = licenseData.email ? ` (${licenseData.email})` : '';
         statusEl.textContent = `✓ License activated${plan}${email}`;
@@ -185,12 +197,14 @@ function attachActivationListener(input, btn, statusEl) {
         btn.style.color = '#0f172a';
         btn.disabled = false;
       } else {
+        trackEvent('license_activation_failed', { reason: 'invalid_key' });
         statusEl.textContent = '✗ Invalid or expired license key.';
         statusEl.style.color = '#dc2626';
         btn.textContent = 'Activate';
         btn.disabled = false;
       }
     } catch (e) {
+      trackEvent('license_activation_failed', { reason: 'server_error' });
       statusEl.textContent = '✗ Could not reach license server. Check your connection and try again.';
       statusEl.style.color = '#dc2626';
       btn.textContent = 'Activate';
@@ -200,9 +214,21 @@ function attachActivationListener(input, btn, statusEl) {
 }
 
 async function init() {
+  trackEvent('options_opened');
+
   const container = document.getElementById('category-list');
   const resetBtn = document.getElementById('reset');
   const openPopupBtn = document.getElementById('openPopup');
+
+  document.querySelectorAll('a[data-plan]').forEach(link => {
+    link.addEventListener('click', () => {
+      trackEvent('upgrade_clicked', {
+        location: 'options_pricing',
+        plan: link.dataset.plan,
+        price: link.dataset.price,
+      });
+    });
+  });
 
   let options = await loadOptions();
 

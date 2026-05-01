@@ -340,5 +340,35 @@
 
   </div>
 
+<script>
+  const TRACK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/track';
+
+  async function trackEvent(name, params = {}) {
+    try {
+      let { ga_client_id } = await chrome.storage.local.get('ga_client_id');
+      if (!ga_client_id) {
+        ga_client_id = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
+        await chrome.storage.local.set({ ga_client_id });
+      }
+      await fetch(TRACK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_id: ga_client_id, events: [{ name, params }] }),
+      });
+    } catch (_) {}
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    trackEvent('onboarding_viewed');
+
+    document.querySelector('.cta-btn')?.addEventListener('click', () => {
+      trackEvent('onboarding_cta_clicked', { cta: 'test_site' });
+    });
+
+    document.querySelector('.pro-link')?.addEventListener('click', () => {
+      trackEvent('onboarding_cta_clicked', { cta: 'learn_pro' });
+    });
+  });
+</script>
 </body>
 </html>
