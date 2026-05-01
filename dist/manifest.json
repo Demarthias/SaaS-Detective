@@ -1,13 +1,12 @@
 {
   "manifest_version": 3,
   "name": "SaaS Detective",
-  "version": "2.5.7",
+  "version": "2.5.8",
   "description": "Instantly identify the tech stack and SaaS tools used by any website.",
   "permissions": [
     "activeTab",
     "scripting",
-    "storage",
-    "alarms"
+    "storage"
   ],
   "host_permissions": [
     "http://*/*",
@@ -35,7 +34,8 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ]
 }

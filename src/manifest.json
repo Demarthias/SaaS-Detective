@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SaaS Detective",
-  "version": "2.5.7",
+  "version": "2.5.8",
   "description": "Instantly identify the tech stack and SaaS tools used by any website.",
   "permissions": [
     "activeTab",
@@ -25,10 +25,17 @@
     "128": "icons/icon128.png"
   },
   "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["affiliates.json", "onboarding.html", "privacy.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["dist/content.js"]
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ]
 }
