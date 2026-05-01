@@ -2,10 +2,10 @@
     "use strict";
 
     const STRIPE_LINKS = {
-        'monthly': 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00',
-        '3mo': 'https://buy.stripe.com/your_3mo_id',
-        '6mo': 'https://buy.stripe.com/your_6mo_id',
-        'yearly': 'https://buy.stripe.com/your_yearly_id'
+        'monthly':   'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00',
+        '3mo':       'https://buy.stripe.com/3cIdRb76e9l28aQcZ51Jm04',
+        '6mo':       'https://buy.stripe.com/6oU00lduC54M0Io5wD1Jm05',
+        'yearly':    'https://buy.stripe.com/8x2bJ3bmu8gYgHm1gn1Jm06'
     };
 
     window.buy = function(plan) {
