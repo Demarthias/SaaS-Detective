@@ -236,6 +236,7 @@ const signatures = [
 
   // --- ADDITIONAL CRM ---
   {id:"pipedrive",name:"Pipedrive",category:"CRM",patterns:["leadbooster-chat.pipedrive.com","pipedrive.com/js/analytics"],globalVar:["LeadBooster"],description:"Sales-focused CRM for small and mid-size teams",alternatives:["HubSpot","Salesforce","Close CRM"]},
+  {id:"closecrm",name:"Close CRM",category:"CRM",patterns:["close.com/embedded","app.close.com"],globalVar:["Close"],description:"Sales CRM built for high-velocity inside sales teams",alternatives:["Pipedrive","HubSpot","Salesforce"]},
 
   // --- ADDITIONAL AUTOMATION ---
   {id:"n8n",name:"n8n",category:"Automation",patterns:["n8n.io/embed","n8n.cloud/webhook"],globalVar:[],description:"Open-source workflow automation platform",alternatives:["Zapier","Make","Workato"]},
@@ -259,6 +260,8 @@ const signatures = [
   {id:"nordvpn",name:"NordVPN",category:"Security",patterns:["nordvpn.com/js","cdn.nordvpn.com","nordvpn.com/affiliate"],globalVar:[],description:"Leading VPN service for privacy and security",alternatives:["ExpressVPN","Surfshark","ProtonVPN"]},
 ];
 
+// SYNC REQUIRED: This must match DEFAULT_OPTIONS in options.js exactly.
+// Cannot use shared.js here — content scripts run in page context, not extension context.
 const DEFAULT_OPTIONS = {
   enabledCategories: {
     'CMS': true, 'E-Commerce': true, 'Builder': true, 'No-Code': true,

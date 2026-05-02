@@ -1,27 +1,8 @@
 // SaaS Detective Options
+// trackEvent, TRACK_URL, VALIDATE_URL, LICENSE_TTL_MS, LICENSE_GRACE_MS come from shared.js
 
-const TRACK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/track';
-
-async function getClientId() {
-  let { ga_client_id } = await chrome.storage.local.get('ga_client_id');
-  if (!ga_client_id) {
-    ga_client_id = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
-    await chrome.storage.local.set({ ga_client_id });
-  }
-  return ga_client_id;
-}
-
-async function trackEvent(name, params = {}) {
-  try {
-    const client_id = await getClientId();
-    await fetch(TRACK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client_id, events: [{ name, params }] }),
-    });
-  } catch (_) {}
-}
-
+// SYNC REQUIRED: This must match DEFAULT_OPTIONS in content.js exactly.
+// content.js cannot import shared.js (content script context restriction).
 const DEFAULT_OPTIONS = {
   enabledCategories: {
     'CMS': true,
@@ -109,10 +90,6 @@ function renderCategories(container, options) {
     container.appendChild(label);
   });
 }
-
-const VALIDATE_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/validate';
-const LICENSE_TTL_MS = 48 * 60 * 60 * 1000;    // 48 hours before re-validation needed
-const LICENSE_GRACE_MS = 7 * 24 * 60 * 60 * 1000; // 7 day grace if server unreachable
 
 function isLicenseCurrentlyValid(lic) {
   if (!lic || !lic.valid || !lic.validated_at) return false;
