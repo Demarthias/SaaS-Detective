@@ -1,6 +1,6 @@
 import { trackEvent } from './analytics';
 
-const FREE_LIMIT = 8;
+const FREE_LIMIT = 15;
 
 const STRIPE_PLANS = [
   { label: 'Monthly', price: '$7.99/mo', url: 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00', plan: 'monthly' },
