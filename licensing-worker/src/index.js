@@ -214,7 +214,7 @@ function serveSuccessPage(sessionId) {
     </div>
   </div>
   <script>
-    const sessionId = '${sessionId}';
+    const sessionId = ${JSON.stringify(sessionId)};
     const PLAN_LABELS = ${JSON.stringify(PLAN_LABELS)};
     const PLAN_FEATURES = ${JSON.stringify(PLAN_FEATURES)};
     async function fetchLicense(attempts = 0) {

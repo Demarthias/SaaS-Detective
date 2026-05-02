@@ -1,23 +1,8 @@
 (()=>{"use strict";
 
-const VALIDATE_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/validate';
-const LICENSE_TTL_MS = 48 * 60 * 60 * 1000;
-const REVALIDATE_ALARM = 'sd_revalidate';
+importScripts('shared.js');
 
-async function trackEvent(name, params = {}) {
-  try {
-    let clientId = (await chrome.storage.local.get('ga_client_id')).ga_client_id;
-    if (!clientId) {
-      clientId = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
-      await chrome.storage.local.set({ ga_client_id: clientId });
-    }
-    await fetch('https://saas-detective-licensing.kubegrayson.workers.dev/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client_id: clientId, events: [{ name, params }] }),
-    });
-  } catch (_) {}
-}
+const REVALIDATE_ALARM = 'sd_revalidate';
 
 async function revalidateLicense() {
   const { sd_license } = await chrome.storage.sync.get({ sd_license: null });
