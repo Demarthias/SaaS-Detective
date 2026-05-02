@@ -94,6 +94,29 @@ async function handleWebhook(request, env) {
       env.LICENSES.put(`session:${sessionId}`, JSON.stringify({ licenseKey, ...licenseData })),
       subscriptionId ? env.LICENSES.put(`sub:${subscriptionId}`, licenseKey) : Promise.resolve()
     ]);
+
+    // Fire GA4 purchase event
+    const measurementId = env.GA_MEASUREMENT_ID || "G-HVECKYG478";
+    const apiSecret = env.GA_API_SECRET;
+    if (apiSecret) {
+      const gaClientId = customerId || sessionId;
+      fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          client_id: gaClientId,
+          events: [{
+            name: "purchase",
+            params: {
+              transaction_id: sessionId,
+              plan,
+              currency: "USD",
+              customer_id: customerId,
+            }
+          }]
+        })
+      }).catch(() => {});
+    }
   }
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object;
@@ -197,7 +220,7 @@ function serveSuccessPage(sessionId) {
     <h1>Welcome to<br><span class="plan-name" id="planName">SaaS Detective</span></h1>
     <p class="tagline" id="tagline">Loading your license...</p>
     <div id="loading">Retrieving your license key...</div>
-    <div id="error">Could not retrieve your license key. Please <a href="mailto:gkube16@protonmail.com">contact support</a> with your order confirmation.</div>
+    <div id="error">Could not retrieve your license key. Please <a href="mailto:grayson@venom-industries.com">contact support</a> with your order confirmation.</div>
     <div id="keySection" style="display:none">
       <div class="key-box">
         <span class="key-text" id="licenseKey">—</span>
@@ -210,7 +233,7 @@ function serveSuccessPage(sessionId) {
         <div class="step"><div class="step-num">2</div><div class="step-text">Click <strong>Options</strong> at the bottom of the popup</div></div>
         <div class="step"><div class="step-num">3</div><div class="step-text">Paste your license key and click <strong>Activate</strong></div></div>
       </div>
-      <p class="support">Need help? <a href="mailto:gkube16@protonmail.com">gkube16@protonmail.com</a></p>
+      <p class="support">Need help? <a href="mailto:grayson@venom-industries.com">grayson@venom-industries.com</a></p>
     </div>
   </div>
   <script>

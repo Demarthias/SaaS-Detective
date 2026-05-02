@@ -27,7 +27,6 @@
       min-height: 100vh;
     }
 
-    /* Header */
     .header {
       background: var(--bg);
       color: #fff;
@@ -62,7 +61,6 @@
       margin-top: 2px;
     }
 
-    /* Main */
     .main {
       max-width: 680px;
       margin: 0 auto;
@@ -101,7 +99,6 @@
       max-width: 520px;
     }
 
-    /* CTA */
     .cta-box {
       background: var(--bg);
       border-radius: 14px;
@@ -113,10 +110,7 @@
       flex-wrap: wrap;
     }
 
-    .cta-box .cta-text {
-      flex: 1;
-      min-width: 200px;
-    }
+    .cta-box .cta-text { flex: 1; min-width: 200px; }
 
     .cta-box h2 {
       font-family: 'Rajdhani', sans-serif;
@@ -149,7 +143,6 @@
 
     .cta-btn:hover { background: var(--accent-hover); }
 
-    /* Steps */
     .steps-title {
       font-size: 13px;
       font-weight: 600;
@@ -192,19 +185,8 @@
       margin-top: 1px;
     }
 
-    .step h3 {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 3px;
-    }
-
-    .step p {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
+    .step h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .step p { font-size: 13px; color: var(--muted); line-height: 1.5; }
     .step code {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 12px;
@@ -214,7 +196,6 @@
       color: var(--accent);
     }
 
-    /* Pro teaser */
     .pro-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -240,16 +221,8 @@
       margin-bottom: 8px;
     }
 
-    .pro-card h3 {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .pro-card p {
-      font-size: 13px;
-      color: var(--muted);
-    }
+    .pro-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .pro-card p { font-size: 13px; color: var(--muted); }
 
     .pro-link {
       color: var(--accent);
@@ -262,7 +235,6 @@
 
     .pro-link:hover { text-decoration: underline; }
 
-    /* Footer */
     .footer {
       text-align: center;
       font-size: 11px;
@@ -295,7 +267,7 @@
         <h2>Try it right now</h2>
         <p>Navigate to any website, then click the SaaS Detective icon in your toolbar to scan it.</p>
       </div>
-      <a class="cta-btn" href="https://stripe.com" target="_blank">Open a test site →</a>
+      <a class="cta-btn" id="testSiteBtn" href="https://stripe.com" target="_blank">Open a test site →</a>
     </div>
 
     <div class="steps-title">How it works</div>
@@ -330,7 +302,7 @@
         <h3>Unlock deeper intelligence</h3>
         <p>Export results, view full signature details, and get unlimited scans with SaaS Detective Pro.</p>
       </div>
-      <a class="pro-link" href="https://venom-industries.com/SaaS-Detective/" target="_blank">Learn about Pro →</a>
+      <a class="pro-link" id="proLink" href="https://venom-industries.com/saas-detective.html" target="_blank">Learn about Pro →</a>
     </div>
 
     <div class="footer">
@@ -340,32 +312,16 @@
 
   </div>
 
+<script src="shared.js"></script>
 <script>
-  const TRACK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/track';
-
-  async function trackEvent(name, params = {}) {
-    try {
-      let { ga_client_id } = await chrome.storage.local.get('ga_client_id');
-      if (!ga_client_id) {
-        ga_client_id = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
-        await chrome.storage.local.set({ ga_client_id });
-      }
-      await fetch(TRACK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client_id: ga_client_id, events: [{ name, params }] }),
-      });
-    } catch (_) {}
-  }
-
   document.addEventListener('DOMContentLoaded', () => {
     trackEvent('onboarding_viewed');
 
-    document.querySelector('.cta-btn')?.addEventListener('click', () => {
-      trackEvent('onboarding_cta_clicked', { cta: 'test_site' });
+    document.getElementById('testSiteBtn')?.addEventListener('click', () => {
+      trackEvent('onboarding_completed', { cta: 'test_site' });
     });
 
-    document.querySelector('.pro-link')?.addEventListener('click', () => {
+    document.getElementById('proLink')?.addEventListener('click', () => {
       trackEvent('onboarding_cta_clicked', { cta: 'learn_pro' });
     });
   });

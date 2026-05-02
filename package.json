@@ -1,8 +1,8 @@
 {
   "name": "saas-detective",
-  "version": "1.0.2",
+  "version": "2.6.0",
   "scripts": {
-    "build": "webpack --mode production && powershell -Command \"Copy-Item src/popup.html dist/; Copy-Item src/manifest.json dist/; Copy-Item src/icon.png dist/; Copy-Item src/onboarding.html dist/; Copy-Item options.html dist/; Copy-Item options.js dist/; Copy-Item privacy.html dist/; Copy-Item affiliates.json dist/; if (!(Test-Path dist/icons)) { New-Item -ItemType Directory dist/icons | Out-Null }; Copy-Item icons/icon16.png dist/icons/; Copy-Item icons/icon48.png dist/icons/; Copy-Item icons/icon128.png dist/icons/\"",
+    "build": "webpack --mode production && powershell -Command \"Copy-Item src/popup.html dist/; Copy-Item src/manifest.json dist/; Copy-Item src/icon.png dist/; Copy-Item src/onboarding.html dist/; Copy-Item options.html dist/; Copy-Item options.js dist/; Copy-Item privacy.html dist/; Copy-Item affiliates.json dist/; Copy-Item shared.js dist/; if (!(Test-Path dist/icons)) { New-Item -ItemType Directory dist/icons | Out-Null }; Copy-Item icons/icon16.png dist/icons/; Copy-Item icons/icon48.png dist/icons/; Copy-Item icons/icon128.png dist/icons/\"",
     "watch": "webpack --mode development --watch"
   },
   "devDependencies": {
