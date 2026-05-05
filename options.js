@@ -147,10 +147,9 @@ function attachActivationListener(input, btn, statusEl) {
     statusEl.style.color = '#475569';
 
     try {
-      const res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, {
-        cache: 'no-store',
-      });
-
+      let res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
+      // Retry once on transient failure
+      if (!res.ok) res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`Server error ${res.status}`);
 
       const data = await res.json();

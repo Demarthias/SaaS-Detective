@@ -91,6 +91,11 @@ async function handleWebhook(request, env) {
     const subscriptionId = session.subscription;
     const customerId = session.customer;
     const email = session.customer_details?.email || session.customer_email || "";
+
+    // Idempotency: if this session was already processed, skip
+    const existing = await env.LICENSES.get(`session:${sessionId}`);
+    if (existing) return new Response("OK", { status: 200 });
+
     let plan = "pro";
     if (subscriptionId && env.STRIPE_SECRET_KEY) {
       const sub = await fetchStripeSubscription(subscriptionId, env.STRIPE_SECRET_KEY);
@@ -109,11 +114,11 @@ async function handleWebhook(request, env) {
       createdAt: (new Date()).toISOString(),
       active: true
     };
-    await Promise.all([
-      env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(licenseData)),
-      env.LICENSES.put(`session:${sessionId}`, JSON.stringify({ licenseKey, ...licenseData })),
-      subscriptionId ? env.LICENSES.put(`sub:${subscriptionId}`, licenseKey) : Promise.resolve()
-    ]);
+
+    // Write KV entries individually so one failure doesn't orphan the license
+    await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(licenseData));
+    await env.LICENSES.put(`session:${sessionId}`, JSON.stringify({ licenseKey, ...licenseData }));
+    if (subscriptionId) await env.LICENSES.put(`sub:${subscriptionId}`, licenseKey);
 
     const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
     const planByAmount = AMOUNT_PLAN_MAP[session.amount_total] || plan;

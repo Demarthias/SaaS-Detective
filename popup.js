@@ -170,12 +170,13 @@
     }
 
     async function maybeShowScanNudge(lockedCount) {
-        if (lockedCount > 0) return; // upgrade banner already visible
+        // Show nudge only if no upgrade banner visible AND user has scanned enough
+        if (lockedCount > 0) return;
         const { scan_count = 0 } = await chrome.storage.local.get({ scan_count: 0 });
-        if (scan_count < 7) return;
+        if (scan_count < 5) return;
         const nudge = document.getElementById('scan-nudge');
         if (nudge) {
-            nudge.textContent = `You've scanned ${scan_count} sites on free — Pro unlocks 150+ more tool signatures.`;
+            nudge.textContent = `You've scanned ${scan_count} sites — Pro unlocks 150+ tool signatures across every category.`;
             nudge.style.display = '';
         }
     }
