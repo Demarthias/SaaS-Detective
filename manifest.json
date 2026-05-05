@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SaaS Detective",
-  "version": "2.5.9",
+  "version": "2.6.1",
   "description": "Instantly identify the tech stack and SaaS tools used by any website.",
   "minimum_chrome_version": "102",
   "content_security_policy": {
