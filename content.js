@@ -257,7 +257,7 @@ const signatures = [
   {id:"netart",name:"netart",category:"Hosting",patterns:["netart.com/js","static.netart.com","netart.com/embed"],globalVar:[],description:"Web hosting, domains, and website builder platform",alternatives:["Hostinger","SiteGround","Bluehost"]},
 
   // --- VPN ---
-  {id:"nordvpn",name:"NordVPN",category:"Security",patterns:["nordvpn.com/js","cdn.nordvpn.com","nordvpn.com/affiliate"],globalVar:[],description:"Leading VPN service for privacy and security",alternatives:["ExpressVPN","Surfshark","ProtonVPN"]},
+  {id:"nordvpn",name:"NordVPN",category:"Security",patterns:["nordvpn.com/js","cdn.nordvpn.com"],globalVar:[],description:"Leading VPN service for privacy and security",alternatives:["ExpressVPN","Surfshark","ProtonVPN"]},
 ];
 
 // SYNC REQUIRED: This must match DEFAULT_OPTIONS in options.js exactly.
@@ -359,8 +359,8 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       const free = allTools.filter(t => t.free);
       const locked = allTools.filter(t => !t.free);
       sendResponse(pro
-        ? { tools: allTools, locked: 0 }
-        : { tools: free, locked: locked.length }
+        ? { tools: allTools, lockedTools: [] }
+        : { tools: free, lockedTools: locked.map(t => ({ name: t.name, category: t.category, description: t.description })) }
       );
     }))
     .catch(() => sendResponse({ tools: [], locked: 0, error: 'scan_failed' }));

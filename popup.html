@@ -52,13 +52,39 @@
     }
     .visit-btn:hover { background: #1d4ed8; }
 
+    /* Locked pro tool cards */
+    .card.locked {
+      background: #f8fafc; border: 1px dashed #cbd5e1;
+      box-shadow: none;
+    }
+    .locked-name { filter: blur(4px); user-select: none; color: #64748b !important; }
+    .locked-desc { filter: blur(3px); user-select: none; }
+    .pro-badge {
+      background: #1e293b; color: #fff; border: none;
+      padding: 5px 9px; border-radius: 6px; font-size: 11px;
+      cursor: pointer; font-weight: 600; font-family: inherit;
+      flex-shrink: 0; align-self: flex-start; margin-top: 1px;
+      white-space: nowrap;
+    }
+    .pro-badge:hover { background: #0f172a; }
+
     .empty { text-align: center; color: var(--muted); font-size: 13px; margin-top: 24px; }
 
+    /* Upgrade banner */
     .upgrade-banner { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-top: 8px; text-align: center; }
     .upgrade-count { font-size: 13px; font-weight: 700; color: #1e40af; }
     .upgrade-sub { font-size: 11px; color: #3b82f6; margin: 3px 0 8px; }
     .upgrade-btn { background: #2563eb; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%; font-family: inherit; }
     .upgrade-btn:hover { background: #1d4ed8; }
+    .upgrade-monthly { display: block; margin-top: 6px; font-size: 10px; color: #93c5fd; cursor: pointer; background: none; border: none; font-family: inherit; width: 100%; }
+    .upgrade-monthly:hover { color: #3b82f6; }
+
+    /* Scan nudge */
+    #scan-nudge {
+      display: none; margin: 6px 16px 4px; padding: 8px 10px;
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px;
+      font-size: 11px; color: #15803d; text-align: center;
+    }
 
     .footer { padding: 10px 12px 12px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid var(--border); background: #fff; }
     .footer a { color: var(--accent); text-decoration: none; }
@@ -81,13 +107,16 @@
 
   <div id="upgrade-banner" class="upgrade-banner" style="display:none;margin:0 16px 8px;">
     <div id="upgrade-count" class="upgrade-count"></div>
-    <div class="upgrade-sub">Upgrade to Pro to see all detected tools.</div>
-    <button id="upgradeBannerBtn" class="upgrade-btn">Upgrade — $7.99/mo</button>
+    <div id="upgrade-sub" class="upgrade-sub"></div>
+    <button id="upgradeBannerBtn" class="upgrade-btn">Get Pro — from $5/mo</button>
+    <button id="upgradeBannerMonthly" class="upgrade-monthly">or $7.99/mo · no commitment</button>
   </div>
+
+  <div id="scan-nudge"></div>
 
   <div class="footer">
     Powered by Venom Industries LLC
-<div style="margin-top:6px;">
+    <div style="margin-top:6px;">
       <a href="#" id="onboardingLink">How it works</a> ·
       <a href="#" id="optionsLink">Options</a> ·
       <a href="privacy.html" target="_blank">Privacy</a>

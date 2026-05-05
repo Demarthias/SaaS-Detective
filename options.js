@@ -196,7 +196,6 @@ async function init() {
 
   const container = document.getElementById('category-list');
   const resetBtn = document.getElementById('reset');
-  const openPopupBtn = document.getElementById('openPopup');
 
   document.querySelectorAll('a[data-plan]').forEach(link => {
     link.addEventListener('click', () => {
@@ -219,9 +218,7 @@ async function init() {
     setStatus('Defaults restored');
   });
 
-  openPopupBtn.addEventListener('click', () => {
-    window.open(chrome.runtime.getURL('popup.html'), '_blank');
-  });
+
 }
 
 document.addEventListener('DOMContentLoaded', () => { init(); initLicense(); });
