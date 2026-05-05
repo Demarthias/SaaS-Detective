@@ -103,8 +103,8 @@
         badge.className = 'pro-badge';
         badge.textContent = '🔒 Pro';
         badge.onclick = () => {
-            trackEvent('upgrade_clicked', { plan: 'yearly', location: 'locked_card' });
-            chrome.tabs.create({ url: STRIPE_LINKS['yearly'] });
+            trackEvent('upgrade_clicked', { plan: 'monthly', location: 'locked_card' });
+            chrome.tabs.create({ url: STRIPE_LINKS['monthly'] });
         };
 
         card.appendChild(cardInfo);
