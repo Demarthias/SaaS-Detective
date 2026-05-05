@@ -58,6 +58,26 @@ async function fetchStripeSubscription(subscriptionId, stripeKey) {
 }
 __name(fetchStripeSubscription, "fetchStripeSubscription");
 
+// Map Stripe amount_total (cents) to plan name for payment links
+var AMOUNT_PLAN_MAP = {
+  799:  "monthly",
+  1999: "3mo",
+  3499: "6mo",
+  5999: "annual"
+};
+
+async function fireGA4Event(env, clientId, eventName, params) {
+  const measurementId = env.GA_MEASUREMENT_ID || "G-HVECKYG478";
+  const apiSecret = env.GA_API_SECRET;
+  if (!apiSecret) return;
+  fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ client_id: clientId, events: [{ name: eventName, params }] })
+  }).catch(() => {});
+}
+__name(fireGA4Event, "fireGA4Event");
+
 async function handleWebhook(request, env) {
   const body = await request.text();
   const signature = request.headers.get("stripe-signature") || "";
@@ -95,28 +115,28 @@ async function handleWebhook(request, env) {
       subscriptionId ? env.LICENSES.put(`sub:${subscriptionId}`, licenseKey) : Promise.resolve()
     ]);
 
-    // Fire GA4 purchase event
-    const measurementId = env.GA_MEASUREMENT_ID || "G-HVECKYG478";
-    const apiSecret = env.GA_API_SECRET;
-    if (apiSecret) {
-      const gaClientId = customerId || sessionId;
-      fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          client_id: gaClientId,
-          events: [{
-            name: "purchase",
-            params: {
-              transaction_id: sessionId,
-              plan,
-              currency: "USD",
-              customer_id: customerId,
-            }
-          }]
-        })
-      }).catch(() => {});
-    }
+    const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
+    const planByAmount = AMOUNT_PLAN_MAP[session.amount_total] || plan;
+    await fireGA4Event(env, customerId || sessionId, "purchase", {
+      transaction_id: sessionId,
+      value: valueUSD,
+      currency: "USD",
+      plan: planByAmount,
+      customer_id: customerId || "",
+    });
+  }
+  if (event.type === "checkout.session.expired") {
+    const session = event.data.object;
+    const sessionId = session.id;
+    const customerId = session.customer || sessionId;
+    const planByAmount = AMOUNT_PLAN_MAP[session.amount_total] || "unknown";
+    const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
+    await fireGA4Event(env, customerId, "checkout_abandoned", {
+      session_id: sessionId,
+      plan: planByAmount,
+      value: valueUSD,
+      currency: "USD",
+    });
   }
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object;
