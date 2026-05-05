@@ -363,7 +363,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
         : { tools: free, lockedTools: locked.map(t => ({ name: t.name, category: t.category, description: t.description })) }
       );
     }))
-    .catch(() => sendResponse({ tools: [], locked: 0, error: 'scan_failed' }));
+    .catch(() => sendResponse({ tools: [], lockedTools: [], error: 'scan_failed' }));
 
   return true;
 });

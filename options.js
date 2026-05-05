@@ -148,7 +148,6 @@ function attachActivationListener(input, btn, statusEl) {
 
     try {
       let res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
-      // Retry once on transient failure
       if (!res.ok) res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`Server error ${res.status}`);
 
