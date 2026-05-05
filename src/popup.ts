@@ -1,6 +1,7 @@
 import { trackEvent } from './analytics';
+import { signatures } from './signatures';
 
-const FREE_LIMIT = 15;
+const FREE_LIMIT = 50;
 
 const STRIPE_PLANS = [
   { label: 'Monthly', price: '$7.99/mo', url: 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00', plan: 'monthly' },
@@ -9,14 +10,12 @@ const STRIPE_PLANS = [
   { label: 'Annual', price: '$59.99/yr', badge: '7-day free trial', url: 'https://buy.stripe.com/8x2bJ3bmu8gYgHm1gn1Jm06', plan: 'annual' },
 ];
 
-let affiliateTable: Record<string, { status: string; url: string; program?: string }> = {};
-let sdOptions: Record<string, unknown> = {};
+// Compact globalVar checks passed to MAIN world script injection
+const globalVarChecks = signatures
+  .filter(s => s.globalVar && s.globalVar.length > 0)
+  .map(s => ({ id: s.id, name: s.name, category: s.category, vars: s.globalVar as string[] }));
 
-async function loadOptions(): Promise<void> {
-  const DEFAULT_OPTIONS = {};
-  const { sd_options } = await chrome.storage.sync.get({ sd_options: DEFAULT_OPTIONS });
-  sdOptions = { ...DEFAULT_OPTIONS, ...(sd_options || {}) };
-}
+let affiliateTable: Record<string, { status: string; url: string; program?: string }> = {};
 
 async function loadAffiliates(): Promise<void> {
   try {
@@ -143,7 +142,7 @@ function appendUpgradeBanner(container: HTMLElement, locked: number): void {
 
 function sendMessageToTab(
   tabId: number
-): Promise<{ tools?: Array<{ name: string; category: string; link?: string }> }> {
+): Promise<{ tools?: Array<{ id: string; name: string; category: string; link?: string }> }> {
   return new Promise((resolve, reject) => {
     chrome.tabs.sendMessage(tabId, { action: 'SCAN_PAGE' }, (response) => {
       if (chrome.runtime.lastError || !response) {
@@ -157,7 +156,7 @@ function sendMessageToTab(
 
 async function sendScan(
   tabId: number
-): Promise<{ tools?: Array<{ name: string; category: string; link?: string }> }> {
+): Promise<{ tools?: Array<{ id: string; name: string; category: string; link?: string }> }> {
   try {
     return await sendMessageToTab(tabId);
   } catch (error) {
@@ -166,6 +165,28 @@ async function sendScan(
       return await sendMessageToTab(tabId);
     }
     throw error;
+  }
+}
+
+// Run in MAIN world to access page's window globals — catches tools loaded
+// asynchronously or via tag managers that don't leave HTML fingerprints.
+async function getGlobalVarMatches(
+  tabId: number
+): Promise<Array<{ id: string; name: string; category: string }>> {
+  try {
+    const results = await chrome.scripting.executeScript({
+      target: { tabId },
+      world: 'MAIN' as chrome.scripting.ExecutionWorld,
+      func: (checks: Array<{ id: string; name: string; category: string; vars: string[] }>) => {
+        return checks
+          .filter(c => c.vars.some((v: string) => typeof (window as any)[v] !== 'undefined'))
+          .map(({ id, name, category }) => ({ id, name, category }));
+      },
+      args: [globalVarChecks],
+    });
+    return (results[0]?.result as Array<{ id: string; name: string; category: string }>) || [];
+  } catch (_) {
+    return [];
   }
 }
 
@@ -186,8 +207,20 @@ async function scanPage(): Promise<void> {
   }
 
   try {
-    const response = await sendScan(tab.id!);
-    const allTools = response.tools || [];
+    const [response, globalMatches] = await Promise.all([
+      sendScan(tab.id!),
+      getGlobalVarMatches(tab.id!),
+    ]);
+
+    const htmlTools = response.tools || [];
+    const htmlIds = new Set(htmlTools.map(t => t.id));
+
+    // Merge: add globalVar detections not already found by HTML patterns
+    const allTools = [
+      ...htmlTools,
+      ...globalMatches.filter(t => !htmlIds.has(t.id)),
+    ];
+
     const licensed = await isLicenseValid();
 
     let visibleTools = allTools;
@@ -217,7 +250,6 @@ async function scanPage(): Promise<void> {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await loadOptions();
   await loadAffiliates();
   trackEvent('popup_opened');
   scanPage();

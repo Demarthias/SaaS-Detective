@@ -1,4 +1,4 @@
-import { signatures } from './core/src.signatures';
+import { signatures } from './signatures';
 
 const DEFAULT_OPTIONS = {
   enabledCategories: {
@@ -33,6 +33,20 @@ const DEFAULT_OPTIONS = {
     'Icons': true,
     'Fonts': true,
     'Comments': true,
+    'Scheduling': true,
+    'Video': true,
+    'Forms': true,
+    'A/B Testing': true,
+    'Automation': true,
+    'Maps': true,
+    'Reviews': true,
+    'Referral': true,
+    'Sales Intelligence': true,
+    'Customer Success': true,
+    'Search': true,
+    'Communications': true,
+    'Courses': true,
+    'Community': true,
   },
 };
 
