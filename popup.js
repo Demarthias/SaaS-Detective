@@ -29,7 +29,11 @@
         } catch (_) {}
     }
 
+    let linkTable = {};
+
     function resolveLink(toolName) {
+        const entry = linkTable[toolName];
+        if (entry && entry.status === 'active') return entry.url;
         return `https://www.google.com/search?q=${encodeURIComponent(toolName + ' software')}`;
     }
 
@@ -144,6 +148,10 @@ function setStatus(msg, isError = false) {
     document.addEventListener('DOMContentLoaded', async () => {
         trackEvent('popup_opened');
 
+        try {
+            const r = await fetch(chrome.runtime.getURL('affiliates.json'));
+            linkTable = await r.json();
+        } catch (_) {}
         scanPage();
 
         document.getElementById('rescanBtn')?.addEventListener('click', () => {
