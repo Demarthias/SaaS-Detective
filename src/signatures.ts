@@ -16,6 +16,7 @@ export const signatures: SaasSignature[] = [
   { id: 'heap', name: 'Heap Analytics', category: 'Analytics', patterns: ['cdn.heapanalytics.com'], globalVar: ['heap', 'heapReadyCb'] },
   { id: 'posthog', name: 'PostHog', category: 'Analytics', patterns: ['app.posthog.com', 'eu.i.posthog.com', 'us.i.posthog.com'], globalVar: ['posthog'] },
   { id: 'plausible', name: 'Plausible', category: 'Analytics', patterns: ['plausible.io/js/'], globalVar: ['plausible'] },
+  { id: 'fathom', name: 'Fathom Analytics', category: 'Analytics', patterns: ['cdn.usefathom.com'], globalVar: ['fathom'] },
   { id: 'matomo', name: 'Matomo', category: 'Analytics', patterns: ['matomo.js', 'piwik.js'], globalVar: ['_paq', 'Piwik'] },
   { id: 'woopra', name: 'Woopra', category: 'Analytics', patterns: ['static.woopra.com'], globalVar: ['woopra'] },
   { id: 'luckyorange', name: 'Lucky Orange', category: 'Analytics', patterns: ['luckyorange.com'], globalVar: ['_loq'] },
