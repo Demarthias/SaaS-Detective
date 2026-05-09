@@ -64,6 +64,59 @@
 - Webflow affiliate link pending approval → update affiliates.json when received
 - Semrush + Miro: get real Impact deep links (publisher ID 6918744)
 - MaxBounty: identify active offers, get tracking URLs
-- ~29 placeholder affiliate entries still need real IDs
+- ~26 placeholder affiliate entries still need real IDs
 - venom-industries.com Cloudflare caching still at 0%
-- Deduplicate trackEvent (3 copies) and DEFAULT_OPTIONS (2 copies)
+
+---
+
+## Session: 2026-05-05
+
+### Full Audit + Overhaul (v2.6.6)
+
+#### Signatures
+- `src/signatures.ts` fully rewritten — 208 entries (was ~95 in src/core/src.signatures.ts)
+- All category names now match DEFAULT_OPTIONS exactly (45 categories)
+- Added 14 missing categories: Video, A/B Testing, Maps, Reviews, Referral, Sales Intelligence, Customer Success, Communications, Courses, Community, Native Ads, Retargeting, Heatmap, Session Replay, Observability, Error Tracking
+- `globalVar` detection added to every signature
+- Deleted dead files: `src/core/src.signatures.ts`, `src/affiliateMap.ts`, `src/config/affiliateMap.ts`, `src/openLink.ts`, `src/detectors/shopify.ts`
+
+#### Detection Engine
+- `src/content.ts` now imports from `./signatures` (updated)
+- `src/popup.ts` now runs a second pass via `chrome.scripting.executeScript({world:'MAIN'})` to check window globals — catches tools loaded async or via GTM
+- Results from both passes are merged (deduped by id) before applying FREE_LIMIT
+
+#### Bug Fixes
+- `FREE_LIMIT` corrected from 15 → 50 (matches UI copy in options.html and onboarding.html)
+- `DEFAULT_OPTIONS` in `src/content.ts` synced to 45 categories (was 31, missing 14)
+- `src/manifest.json` version synced and bumped to 2.6.6 (was stuck at 2.6.0)
+- `alarms` permission was declared but unused — now wired up in background.ts
+
+#### License Revalidation
+- `src/background.ts` now creates `license_revalidate` alarm on install/update (24h period)
+- Alarm handler re-fetches `/validate`, updates `sd_license.validated_at`, fires `license_revalidated` or `license_expired` events
+
+#### Outstanding
+- ~26 placeholder affiliate entries still need real IDs
+- venom-industries.com Cloudflare caching still at 0%
+- trackEvent still has 2 copies (src/analytics.ts for webpack, shared.js for options/onboarding) — harmless but worth future dedup
+
+---
+
+## Session: 2026-05-09
+
+### GA4 Checkout Path Audit + Marketing-Site Tracking Patch
+- Traced the full upgrade-click → GA4 path. Extension side is fully wired (popup banner, locked card, options pricing, onboarding pricing — all fire `upgrade_clicked` via `shared.js` trackEvent → `/track` → GA4 `G-HVECKYG478`; `license_activated` fires post-key-paste).
+- Found the marketing site (venom-industries.com/saas-detective, rendered by `worker.js` SD_HTML) had **zero tracking** on its 4 Stripe checkout links. The orphan files `track-checkout.js` and `index (1).html` were dead — bare ESM `import` in a non-module script tag, referenced a non-existent `./src/analytics.js`, and used `chrome.storage.local` outside an extension context. Page wasn't served anyway.
+
+### Patch Applied (worker.js)
+- Added `data-stripe-checkout`, `data-plan`, `data-price` to all 4 Stripe `<a>` tags in SD_HTML (monthly/yearly/3month/6month).
+- Injected an inline `<script>` before `${NAV_SCRIPT}` that:
+  - Persists a `client_id` in `localStorage` (key `sd_ga_client_id`); falls back to ephemeral `anon.<ts>` on storage exception.
+  - Capture-phase click listener catches anchors *before* navigation, POSTs `checkout_begin` (with `plan`, `price`, `location: 'marketing_site'`) to `https://saas-detective-licensing.kubegrayson.workers.dev/track` using `keepalive: true` so the request survives the redirect.
+
+### Cleanup
+- Deleted dead files: `track-checkout.js`, `index (1).html`.
+
+### Pending
+- **Manual deploy required** — there is no `wrangler.toml` for the marketing-site worker in this repo (only `licensing-worker/wrangler.toml` for the licensing one). `worker.js` is presumably deployed via the Cloudflare dashboard. Push the new `worker.js` content there to take this live.
+- Once live, verify in GA4 Realtime that `checkout_begin` fires when a Stripe link is clicked on venom-industries.com/saas-detective.
