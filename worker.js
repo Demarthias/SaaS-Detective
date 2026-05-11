@@ -839,6 +839,105 @@ const SD_HTML = `<!DOCTYPE html>
     .pricing-sub { font-size: 0.82rem; color: var(--muted); margin-top: 24px; text-align: center; }
     .pricing-sub a { color: var(--accent); text-decoration: underline; }
 
+    /* STAT STRIP */
+    .pricing-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+      margin: 40px 0 8px;
+      border: 1px solid var(--border); border-radius: 12px;
+      background: var(--card); overflow: hidden;
+    }
+    .pricing-stat {
+      padding: 22px 16px; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .pricing-stat:last-child { border-right: none; }
+    .pricing-stat-num {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem;
+      letter-spacing: -0.03em; color: var(--text); line-height: 1;
+    }
+    .pricing-stat-num em { font-style: normal; color: var(--accent); }
+    .pricing-stat-label {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); margin-top: 10px;
+    }
+
+    /* COMPARISON TABLE */
+    .compare-wrap { margin-top: 56px; }
+    .compare-title {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted); text-align: center; margin-bottom: 20px;
+    }
+    .compare-table {
+      width: 100%; max-width: 760px; margin: 0 auto;
+      border-collapse: collapse;
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    }
+    .compare-table th, .compare-table td {
+      padding: 14px 18px; text-align: left; font-size: 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-table th {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); font-weight: 500;
+      background: var(--surface);
+    }
+    .compare-table th.col-feature { width: 50%; }
+    .compare-table th.col-pro { color: var(--accent); }
+    .compare-table td.cell-value { text-align: center; width: 25%; color: var(--text); font-weight: 500; }
+    .compare-table td.cell-value.dim { color: var(--muted); font-weight: 300; }
+    .compare-table tr:last-child th, .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .compare-check { color: var(--accent); font-weight: 700; }
+    .compare-table .compare-cross { color: var(--muted); opacity: 0.5; }
+
+    @media (max-width: 900px) {
+      .pricing-stats { grid-template-columns: repeat(2, 1fr); }
+      .pricing-stat:nth-child(2) { border-right: none; }
+      .pricing-stat:nth-child(1), .pricing-stat:nth-child(2) { border-bottom: 1px solid var(--border); }
+      .compare-table th, .compare-table td { padding: 10px 12px; font-size: 0.78rem; }
+    }
+
+    /* TRIAL CTA */
+    .trial-cta-card {
+      margin: 32px auto 0; max-width: 760px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 28px 32px;
+      display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center;
+    }
+    .trial-cta-card.has-result { grid-template-columns: 1fr; text-align: center; }
+    .trial-cta-text h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em; margin: 0 0 6px; }
+    .trial-cta-text p { font-size: 0.85rem; color: var(--muted); margin: 0; line-height: 1.5; }
+    .trial-form { display: flex; gap: 8px; align-items: stretch; }
+    .trial-form input {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 11px 14px; font-family: inherit; font-size: 0.88rem; color: var(--text);
+      min-width: 240px; outline: none; transition: border-color 0.15s;
+    }
+    .trial-form input:focus { border-color: var(--accent); }
+    .trial-form button {
+      background: var(--accent); color: var(--bg); border: none; border-radius: 8px;
+      padding: 11px 22px; font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+    }
+    .trial-form button:hover:not(:disabled) { opacity: 0.87; transform: translateY(-1px); }
+    .trial-form button:disabled { opacity: 0.5; cursor: wait; }
+    .trial-result { display: none; }
+    .trial-result.show { display: block; }
+    .trial-result-key {
+      font-family: monospace; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.08em;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 20px; margin: 16px auto; max-width: 360px;
+    }
+    .trial-result-steps { font-size: 0.82rem; color: var(--muted); margin: 8px 0 0; line-height: 1.7; }
+    .trial-error { color: #f87171; font-size: 0.85rem; margin-top: 10px; display: none; }
+    .trial-error.show { display: block; }
+
+    @media (max-width: 700px) {
+      .trial-cta-card { grid-template-columns: 1fr; text-align: center; }
+      .trial-form { flex-direction: column; }
+      .trial-form input { min-width: auto; width: 100%; }
+    }
+
     /* FAQ */
     .faq-list { margin-top: 40px; max-width: 680px; }
     .faq-item { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; background: var(--card); overflow: hidden; }
@@ -1065,6 +1164,30 @@ ${NAV('sd')}
     <div class="section-label">Pricing</div>
     <h2 class="section-title reveal">Simple. Honest. No surprises.</h2>
     <p class="section-sub reveal">Start free. Upgrade when you need more. Cancel anytime.</p>
+
+    <!--
+      TODO (sd-pricing): replace data-installs="—" with the live Chrome Web Store install count
+      (e.g. "1,200+"). Found in the CWS dashboard. Until then this card just reads "Built for".
+    -->
+    <div class="pricing-stats reveal">
+      <div class="pricing-stat">
+        <div class="pricing-stat-num"><em>175<sup style="font-size:1rem;">+</sup></em></div>
+        <div class="pricing-stat-label">Tool signatures</div>
+      </div>
+      <div class="pricing-stat">
+        <div class="pricing-stat-num"><em>45<sup style="font-size:1rem;">+</sup></em></div>
+        <div class="pricing-stat-label">Categories detected</div>
+      </div>
+      <div class="pricing-stat">
+        <div class="pricing-stat-num"><em>100%</em></div>
+        <div class="pricing-stat-label">Client-side &amp; private</div>
+      </div>
+      <div class="pricing-stat" data-installs="—">
+        <div class="pricing-stat-num">Founders<br>&amp; sales</div>
+        <div class="pricing-stat-label">Built for</div>
+      </div>
+    </div>
+
     <div class="pricing-grid">
 
       <!-- FREE -->
@@ -1123,6 +1246,47 @@ ${NAV('sd')}
 
     </div>
     <p class="pricing-sub">Also available: <a href="https://buy.stripe.com/3cIdRb76e9l28aQcZ51Jm04" data-stripe-checkout data-plan="3month" data-price="19.99">3-month ($19.99)</a> · <a href="https://buy.stripe.com/6oU00lduC54M0Io5wD1Jm05" data-stripe-checkout data-plan="6month" data-price="34.99">6-month ($34.99)</a> &nbsp;·&nbsp; Payments secured by Stripe &nbsp;·&nbsp; License key delivered instantly</p>
+
+    <div class="trial-cta-card reveal" id="trialCard">
+      <div class="trial-cta-text">
+        <h3>Not sure yet? Try Pro free for 7 days.</h3>
+        <p>Full access to all 175+ signatures. No credit card. We'll email your key.</p>
+      </div>
+      <form class="trial-form" id="trialForm" novalidate>
+        <input type="email" id="trialEmail" placeholder="you@company.com" required autocomplete="email" />
+        <button type="submit" id="trialSubmit">Start free trial</button>
+      </form>
+      <div class="trial-error" id="trialError"></div>
+      <div class="trial-result" id="trialResult">
+        <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.25rem;margin:0 0 4px;">Your trial is active.</h3>
+        <p style="font-size:.85rem;color:var(--muted);margin:0;">7 days of full Pro access. Save this key — we've also sent it to your inbox.</p>
+        <div class="trial-result-key" id="trialResultKey">—</div>
+        <p class="trial-result-steps">Open the SaaS Detective extension → Options → paste your key → Activate.</p>
+      </div>
+    </div>
+
+    <div class="compare-wrap reveal">
+      <div class="compare-title">What you get</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="col-feature">Feature</th>
+            <th class="col-free">Free</th>
+            <th class="col-pro">Pro</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Tool signatures detected</td><td class="cell-value dim">50 most common</td><td class="cell-value"><strong>All 175+</strong></td></tr>
+          <tr><td>Categories covered</td><td class="cell-value">45+</td><td class="cell-value">45+</td></tr>
+          <tr><td>One-click visit links</td><td class="cell-value"><span class="compare-check">✓</span></td><td class="cell-value"><span class="compare-check">✓</span></td></tr>
+          <tr><td>Tool descriptions &amp; alternatives</td><td class="cell-value"><span class="compare-check">✓</span></td><td class="cell-value"><span class="compare-check">✓</span></td></tr>
+          <tr><td>CRM, A/B testing, sales intel signatures</td><td class="cell-value"><span class="compare-cross">—</span></td><td class="cell-value"><span class="compare-check">✓</span></td></tr>
+          <tr><td>Customer success, native ads, compliance</td><td class="cell-value"><span class="compare-cross">—</span></td><td class="cell-value"><span class="compare-check">✓</span></td></tr>
+          <tr><td>All future signature additions</td><td class="cell-value"><span class="compare-cross">—</span></td><td class="cell-value"><span class="compare-check">✓</span></td></tr>
+          <tr><td>Priority support</td><td class="cell-value"><span class="compare-cross">—</span></td><td class="cell-value"><span class="compare-check">✓</span></td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -1196,9 +1360,68 @@ ${FOOTER}
     } catch (_) {
       clientId = 'anon.' + Date.now();
     }
+    var TRIAL_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/trial/start';
+    var trialForm = document.getElementById('trialForm');
+    if (trialForm) {
+      trialForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var email = (document.getElementById('trialEmail').value || '').trim();
+        var btn = document.getElementById('trialSubmit');
+        var errorEl = document.getElementById('trialError');
+        errorEl.classList.remove('show');
+        if (!email || email.indexOf('@') < 0) {
+          errorEl.textContent = 'Please enter a valid email.';
+          errorEl.classList.add('show');
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Starting…';
+        try {
+          var res = await fetch(TRIAL_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, client_id: clientId }),
+          });
+          var data = await res.json().catch(function () { return {}; });
+          if (res.ok && data.ok && data.key) {
+            document.getElementById('trialResultKey').textContent = data.key;
+            document.getElementById('trialCard').classList.add('has-result');
+            trialForm.style.display = 'none';
+            document.getElementById('trialResult').classList.add('show');
+            try {
+              fetch(TRACK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ client_id: clientId, events: [{ name: 'trial_form_submitted', params: { location: 'marketing_site', email_sent: data.email_sent ? 1 : 0 } }] }),
+                keepalive: true,
+              });
+            } catch (_) {}
+          } else if (res.status === 409) {
+            errorEl.textContent = 'A trial has already been issued for this email. Check your inbox or contact support.';
+            errorEl.classList.add('show');
+          } else {
+            errorEl.textContent = (data && data.error) ? data.error : 'Could not start trial. Please try again.';
+            errorEl.classList.add('show');
+          }
+        } catch (_) {
+          errorEl.textContent = 'Network error. Please try again.';
+          errorEl.classList.add('show');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Start free trial';
+        }
+      });
+    }
     document.addEventListener('click', function (e) {
       var a = e.target && e.target.closest && e.target.closest('a[data-stripe-checkout]');
       if (!a) return;
+      try {
+        var u = new URL(a.href);
+        if (!u.searchParams.get('client_reference_id')) {
+          u.searchParams.set('client_reference_id', clientId);
+          a.href = u.toString();
+        }
+      } catch (_) {}
       var params = {
         plan: a.getAttribute('data-plan') || 'unknown',
         price: a.getAttribute('data-price') || '',

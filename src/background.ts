@@ -9,6 +9,8 @@ interface LicenseData {
   plan?: string;
   email?: string;
   validated_at?: number;
+  trial?: boolean;
+  expires_at?: number | null;
 }
 
 chrome.runtime.onInstalled.addListener((details) => {
@@ -45,12 +47,16 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
       ...sd_license,
       valid: Boolean(data.valid),
       plan: data.plan || sd_license.plan,
+      trial: Boolean(data.trial),
+      expires_at: typeof data.expires_at === 'number' ? data.expires_at : null,
       validated_at: Date.now(),
     };
     await chrome.storage.sync.set({ sd_license: updated });
 
     if (data.valid) {
-      trackEvent('license_revalidated', { plan: data.plan || sd_license.plan });
+      trackEvent('license_revalidated', { plan: data.plan || sd_license.plan, trial: Boolean(data.trial) });
+    } else if (data.reason === 'trial_expired') {
+      trackEvent('trial_expired', { plan: sd_license.plan });
     } else {
       trackEvent('license_expired', { plan: sd_license.plan });
     }

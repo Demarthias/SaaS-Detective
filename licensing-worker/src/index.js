@@ -70,11 +70,11 @@ async function fireGA4Event(env, clientId, eventName, params) {
   const measurementId = env.GA_MEASUREMENT_ID || "G-HVECKYG478";
   const apiSecret = env.GA_API_SECRET;
   if (!apiSecret) return;
-  fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
+  await fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ client_id: clientId, events: [{ name: eventName, params }] })
-  }).catch(() => {});
+  });
 }
 __name(fireGA4Event, "fireGA4Event");
 
@@ -122,7 +122,8 @@ async function handleWebhook(request, env) {
 
     const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
     const planByAmount = AMOUNT_PLAN_MAP[session.amount_total] || plan;
-    await fireGA4Event(env, customerId || sessionId, "purchase", {
+    const ga4ClientId = session.client_reference_id || customerId || sessionId;
+    await fireGA4Event(env, ga4ClientId, "purchase", {
       transaction_id: sessionId,
       value: valueUSD,
       currency: "USD",
@@ -136,7 +137,8 @@ async function handleWebhook(request, env) {
     const customerId = session.customer || sessionId;
     const planByAmount = AMOUNT_PLAN_MAP[session.amount_total] || "unknown";
     const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
-    await fireGA4Event(env, customerId, "checkout_abandoned", {
+    const ga4ClientId = session.client_reference_id || customerId;
+    await fireGA4Event(env, ga4ClientId, "checkout_abandoned", {
       session_id: sessionId,
       plan: planByAmount,
       value: valueUSD,
@@ -168,6 +170,87 @@ async function handleGetLicense(url, env) {
   return json({ licenseKey: data.licenseKey, plan: data.plan, email: data.email });
 }
 __name(handleGetLicense, "handleGetLicense");
+
+var TRIAL_DURATION_DAYS = 7;
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+async function sendTrialEmail(env, email, key, expiresAt) {
+  if (!env.RESEND_API_KEY) return { sent: false, reason: "no_api_key" };
+  const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";
+  const expiresStr = new Date(expiresAt).toUTCString();
+  const body = {
+    from,
+    to: [email],
+    subject: "Your SaaS Detective 7-day Pro trial",
+    html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
+  <h1 style="font-size:22px;margin:0 0 8px;">Your Pro trial is active</h1>
+  <p style="color:#475569;font-size:14px;margin:0 0 24px;">7 days of full access. Cancel anytime — there is nothing to cancel.</p>
+  <div style="background:#0f172a;color:#f1f5f9;font-family:monospace;font-size:18px;font-weight:700;letter-spacing:.08em;padding:14px 18px;border-radius:10px;text-align:center;">${key}</div>
+  <p style="color:#64748b;font-size:13px;margin:14px 0 24px;">Expires ${expiresStr}</p>
+  <h3 style="font-size:14px;margin:0 0 10px;">Activate in 3 steps</h3>
+  <ol style="color:#334155;font-size:14px;line-height:1.7;padding-left:18px;margin:0 0 24px;">
+    <li>Click the SaaS Detective icon in your browser toolbar</li>
+    <li>Click <strong>Options</strong> at the bottom of the popup</li>
+    <li>Paste your key and click <strong>Activate</strong></li>
+  </ol>
+  <p style="color:#64748b;font-size:12px;">Need help? <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
+</div>`,
+  };
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return { sent: res.ok, status: res.status };
+  } catch (err) {
+    return { sent: false, reason: "fetch_failed" };
+  }
+}
+__name(sendTrialEmail, "sendTrialEmail");
+
+async function handleTrialStart(request, env) {
+  let payload;
+  try { payload = await request.json(); } catch { return json({ ok: false, error: "Invalid JSON" }, 400); }
+  const email = String(payload?.email || "").trim().toLowerCase();
+  const clientId = String(payload?.client_id || "");
+  if (!EMAIL_RE.test(email)) return json({ ok: false, error: "Invalid email" }, 400);
+
+  const existingKey = await env.LICENSES.get(`trial-email:${email}`);
+  if (existingKey) {
+    const raw = await env.LICENSES.get(`license:${existingKey}`);
+    if (raw) {
+      const data = JSON.parse(raw);
+      return json({ ok: false, error: "Trial already issued for this email", key: existingKey, expires_at: data.expires_at }, 409);
+    }
+  }
+
+  const key = generateLicenseKey();
+  const now = Date.now();
+  const expiresAt = now + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000;
+  const license = {
+    plan: "pro",
+    trial: true,
+    email,
+    active: true,
+    createdAt: new Date(now).toISOString(),
+    expires_at: expiresAt,
+  };
+  const trialTtlSec = TRIAL_DURATION_DAYS * 24 * 60 * 60 + 7 * 24 * 60 * 60;
+  await env.LICENSES.put(`license:${key}`, JSON.stringify(license), { expirationTtl: trialTtlSec });
+  await env.LICENSES.put(`trial-email:${email}`, key, { expirationTtl: trialTtlSec });
+
+  const emailResult = await sendTrialEmail(env, email, key, expiresAt);
+
+  await fireGA4Event(env, clientId || email, "trial_started", {
+    plan: "pro",
+    days: TRIAL_DURATION_DAYS,
+    email_sent: emailResult.sent ? 1 : 0,
+  });
+
+  return json({ ok: true, key, email, expires_at: expiresAt, email_sent: emailResult.sent });
+}
+__name(handleTrialStart, "handleTrialStart");
 
 async function handleTrack(request, env) {
   try {
@@ -316,7 +399,19 @@ var index_default = {
       const raw = await env.LICENSES.get(`license:${key}`);
       if (!raw) return json({ valid: false, error: "Key not found" });
       const license = JSON.parse(raw);
-      return json({ valid: license.active, plan: license.plan, email: license.email });
+      const isTrial = Boolean(license.trial);
+      const expired = isTrial && license.expires_at && Date.now() > license.expires_at;
+      return json({
+        valid: license.active && !expired,
+        plan: license.plan,
+        email: license.email,
+        trial: isTrial,
+        expires_at: license.expires_at || null,
+        reason: expired ? "trial_expired" : undefined,
+      });
+    }
+    if (url.pathname === "/trial/start" && request.method === "POST") {
+      return handleTrialStart(request, env);
     }
     if (url.pathname === "/license" && request.method === "GET") {
       return handleGetLicense(url, env);

@@ -1,7 +1,9 @@
-import { trackEvent } from './analytics';
+import { trackEvent, getClientId, withClientRef } from './analytics';
 import { signatures } from './signatures';
 
 const FREE_LIMIT = 50;
+const NUDGE_THRESHOLD_SCANS = 3;
+const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
 const STRIPE_PLANS = [
   { label: 'Monthly', price: '$7.99/mo', url: 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00', plan: 'monthly' },
@@ -32,14 +34,23 @@ interface LicenseData {
   plan?: string;
   email?: string;
   key?: string;
+  trial?: boolean;
+  expires_at?: number | null;
 }
 
-async function isLicenseValid(): Promise<boolean> {
+async function getLicense(): Promise<LicenseData | null> {
+  const result = await chrome.storage.sync.get({ sd_license: null });
+  return result['sd_license'] as LicenseData | null;
+}
+
+async function isLicenseValid(license?: LicenseData | null): Promise<boolean> {
   const LICENSE_TTL_MS = 48 * 60 * 60 * 1000;
   const LICENSE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
-  const result = await chrome.storage.sync.get({ sd_license: null });
-  const sd_license = result['sd_license'] as LicenseData | null;
+  const sd_license = license !== undefined ? license : await getLicense();
   if (!sd_license || !sd_license.valid || !sd_license.validated_at) return false;
+  if (sd_license.trial && typeof sd_license.expires_at === 'number' && Date.now() > sd_license.expires_at) {
+    return false;
+  }
   return Date.now() < sd_license.validated_at + LICENSE_TTL_MS + LICENSE_GRACE_MS;
 }
 
@@ -111,33 +122,98 @@ function renderTools(tools: Array<{ name: string; category: string; link?: strin
   if (locked > 0) appendUpgradeBanner(resultsEl, locked);
 }
 
-function appendUpgradeBanner(container: HTMLElement, locked: number): void {
-  const banner = document.createElement('div');
-  banner.className = 'upgrade-banner';
-
-  const plans = STRIPE_PLANS.map((p) => {
+function renderPlanGrid(): string {
+  return STRIPE_PLANS.map((p) => {
     const badgeHtml = p.badge ? `<span class="plan-badge">${p.badge}</span>` : '';
     return `<button class="plan-btn" data-url="${p.url}" data-plan="${p.plan}" data-price="${p.price}">${p.label}<br><span class="plan-price">${p.price}</span>${badgeHtml}</button>`;
   }).join('');
+}
 
-  banner.innerHTML = `
-    <div class="upgrade-count">+${locked} more tool${locked !== 1 ? 's' : ''} detected</div>
-    <div class="upgrade-sub">Upgrade to Pro to reveal all 200+ tools</div>
-    <div class="plan-grid">${plans}</div>
-  `;
-
+function wirePlanButtons(banner: HTMLElement, location: string): void {
   banner.querySelectorAll<HTMLButtonElement>('.plan-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       trackEvent('upgrade_clicked', {
-        location: 'popup_banner',
+        location,
         plan: btn.dataset.plan,
         price: btn.dataset.price,
       });
-      chrome.tabs.create({ url: btn.dataset.url! });
+      const clientId = await getClientId();
+      chrome.tabs.create({ url: withClientRef(btn.dataset.url!, clientId) });
     });
   });
+}
 
+function appendUpgradeBanner(container: HTMLElement, locked: number): void {
+  const banner = document.createElement('div');
+  banner.className = 'upgrade-banner';
+  banner.innerHTML = `
+    <div class="upgrade-count">+${locked} more tool${locked !== 1 ? 's' : ''} detected</div>
+    <div class="upgrade-sub">Upgrade to Pro to reveal all 200+ tools</div>
+    <div class="plan-grid">${renderPlanGrid()}</div>
+  `;
+  wirePlanButtons(banner, 'popup_banner');
   container.appendChild(banner);
+}
+
+function appendUpgradeNudge(container: HTMLElement, visibleCount: number): void {
+  const banner = document.createElement('div');
+  banner.className = 'upgrade-banner';
+  banner.innerHTML = `
+    <div class="upgrade-count">Detected ${visibleCount} tool${visibleCount !== 1 ? 's' : ''} here</div>
+    <div class="upgrade-sub">Pro unlocks all 175+ signatures — CRM, A/B testing, sales intel & more</div>
+    <div class="plan-grid">${renderPlanGrid()}</div>
+  `;
+  wirePlanButtons(banner, 'popup_nudge');
+  container.appendChild(banner);
+}
+
+function appendTrialBanner(container: HTMLElement, daysLeft: number, expired: boolean): void {
+  const banner = document.createElement('div');
+  banner.className = 'upgrade-banner';
+  if (expired) {
+    banner.innerHTML = `
+      <div class="upgrade-count">Your Pro trial has ended</div>
+      <div class="upgrade-sub">Keep your full stack analysis — pick a plan to continue</div>
+      <div class="plan-grid">${renderPlanGrid()}</div>
+    `;
+    wirePlanButtons(banner, 'popup_trial_expired');
+  } else {
+    const dayLabel = daysLeft === 1 ? 'day' : 'days';
+    banner.innerHTML = `
+      <div class="upgrade-count">Pro trial · ${daysLeft} ${dayLabel} left</div>
+      <div class="upgrade-sub">Lock in Pro before your trial ends</div>
+      <div class="plan-grid">${renderPlanGrid()}</div>
+    `;
+    wirePlanButtons(banner, 'popup_trial_active');
+  }
+  container.appendChild(banner);
+}
+
+interface NudgeState {
+  sd_scans_with_content: number;
+  sd_last_nudge_at: number;
+}
+
+async function getNudgeState(): Promise<NudgeState> {
+  const result = await chrome.storage.local.get({
+    sd_scans_with_content: 0,
+    sd_last_nudge_at: 0,
+  });
+  return {
+    sd_scans_with_content: result['sd_scans_with_content'] as number,
+    sd_last_nudge_at: result['sd_last_nudge_at'] as number,
+  };
+}
+
+async function recordScanWithContent(): Promise<number> {
+  const { sd_scans_with_content } = await getNudgeState();
+  const next = sd_scans_with_content + 1;
+  await chrome.storage.local.set({ sd_scans_with_content: next });
+  return next;
+}
+
+async function markNudgeShown(): Promise<void> {
+  await chrome.storage.local.set({ sd_last_nudge_at: Date.now() });
 }
 
 function sendMessageToTab(
@@ -221,7 +297,10 @@ async function scanPage(): Promise<void> {
       ...globalMatches.filter(t => !htmlIds.has(t.id)),
     ];
 
-    const licensed = await isLicenseValid();
+    const license = await getLicense();
+    const licensed = await isLicenseValid(license);
+    const onTrial = Boolean(license?.trial && licensed);
+    const trialExpired = Boolean(license?.trial && !licensed);
 
     let visibleTools = allTools;
     let locked = 0;
@@ -236,12 +315,46 @@ async function scanPage(): Promise<void> {
     const hasContent = visibleTools.length > 0 || locked > 0;
     setStatus(hasContent ? 'Scan complete.' : 'Scan complete. Nothing detected.');
 
+    const resultsAfter = document.getElementById('results');
+    let nudgeShown = false;
+    let trialBannerShown = false;
+
+    if (onTrial && resultsAfter && typeof license?.expires_at === 'number') {
+      const msLeft = license.expires_at - Date.now();
+      const daysLeft = Math.max(1, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
+      appendTrialBanner(resultsAfter, daysLeft, false);
+      trialBannerShown = true;
+      trackEvent('trial_banner_shown', { days_left: daysLeft });
+    } else if (trialExpired && resultsAfter) {
+      appendTrialBanner(resultsAfter, 0, true);
+      trialBannerShown = true;
+      trackEvent('trial_expired_banner_shown');
+    } else if (!licensed && visibleTools.length > 0) {
+      const scansWithContent = await recordScanWithContent();
+      if (locked === 0) {
+        const { sd_last_nudge_at } = await getNudgeState();
+        const cooledDown = Date.now() - sd_last_nudge_at > NUDGE_COOLDOWN_MS;
+        if (scansWithContent >= NUDGE_THRESHOLD_SCANS && cooledDown && resultsAfter) {
+          appendUpgradeNudge(resultsAfter, visibleTools.length);
+          await markNudgeShown();
+          nudgeShown = true;
+          trackEvent('upgrade_nudge_shown', {
+            tools_detected: visibleTools.length,
+            scans_with_content: scansWithContent,
+          });
+        }
+      }
+    }
+
     const siteHost = (() => { try { return new URL(tab.url!).hostname; } catch { return ''; } })();
     trackEvent('scan_complete', {
       tools_detected: visibleTools.length,
       tools_locked: locked,
-      site: siteHost,
+      domain: siteHost,
       licensed,
+      nudge_shown: nudgeShown,
+      trial: onTrial,
+      trial_banner_shown: trialBannerShown,
     });
   } catch (_) {
     trackEvent('scan_error');
