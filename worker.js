@@ -1041,6 +1041,25 @@ const SD_HTML = `<!DOCTYPE html>
     .faq-item.open .faq-a { max-height: 300px; padding-bottom: 18px; }
     .faq-item.open .faq-arrow { transform: rotate(180deg); }
 
+    /* BLOG TEASER */
+    .blog-teaser { position: relative; z-index: 1; padding: 100px 48px; max-width: 1100px; margin: 0 auto; border-top: 1px solid var(--border); }
+    .blog-teaser-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; margin-bottom: 40px; flex-wrap: wrap; }
+    .blog-teaser-header-text { max-width: 520px; }
+    .blog-teaser-all { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); white-space: nowrap; text-decoration: none; }
+    .blog-teaser-all:hover { opacity: 0.8; }
+    .blog-teaser-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .blog-teaser-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 28px 26px 24px; display: flex; flex-direction: column; gap: 14px;
+      transition: border-color 0.2s, transform 0.2s; text-decoration: none; color: inherit;
+    }
+    .blog-teaser-card:hover { border-color: rgba(200,241,53,0.3); transform: translateY(-2px); }
+    .blog-teaser-meta { display: flex; align-items: center; gap: 10px; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .blog-teaser-tag { color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(200,241,53,0.18); padding: 3px 8px; border-radius: 4px; }
+    .blog-teaser-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.02em; line-height: 1.3; color: var(--text); }
+    .blog-teaser-excerpt { font-size: 0.83rem; color: var(--muted); line-height: 1.65; font-weight: 300; flex: 1; }
+    .blog-teaser-cta { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-top: 4px; }
+
     /* FINAL CTA */
     .final-cta {
       position: relative; z-index: 1; text-align: center;
@@ -1064,6 +1083,8 @@ const SD_HTML = `<!DOCTYPE html>
       .steps { grid-template-columns: 1fr; }
       .step:first-child { border-radius: 12px 12px 0 0; }
       .step:last-child { border-radius: 0 0 12px 12px; }
+      .blog-teaser-grid { grid-template-columns: 1fr; }
+      .blog-teaser { padding: 80px 24px; }
     }
     @media (max-width: 768px) {
       .stats-strip { flex-direction: column; }
@@ -1407,6 +1428,38 @@ ${NAV('sd')}
       <button class="faq-q" aria-expanded="false">Can I cancel? <span class="faq-arrow">▾</span></button>
       <div class="faq-a">Monthly Pro can be cancelled anytime from your Stripe billing portal — no questions asked. The 3-month, 6-month, and annual plans are one-time charges with no recurring billing, so there's nothing to cancel. Your access is active for the full period you paid for.</div>
     </div>
+  </div>
+</div>
+
+<!-- BLOG TEASER -->
+<div class="blog-teaser">
+  <div class="blog-teaser-header reveal">
+    <div class="blog-teaser-header-text">
+      <div class="section-label">From the blog</div>
+      <h2 class="section-title">Deeper reads on tech-stack research.</h2>
+      <p class="section-sub">Real data, real comparisons, and the exact playbooks behind every signature in the extension.</p>
+    </div>
+    <a href="/blog" class="blog-teaser-all">All posts →</a>
+  </div>
+  <div class="blog-teaser-grid">
+    <a href="/blog/framer-vs-webflow-2026" class="blog-teaser-card reveal">
+      <div class="blog-teaser-meta"><span class="blog-teaser-tag">Featured</span><span>May 6, 2026 · 9 min</span></div>
+      <h3 class="blog-teaser-title">Framer vs Webflow in 2026: We Scanned 1,000+ Sites and the Data Is Clear</h3>
+      <p class="blog-teaser-excerpt">One builder is quietly winning the market, the other is bleeding share. The numbers behind the no-code debate.</p>
+      <span class="blog-teaser-cta">Read the breakdown →</span>
+    </a>
+    <a href="/blog/founder-stack-2026" class="blog-teaser-card reveal">
+      <div class="blog-teaser-meta"><span class="blog-teaser-tag">Tools</span><span>May 6, 2026 · 11 min</span></div>
+      <h3 class="blog-teaser-title">The Lean Founder Stack 2026: 10 Tools Under $100/mo</h3>
+      <p class="blog-teaser-excerpt">The exact 10-tool stack winning for indie SaaS founders right now — and what each tool costs.</p>
+      <span class="blog-teaser-cta">Read the stack →</span>
+    </a>
+    <a href="/blog/best-chrome-extensions-tech-stack.html" class="blog-teaser-card reveal">
+      <div class="blog-teaser-meta"><span class="blog-teaser-tag">Tools</span><span>May 2, 2026 · 9 min</span></div>
+      <h3 class="blog-teaser-title">Best Chrome Extensions for Researching Tech Stacks</h3>
+      <p class="blog-teaser-excerpt">A ranked comparison of every extension that does tech-stack detection — what each catches and which to trust.</p>
+      <span class="blog-teaser-cta">Read the ranking →</span>
+    </a>
   </div>
 </div>
 
