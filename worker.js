@@ -82,6 +82,12 @@ const BASE_CSS = `
     text-decoration: none; display: inline-block;
   }
   .btn-nav:hover { opacity: 0.85; transform: translateY(-1px); }
+  .nav-toggle {
+    display: none; background: none; border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; padding: 8px 10px;
+    font-size: 1.2rem; line-height: 1; border-radius: 6px; margin-left: auto;
+  }
+  .nav-toggle:hover { border-color: var(--accent); color: var(--accent); }
   .btn-outline {
     font-family: 'DM Mono', monospace; font-size: 0.72rem; font-weight: 500;
     letter-spacing: 0.08em; text-transform: uppercase;
@@ -147,8 +153,18 @@ const BASE_CSS = `
 
   /* RESPONSIVE */
   @media (max-width: 768px) {
-    nav { padding: 18px 24px; }
-    .nav-links { display: none; }
+    nav { padding: 18px 24px; flex-wrap: wrap; }
+    .nav-toggle { display: block; }
+    .nav-links {
+      display: none; width: 100%;
+      flex-direction: column; align-items: stretch; gap: 0;
+      padding: 8px 0 4px; order: 99; margin-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .nav-links li { list-style: none; }
+    .nav-links a { display: block; padding: 14px 4px; font-size: 1rem; border-bottom: 1px solid var(--border); }
+    .nav-links li:last-child a { border-bottom: none; }
+    nav.nav-open .nav-links { display: flex; }
     .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
     site-footer { padding: 40px 24px; }
   }
@@ -170,6 +186,7 @@ const NAV = (active) => `
     <li><a href="/about" ${active==='about'?'class="active"':''}>About</a></li>
   </ul>
   <a href="/saas-detective" class="btn-nav">Get SaaS Detective</a>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
 </nav>`;
 
 const FOOTER = `
@@ -218,6 +235,21 @@ const NAV_SCRIPT = `
     });
   }, { threshold: 0.08 });
   reveals.forEach(el => observer.observe(el));
+  const navToggle = document.getElementById('navToggle');
+  if (navToggle && nav) {
+    navToggle.addEventListener('click', () => {
+      const open = nav.classList.toggle('nav-open');
+      navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      navToggle.textContent = open ? '✕' : '☰';
+    });
+    nav.querySelectorAll('.nav-links a').forEach(a => {
+      a.addEventListener('click', () => {
+        nav.classList.remove('nav-open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.textContent = '☰';
+      });
+    });
+  }
 </script>`;
 
 // ─────────────────────────────────────────────
