@@ -459,11 +459,33 @@ const HOME_HTML = `<!DOCTYPE html>
     .newsletter-inner h2 { margin-bottom: 16px; }
     .newsletter-inner p { color: var(--muted); line-height: 1.7; font-weight: 300; margin-bottom: 36px; }
 
+    /* BLOG TEASER */
+    .blog-teaser { position: relative; z-index: 1; padding: 120px 48px; max-width: 1100px; margin: 0 auto; }
+    .blog-teaser-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; margin-bottom: 48px; flex-wrap: wrap; }
+    .blog-teaser-header-text { max-width: 520px; }
+    .blog-teaser-all { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
+    .blog-teaser-all:hover { opacity: 0.8; }
+    .blog-teaser-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .blog-teaser-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 28px 26px 24px; display: flex; flex-direction: column; gap: 14px;
+      transition: border-color 0.2s, transform 0.2s;
+      text-decoration: none; color: inherit;
+    }
+    .blog-teaser-card:hover { border-color: rgba(200,241,53,0.3); transform: translateY(-2px); }
+    .blog-teaser-meta { display: flex; align-items: center; gap: 10px; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .blog-teaser-tag { color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(200,241,53,0.18); padding: 3px 8px; border-radius: 4px; }
+    .blog-teaser-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.02em; line-height: 1.3; color: var(--text); }
+    .blog-teaser-excerpt { font-size: 0.83rem; color: var(--muted); line-height: 1.65; font-weight: 300; flex: 1; }
+    .blog-teaser-cta { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-top: 4px; }
+
     /* RESPONSIVE */
     @media (max-width: 900px) {
       .what-grid { grid-template-columns: 1fr; gap: 48px; }
       .product-card { grid-template-columns: 1fr; }
       .product-cta { text-align: left; }
+      .blog-teaser-grid { grid-template-columns: 1fr; }
+      .blog-teaser { padding: 80px 24px; }
     }
     @media (max-width: 768px) {
       .trust-bar { padding: 24px; }
@@ -622,6 +644,38 @@ ${NAV('home')}
   <div class="section-label reveal">Our mission</div>
   <h2 class="section-title reveal">"Information asymmetry is the most valuable edge in business.<br/>We close that gap."</h2>
   <p class="reveal">We're a small, focused software company. No VC funding, no bloated team, no roadmap driven by committee. Just sharp products that solve real problems — built fast, maintained with care, and priced honestly.</p>
+</div>
+
+<!-- BLOG TEASER -->
+<div class="blog-teaser">
+  <div class="blog-teaser-header reveal">
+    <div class="blog-teaser-header-text">
+      <div class="section-label">Latest from the blog</div>
+      <h2 class="section-title">Stack intel, no filler.</h2>
+      <p class="section-sub">Tech-stack breakdowns, founder tooling guides, and competitive research — written and edited by us.</p>
+    </div>
+    <a href="/blog" class="blog-teaser-all">All posts →</a>
+  </div>
+  <div class="blog-teaser-grid">
+    <a href="/blog/framer-vs-webflow-2026" class="blog-teaser-card reveal">
+      <div class="blog-teaser-meta"><span class="blog-teaser-tag">Featured</span><span>May 6, 2026 · 9 min</span></div>
+      <h3 class="blog-teaser-title">Framer vs Webflow in 2026: We Scanned 1,000+ Sites and the Data Is Clear</h3>
+      <p class="blog-teaser-excerpt">One builder is quietly winning the market, the other is bleeding share. We used SaaS Detective to scan over a thousand sites — here's what adoption actually looks like.</p>
+      <span class="blog-teaser-cta">Read the breakdown →</span>
+    </a>
+    <a href="/blog/founder-stack-2026" class="blog-teaser-card reveal">
+      <div class="blog-teaser-meta"><span class="blog-teaser-tag">Tools</span><span>May 6, 2026 · 11 min</span></div>
+      <h3 class="blog-teaser-title">The Lean Founder Stack 2026: 10 Tools Under $100/mo That Replace Enterprise Software</h3>
+      <p class="blog-teaser-excerpt">The fastest-growing solo SaaS businesses aren't running 40 tools — they've found 10 that compose perfectly. The exact stack winning in 2026.</p>
+      <span class="blog-teaser-cta">Read the stack →</span>
+    </a>
+    <a href="/blog/how-to-see-tech-stack.html" class="blog-teaser-card reveal">
+      <div class="blog-teaser-meta"><span class="blog-teaser-tag">Tech Intel</span><span>Apr 7, 2026 · 8 min</span></div>
+      <h3 class="blog-teaser-title">How to See What Tech Stack a Website Uses</h3>
+      <p class="blog-teaser-excerpt">The exact methods professionals use to reverse-engineer any website's technology — frameworks, CMS, analytics, payments — using free tools.</p>
+      <span class="blog-teaser-cta">Read the post →</span>
+    </a>
+  </div>
 </div>
 
 <!-- NEWSLETTER -->
