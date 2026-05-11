@@ -166,6 +166,7 @@ const NAV = (active) => `
   <ul class="nav-links">
     <li><a href="/" ${active==='home'?'class="active"':''}>Home</a></li>
     <li><a href="/saas-detective" ${active==='sd'?'class="active"':''}>SaaS Detective</a></li>
+    <li><a href="/blog" ${active==='blog'?'class="active"':''}>Blog</a></li>
     <li><a href="/about" ${active==='about'?'class="active"':''}>About</a></li>
   </ul>
   <a href="/saas-detective" class="btn-nav">Get SaaS Detective</a>
@@ -188,6 +189,7 @@ const FOOTER = `
     <div class="footer-col">
       <div class="footer-col-title">Company</div>
       <a href="/about">About</a>
+      <a href="/blog">Blog</a>
       <a href="/privacy">Privacy Policy</a>
       <a href="/terms">Terms of Service</a>
     </div>
