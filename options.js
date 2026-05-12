@@ -196,6 +196,7 @@ async function init() {
   const resetBtn = document.getElementById('reset');
 
   document.querySelectorAll('a[data-plan]').forEach(link => {
+    attachClientRef(link);
     link.addEventListener('click', () => {
       trackEvent('upgrade_clicked', {
         location: 'options_pricing',

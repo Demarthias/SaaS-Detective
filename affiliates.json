@@ -1,4 +1,4 @@
-{
+﻿{
   "Fathom Analytics": {
     "status": "active",
     "url": "https://usefathom.com/ref/G4NCVP",
@@ -112,6 +112,12 @@
     "url": "https://partners.kit.com/fa2gudf11pfj",
     "program": "ConvertKit (Kit) Affiliate",
     "notes": "Approved 2026-04-10 via partners.kit.com"
+  },
+  "Constant Contact": {
+    "status": "pending",
+    "url": "",
+    "program": "CJ (Commission Junction)",
+    "notes": "Apply on CJ — historically a top CJ email affiliate; signature added 2026-05-10 so it's ready for the real click URL"
   },
   "Drip": {
     "status": "active",
@@ -293,11 +299,23 @@
     "program": "CJ (Commission Junction)",
     "notes": "Real CJ affiliate link — approved"
   },
+  "NordPass": {
+    "status": "active",
+    "url": "https://www.kqzyfj.com/click-101717325-17261169",
+    "program": "CJ (Commission Junction)",
+    "notes": "Real CJ affiliate link — approved"
+  },
   "Semrush": {
     "status": "active",
     "url": "https://semrush.sjv.io/saasdetective",
     "program": "Impact",
     "notes": "Replace saasdetective with your Impact publisher ID"
+  },
+  "Elementor": {
+    "status": "active",
+    "url": "https://www.dpbolvw.net/click-101717325-15832558",
+    "program": "CJ (Commission Junction)",
+    "notes": "Real CJ affiliate link - approved"
   },
   "Miro": {
     "status": "active",

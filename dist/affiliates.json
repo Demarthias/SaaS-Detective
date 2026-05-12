@@ -1,4 +1,10 @@
 {
+  "Fathom Analytics": {
+    "status": "active",
+    "url": "https://usefathom.com/ref/G4NCVP",
+    "program": "Fathom Referral",
+    "notes": "Real affiliate link — added 2026-05-06"
+  },
   "Shopify": {
     "status": "active",
     "url": "https://shopify.pxf.io/c/6918744/1728774/13624",
@@ -106,6 +112,12 @@
     "url": "https://partners.kit.com/fa2gudf11pfj",
     "program": "ConvertKit (Kit) Affiliate",
     "notes": "Approved 2026-04-10 via partners.kit.com"
+  },
+  "Constant Contact": {
+    "status": "pending",
+    "url": "",
+    "program": "CJ (Commission Junction)",
+    "notes": "Apply on CJ — historically a top CJ email affiliate; signature added 2026-05-10 so it's ready for the real click URL"
   },
   "Drip": {
     "status": "active",
@@ -284,6 +296,12 @@
   "NordVPN": {
     "status": "active",
     "url": "https://www.jdoqocy.com/click-101717325-13914989",
+    "program": "CJ (Commission Junction)",
+    "notes": "Real CJ affiliate link — approved"
+  },
+  "NordPass": {
+    "status": "active",
+    "url": "https://www.kqzyfj.com/click-101717325-17261169",
     "program": "CJ (Commission Junction)",
     "notes": "Real CJ affiliate link — approved"
   },

@@ -1,5 +1,60 @@
 # SaaS Detective — Claude Session Log
 
+## Session: 2026-05-11
+
+### Growth Sprint — 4 items shipped end-to-end
+
+**1. Marketing-site tracking patch — DEPLOYED**
+- Discovered the 2026-05-09 patch (checkout_begin GA4 tracking on Stripe links) was in `worker.js` locally but never went live on `venom-industries.com`. Created `marketing-site-worker/wrangler.toml` (minimal: name + main only, no routes/bindings declared so existing infra is preserved) and ran `wrangler deploy`. **The Cloudflare worker now serves the patched content at `venom-saas-detective.kubegrayson.workers.dev` — but venom-industries.com is GitHub Pages.** See `Topology` note below.
+
+**2. Broader popup upgrade triggers — `src/popup.ts`**
+- Existing `>50 tools detected` banner kept (rare trigger).
+- Added soft "Detected N tools here / Pro unlocks all 175+ signatures" nudge that fires after the user has scanned 3+ pages with detected tools (`sd_scans_with_content` counter in `chrome.storage.local`), throttled to once per 24h via `sd_last_nudge_at`. Tracks `upgrade_nudge_shown` event with `tools_detected` and `scans_with_content` params, location `popup_nudge` on click.
+- Refactored shared banner internals: `renderPlanGrid()` + `wirePlanButtons(banner, location)` so the three banner variants (locked-hard, soft-nudge, trial) share the plan grid wiring.
+
+**3. Pricing page — stat strip + Free-vs-Pro comparison table**
+- Edits made in BOTH `worker.js` (workers.dev) AND `Venom-Industries-LLC/saas-detective.html` (GitHub Pages — the real production source).
+- Added a 4-cell stat strip above the pricing grid: 175+ signatures / 45+ categories / 100% client-side / "Founders & sales" (placeholder — TODO marker for live CWS install count).
+- Added side-by-side Free vs Pro comparison table after the pricing grid (8 rows).
+- Renamed classes to `.pricing-stats` / `.pricing-stat` to avoid collision with the existing `.stats-strip`/`.stat` on the hero.
+
+**4. 7-day Pro trial flow — full stack**
+- **Licensing worker (`licensing-worker/src/index.js`):** New `POST /trial/start` endpoint. Validates email regex, blocks duplicate emails via `trial-email:${email}` KV key (returns 409 + existing key/expiry), generates a `SD-XXXX-XXXX-XXXX-XXXX` license, stores `license:${key}` with `{ plan: "pro", trial: true, active: true, email, createdAt, expires_at }` and a 14-day KV TTL. Sends Resend email if `RESEND_API_KEY` is set (graceful no-op otherwise — the key is still returned in response, so the trial works inline regardless). Fires GA4 `trial_started` event with `email_sent` flag.
+- `/validate` now returns `trial`, `expires_at`, and treats trials past their `expires_at` as `valid: false` with `reason: "trial_expired"`.
+- **Marketing site:** Inline email-capture form added to both `worker.js` and `saas-detective.html`, posts to `/trial/start`, reveals the license key inline on success, shows duplicate-email error on 409. Tracks `trial_form_submitted` event.
+- **Extension (`src/popup.ts`, `src/background.ts`):** `LicenseData` extended with `trial` + `expires_at`. Background revalidation alarm now writes those fields and fires `trial_expired` event when a trial expires. Popup shows a "Pro trial · N days left" banner when on an active trial, or a "Your Pro trial has ended" banner with plan grid when expired. These banners replace the regular nudge for trial users.
+
+### Deploys
+- `saas-detective-licensing` worker — version `f1198dfd-6d49-47c2-8a85-f98c8979357a` (trial endpoint live)
+- `venom-saas-detective` worker — versions `9030de91 → 1c2bb12e → ccb6ccdf → 17157648` (pricing + trial form, four iterations)
+- Both git repos pushed to GitHub `main`. GitHub Pages on Venom-Industries-LLC rebuilds in 30-90s.
+- Extension version bumped `src/manifest.json` 2.6.8 → 2.7.0. **CWS submission not done in this session** — `dist/` is rebuilt but you need to upload to the Web Store yourself.
+
+### Smoke tests passed
+- `POST /trial/start` with fresh email → `{ ok: true, key: "SD-...", email, expires_at, email_sent: false }`
+- `GET /validate?key=<trial key>` → `{ valid: true, plan: "pro", trial: true, expires_at }`
+- Duplicate email on `/trial/start` → 409
+- `npx tsc --noEmit` clean after popup + background edits
+- `npx webpack --mode production` clean
+
+### Topology gotcha (discovered the hard way)
+`venom-industries.com/saas-detective` is served by **GitHub Pages** (Demarthias/Venom-Industries-LLC repo, file `saas-detective.html`), proxied through Cloudflare DNS. The Cloudflare Worker `venom-saas-detective` is only on the workers.dev URL. Headers gave it away: `x-github-request-id` + `Via: 1.1 varnish` (Fastly = GitHub Pages CDN). All marketing-site changes must go to BOTH files.
+
+### Follow-up — resolved in same session
+- **CWS submission**: packaged `saas-detective-2.7.0.zip` (45.9 KB, manifest at root) at repo root via `npm run build` + Compress-Archive. User uploaded + submitted via dev console.
+- **Install count placeholder**: kept directional copy ("Founders & sales / Built for") instead of showing 50 installs — at this scale a raw number suppresses conversion vs directional. Revisit when installs > ~300.
+- **Resend configured**: `venom-industries.com` verified on Resend (SPF + DKIM via Cloudflare DNS, DNS-only / grey-cloud). `wrangler secret put RESEND_API_KEY` and `RESEND_FROM` set on `saas-detective-licensing` worker. `RESEND_FROM` is `"SaaS Detective <grayson@venom-industries.com>"` so replies land in the existing support inbox.
+- **Smoke test**: posted `/trial/start` for two test emails — both returned `email_sent: true` and landed in user's inbox with the SD-XXXX-XXXX-XXXX-XXXX key, expected subject, and 3-step activation copy. Trial flow is live end-to-end.
+
+### Permission justifications written for CWS review
+Wrote justification copy for `alarms`, `storage`, `scripting`, `activeTab`, and `host_permissions` — see conversation history for the exact text used in the dev console. Centered on license revalidation (24h alarm), local-only storage, MAIN-world script injection on active tab only, no off-device data transmission.
+
+### Still outstanding (carryover from prior sessions)
+- ~26 placeholder affiliate entries still need real IDs.
+- venom-industries.com Cloudflare caching still at 0%.
+
+---
+
 ## Session: 2026-04-27
 
 ### Affiliate Links Added

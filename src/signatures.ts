@@ -1,4 +1,4 @@
-export interface SaasSignature {
+﻿export interface SaasSignature {
   id: string;
   name: string;
   category: string;
@@ -87,6 +87,7 @@ export const signatures: SaasSignature[] = [
   { id: 'mailerlite', name: 'MailerLite', category: 'Email', patterns: ['static.mailerlite.com', 'assets.mailerlite.com'], globalVar: ['ml_account'] },
   { id: 'getresponse', name: 'GetResponse', category: 'Email', patterns: ['gr4.com/js/', 'gr-analytics.com'], globalVar: ['_gr4'] },
   { id: 'customerio', name: 'Customer.io', category: 'Email', patterns: ['assets.customer.io', 'cio-tracker.js'], globalVar: ['_cio'] },
+  { id: 'constantcontact', name: 'Constant Contact', category: 'Email', patterns: ['static.ctctcdn.com', 'ctctcdn.com', 'r20.rs6.net', 'constantcontact.com/signup'], globalVar: ['CTCT', '_ctct'] },
 
   // --- PUSH NOTIFICATIONS ---
   { id: 'onesignal', name: 'OneSignal', category: 'Push Notifications', patterns: ['cdn.onesignal.com'], globalVar: ['OneSignal'] },
@@ -139,6 +140,7 @@ export const signatures: SaasSignature[] = [
   { id: 'framer', name: 'Framer', category: 'Builder', patterns: ['framerusercontent.com', 'framer.com/m'], globalVar: [] },
   { id: 'duda', name: 'Duda', category: 'Builder', patterns: ['irp-cdn.multiscreensite.com', 'dm-cdn.multiscreensite.com'], globalVar: ['dmAPI'] },
 
+  { id: 'elementor', name: 'Elementor', category: 'Builder', patterns: ['elementor/js', 'elementor-frontend'], globalVar: ['elementorFrontend'] },
   // --- CMS ---
   { id: 'wordpress', name: 'WordPress', category: 'CMS', patterns: ['/wp-content/', '/wp-includes/', 'wp-json'], globalVar: ['wp', 'wpApiSettings'] },
   { id: 'ghost', name: 'Ghost', category: 'CMS', patterns: ['ghost.org', 'cdn.jsdelivr.net/ghost'], globalVar: ['Ghost'] },
@@ -153,6 +155,7 @@ export const signatures: SaasSignature[] = [
   { id: 'bubble', name: 'Bubble', category: 'No-Code', patterns: ['bubble.io', 'appsbubble.com'], globalVar: ['bubble'] },
   { id: 'carrd', name: 'Carrd', category: 'No-Code', patterns: ['cdn2.carrd.co', 'carrd.co'], globalVar: [] },
   { id: 'glide', name: 'Glide', category: 'No-Code', patterns: ['cdn.glideapps.com', 'glideapps.com'], globalVar: [] },
+  { id: 'miro', name: 'Miro', category: 'No-Code', patterns: ['miro.com/app/embed', 'cdn.miro.com', 'miro.com/embed'], globalVar: ['miro'] },
 
   // --- FRAMEWORK ---
   { id: 'react', name: 'React', category: 'Framework', patterns: ['react.production.min.js', 'react-dom'], globalVar: ['React', '__REACT_DEVTOOLS_GLOBAL_HOOK__'] },
@@ -192,6 +195,7 @@ export const signatures: SaasSignature[] = [
   { id: 'firebase', name: 'Firebase', category: 'Hosting', patterns: ['firebaseapp.com', 'firebase.googleapis.com'], globalVar: ['firebase', '__FIREBASE_DEFAULTS__'] },
   { id: 'render', name: 'Render', category: 'Hosting', patterns: ['onrender.com'], globalVar: [] },
   { id: 'aws_amplify', name: 'AWS Amplify', category: 'Hosting', patterns: ['amplifyapp.com', 'aws-amplify'], globalVar: ['aws_amplify', 'Amplify'] },
+  { id: 'netart', name: 'netart', category: 'Hosting', patterns: ['netart.com/js', 'static.netart.com', 'netart.com/embed'], globalVar: [] },
 
   // --- STORAGE ---
   { id: 'aws_s3', name: 'Amazon S3', category: 'Storage', patterns: ['s3.amazonaws.com', 's3-website'], globalVar: [] },
@@ -204,6 +208,8 @@ export const signatures: SaasSignature[] = [
   { id: 'auth0', name: 'Auth0', category: 'Security', patterns: ['cdn.auth0.com', 'auth0.com/authorize'], globalVar: ['Auth0', 'auth0'] },
   { id: 'okta', name: 'Okta', category: 'Security', patterns: ['okta.com/login', 'okta.com/oauth2', 'cdn.okta.com'], globalVar: ['OktaSignIn'] },
   { id: 'clerk', name: 'Clerk', category: 'Security', patterns: ['clerk.browser.js', 'accounts.dev', 'clerk.dev'], globalVar: ['Clerk'] },
+  { id: 'nordvpn', name: 'NordVPN', category: 'Security', patterns: ['nordvpn.com/js', 'cdn.nordvpn.com'], globalVar: [] },
+  { id: 'nordpass', name: 'NordPass', category: 'Security', patterns: ['nordpass.com/js', 'cdn.nordpass.com', 'assets.nordpass.com'], globalVar: [] },
 
   // --- COMPLIANCE ---
   { id: 'cookiebot', name: 'Cookiebot', category: 'Compliance', patterns: ['consent.cookiebot.com', 'cookiebot.com'], globalVar: ['Cookiebot', 'CookieConsent'] },
@@ -278,6 +284,7 @@ export const signatures: SaasSignature[] = [
   { id: 'zoominfo', name: 'ZoomInfo', category: 'Sales Intelligence', patterns: ['ws.zoominfo.com', 'zoominfo.com/js/'], globalVar: [] },
   { id: 'apollo', name: 'Apollo.io', category: 'Sales Intelligence', patterns: ['cdn.apollo.io', 'assets.apollo.io'], globalVar: [] },
   { id: 'leadfeeder', name: 'Leadfeeder', category: 'Sales Intelligence', patterns: ['lf-cdn.com/ls.min.js', 'lf-cdn.com'], globalVar: [] },
+  { id: 'semrush', name: 'Semrush', category: 'Sales Intelligence', patterns: ['cdn.semrush.com', 'semrush.com/swa', 'semrush.com/widget'], globalVar: [] },
 
   // --- CUSTOMER SUCCESS ---
   { id: 'pendo', name: 'Pendo', category: 'Customer Success', patterns: ['cdn.pendo.io', 'data.pendo.io'], globalVar: ['pendo'] },

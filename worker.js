@@ -1572,7 +1572,7 @@ ${FOOTER}
         fetch(TRACK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ client_id: clientId, events: [{ name: 'checkout_begin', params: params }] }),
+          body: JSON.stringify({ client_id: clientId, events: [{ name: 'begin_checkout', params: params }] }),
           keepalive: true
         });
       } catch (_) {}

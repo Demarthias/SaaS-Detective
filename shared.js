@@ -8,13 +8,52 @@ const VALIDATE_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/v
 const LICENSE_TTL_MS = 48 * 60 * 60 * 1000;
 const LICENSE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
 
+let _cachedClientId = null;
+let _clientIdPromise = null;
+
+function ensureClientId() {
+  if (_cachedClientId) return Promise.resolve(_cachedClientId);
+  if (_clientIdPromise) return _clientIdPromise;
+  _clientIdPromise = (async () => {
+    let id = (await chrome.storage.local.get('ga_client_id')).ga_client_id;
+    if (!id) {
+      id = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
+      await chrome.storage.local.set({ ga_client_id: id });
+    }
+    _cachedClientId = id;
+    return id;
+  })();
+  return _clientIdPromise;
+}
+
+function appendClientRef(url, clientId) {
+  try {
+    const u = new URL(url);
+    if (!u.searchParams.get('client_reference_id')) {
+      u.searchParams.set('client_reference_id', clientId);
+    }
+    return u.toString();
+  } catch (_) {
+    return url;
+  }
+}
+
+// Patches the anchor's href at click time using the cached client_id.
+// Click-time (vs load-time) avoids the race where a user clicks before
+// the chrome.storage.local lookup resolves.
+function attachClientRef(anchorEl) {
+  anchorEl.addEventListener('click', () => {
+    if (_cachedClientId) {
+      anchorEl.href = appendClientRef(anchorEl.href, _cachedClientId);
+    }
+  }, true);
+}
+
+ensureClientId();
+
 async function trackEvent(name, params = {}) {
   try {
-    let clientId = (await chrome.storage.local.get('ga_client_id')).ga_client_id;
-    if (!clientId) {
-      clientId = `${Math.random().toString(36).slice(2)}.${Date.now()}`;
-      await chrome.storage.local.set({ ga_client_id: clientId });
-    }
+    const clientId = await ensureClientId();
     await fetch(TRACK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

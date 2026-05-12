@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — Venom Industries</title>
+  <meta name="description" content="Stack breakdowns, founder tooling guides, and web intelligence from Venom Industries. No fluff. No filler. Just signal." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://venom-industries.com/blog" />
+  <meta property="og:title" content="Blog — Venom Industries" />
+  <meta property="og:description" content="Stack breakdowns, founder tooling guides, and web intelligence. No filler." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://venom-industries.com/blog" />
+  <meta property="og:image" content="https://venom-industries.com/assets/og-image.png" />
+  <meta property="og:site_name" content="Venom Industries" />
+  <link rel="icon" href="/favicon.ico" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Blog — Venom Industries" />
+  <meta name="twitter:description" content="Stack breakdowns, founder tooling guides, and web intelligence from Venom Industries. No fluff. No filler. Just signal." />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MKZX7T7V');</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #060608;
+      --bg2: #0d0d10;
+      --lime: #b8ff00;
+      --lime-dim: rgba(184,255,0,0.07);
+      --lime-border: rgba(184,255,0,0.18);
+      --text: #f0f0f4;
+      --text-muted: #545464;
+      --text-dim: #8080a0;
+      --border: rgba(255,255,255,0.06);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 64px;
+      background: rgba(6,6,8,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 17px;
+      color: var(--lime); text-decoration: none; letter-spacing: 0.05em;
+    }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a {
+      color: var(--text-dim); text-decoration: none; font-size: 12px;
+      letter-spacing: 0.07em; transition: color 0.18s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-cta {
+      background: var(--lime); color: #060608 !important;
+      font-family: 'Rajdhani', sans-serif; font-weight: 700;
+      font-size: 12px !important; letter-spacing: 0.1em; padding: 8px 18px;
+    }
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* HERO */
+    .hero {
+      padding: 144px 48px 72px;
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: end;
+    }
+    .hero-label {
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--lime); margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: clamp(56px, 7.5vw, 100px);
+      font-weight: 700; line-height: 0.9;
+      letter-spacing: -0.03em; text-transform: uppercase; color: var(--text);
+    }
+    .hero h1 em {
+      font-family: 'Instrument Serif', serif; font-style: italic;
+      text-transform: none; color: var(--lime); font-weight: 400;
+    }
+    .hero-right {
+      padding-bottom: 8px;
+    }
+    .hero-sub {
+      color: var(--text-dim); font-size: 13px; line-height: 1.85;
+      margin-bottom: 32px;
+    }
+    .hero-stats {
+      display: flex; gap: 40px;
+      border-top: 1px solid var(--border); padding-top: 28px;
+    }
+    .stat-val {
+      font-family: 'Rajdhani', sans-serif; font-size: 28px;
+      font-weight: 700; color: var(--lime); line-height: 1;
+    }
+    .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.06em; }
+
+    /* POSTS */
+    .posts { max-width: 1200px; margin: 0 auto; padding: 0 48px 120px; }
+    .section-rule {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 48px;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .section-rule::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .posts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); }
+
+    .post-card {
+      display: flex; flex-direction: column; gap: 20px;
+      padding: 48px; background: var(--bg); text-decoration: none;
+      color: inherit; position: relative; overflow: hidden;
+      transition: background 0.2s;
+    }
+    .post-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--lime); transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .post-card:hover { background: var(--bg2); }
+    .post-card:hover::before { transform: scaleX(1); }
+
+    .post-card.featured {
+      grid-column: 1 / -1;
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 0; align-items: stretch;
+    }
+    .featured-index {
+      writing-mode: vertical-rl; text-orientation: mixed;
+      font-family: 'Rajdhani', sans-serif; font-size: 11px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted); padding: 48px 24px 48px 48px;
+      border-right: 1px solid var(--border); user-select: none;
+    }
+    .featured-body {
+      display: flex; flex-direction: column; gap: 20px;
+      padding: 48px;
+    }
+
+    .post-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .post-tag {
+      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--lime); background: var(--lime-dim); border: 1px solid var(--lime-border);
+      padding: 3px 10px;
+    }
+    .post-date, .post-read { font-size: 11px; color: var(--text-muted); }
+    .post-read { margin-left: auto; }
+
+    .post-title {
+      font-family: 'Rajdhani', sans-serif; font-weight: 700;
+      font-size: clamp(22px, 2.8vw, 36px); line-height: 1.05;
+      color: var(--text); letter-spacing: -0.01em; text-transform: uppercase;
+    }
+    .post-card.featured .post-title { font-size: clamp(28px, 4vw, 52px); }
+
+    .post-excerpt { color: var(--text-dim); font-size: 13px; line-height: 1.8; }
+
+    .post-cta {
+      margin-top: auto; font-size: 11px; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--lime);
+      display: flex; align-items: center; gap: 8px;
+      transition: gap 0.2s;
+    }
+    .post-card:hover .post-cta { gap: 14px; }
+
+    /* FOOTER — matches live site exactly */
+    .site-footer { border-top: 1px solid var(--border); padding: 48px; }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 48px;
+    }
+    .footer-logo {
+      font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 16px;
+      color: var(--lime); text-decoration: none; display: block; margin-bottom: 12px;
+    }
+    .footer-brand p { color: var(--text-muted); font-size: 12px; line-height: 1.65; max-width: 280px; }
+    .footer-col h4 {
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 10px; }
+    .footer-col a { color: var(--text-dim); text-decoration: none; font-size: 13px; transition: color 0.18s; }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom {
+      max-width: 1200px; margin: 32px auto 0;
+      padding-top: 24px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-bottom p { font-size: 11px; color: var(--text-muted); }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { gap: 16px; }
+      .hero { grid-template-columns: 1fr; padding: 120px 20px 56px; gap: 36px; }
+      .posts { padding: 0 20px 80px; }
+      .posts-grid { grid-template-columns: 1fr; }
+      .post-card.featured { grid-template-columns: 1fr; }
+      .featured-index { display: none; }
+      .featured-body, .post-card { padding: 32px 20px; }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+      .site-footer { padding: 40px 20px; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MKZX7T7V" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <nav>
+    <a href="/" class="nav-logo">V Venom Industries</a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/saas-detective">SaaS Detective</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/blog" class="active">Blog</a></li>
+      <li><a href="https://chromewebstore.google.com/detail/saas-detective/efnmaomojnnbkmbhkokoflhogjphegpj" class="nav-cta">Add to Chrome — Free</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <p class="hero-label">// The Stack Report</p>
+      <h1>No Fluff.<br /><em>Just</em><br />Signal.</h1>
+    </div>
+    <div class="hero-right">
+      <p class="hero-sub">Stack breakdowns, founder tooling deep-dives, and web intelligence you can actually use. Every post is written by someone who builds tools for a living — not a content team chasing keywords.</p>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-val">2</div>
+          <div class="stat-label">Posts live</div>
+        </div>
+        <div>
+          <div class="stat-val">0</div>
+          <div class="stat-label">Sponsored posts</div>
+        </div>
+        <div>
+          <div class="stat-val">∞</div>
+          <div class="stat-label">Free forever</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="posts">
+    <div class="section-rule">Latest posts</div>
+
+    <div class="posts-grid">
+
+      <!-- FEATURED: Post 1 -->
+      <a href="/blog/framer-vs-webflow-2026" class="post-card featured">
+        <div class="featured-index">Featured · 01</div>
+        <div class="featured-body">
+          <div class="post-meta">
+            <span class="post-tag">Builder Showdown</span>
+            <span class="post-date">May 2026</span>
+            <span class="post-read">9 min read</span>
+          </div>
+          <h2 class="post-title">Framer vs Webflow in 2026:<br />We Scanned 1,000+ Sites and the Data Is Clear</h2>
+          <p class="post-excerpt">The debate has real stakes — one of these builders is quietly winning the market, and the other is bleeding market share. We used SaaS Detective to scan over a thousand startup and SaaS sites and compare actual adoption. Here's what the numbers say, and which one you should be building on right now.</p>
+          <span class="post-cta">Read the breakdown →</span>
+        </div>
+      </a>
+
+      <!-- Post 2 -->
+      <a href="/blog/founder-stack-2026" class="post-card">
+        <div class="post-meta">
+          <span class="post-tag">Founder Tools</span>
+          <span class="post-date">May 2026</span>
+          <span class="post-read">11 min read</span>
+        </div>
+        <h2 class="post-title">The Lean Founder Stack 2026: 10 Tools Under $100/mo That Replace Enterprise Software</h2>
+        <p class="post-excerpt">The fastest-growing solo SaaS businesses aren't running 40 tools. They've found 10 that compose perfectly. We scanned hundreds of indie products and pulled out the exact stack winning in 2026 — including what each tool costs and who to swap it for when you scale.</p>
+        <span class="post-cta">Read the stack →</span>
+      </a>
+
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="/" class="footer-logo">V Venom Industries</a>
+        <p>Building software tools that give founders, marketers, and sales teams an unfair advantage.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Products</h4>
+        <ul>
+          <li><a href="/saas-detective">SaaS Detective</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:grayson@venom-industries.com">grayson@venom-industries.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Venom Industries LLC — All rights reserved.</p>
+      <p>Built in the US · Payments secured by Stripe</p>
+    </div>
+  </footer>
+
+</body>
+</html>

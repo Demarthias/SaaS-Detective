@@ -18,6 +18,7 @@ document.getElementById('openOptions')?.addEventListener('click', () => {
 
 // Track pricing link clicks from onboarding
 document.querySelectorAll('a[href*="buy.stripe.com"]').forEach(link => {
+  attachClientRef(link);
   link.addEventListener('click', () => {
     const url = link.href;
     let plan = 'yearly';

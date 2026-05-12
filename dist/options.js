@@ -147,10 +147,8 @@ function attachActivationListener(input, btn, statusEl) {
     statusEl.style.color = '#475569';
 
     try {
-      const res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, {
-        cache: 'no-store',
-      });
-
+      let res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
+      if (!res.ok) res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`Server error ${res.status}`);
 
       const data = await res.json();
@@ -196,9 +194,9 @@ async function init() {
 
   const container = document.getElementById('category-list');
   const resetBtn = document.getElementById('reset');
-  const openPopupBtn = document.getElementById('openPopup');
 
   document.querySelectorAll('a[data-plan]').forEach(link => {
+    attachClientRef(link);
     link.addEventListener('click', () => {
       trackEvent('upgrade_clicked', {
         location: 'options_pricing',
@@ -219,9 +217,7 @@ async function init() {
     setStatus('Defaults restored');
   });
 
-  openPopupBtn.addEventListener('click', () => {
-    window.open(chrome.runtime.getURL('popup.html'), '_blank');
-  });
+
 }
 
 document.addEventListener('DOMContentLoaded', () => { init(); initLicense(); });
