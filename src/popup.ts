@@ -1,19 +1,24 @@
 import { trackEvent, getClientId, withClientRef } from './analytics';
 import { signatures } from './signatures';
+
 const FREE_LIMIT = 50;
 const NUDGE_THRESHOLD_SCANS = 3;
 const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+
 const STRIPE_PLANS = [
   { label: 'Monthly', price: '$7.99/mo', url: 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00', plan: 'monthly' },
   { label: '3 Months', price: '$19.99', url: 'https://buy.stripe.com/3cIdRb76e9l28aQcZ51Jm04', plan: 'quarterly' },
   { label: '6 Months', price: '$34.99', url: 'https://buy.stripe.com/6oU00lduC54M0Io5wD1Jm05', plan: 'biannual' },
   { label: 'Annual', price: '$59.99/yr', badge: '7-day free trial', url: 'https://buy.stripe.com/8x2bJ3bmu8gYgHm1gn1Jm06', plan: 'annual' },
 ];
+
 // Compact globalVar checks passed to MAIN world script injection
 const globalVarChecks = signatures
   .filter(s => s.globalVar && s.globalVar.length > 0)
   .map(s => ({ id: s.id, name: s.name, category: s.category, vars: s.globalVar as string[] }));
+
 let affiliateTable: Record<string, { status: string; url: string; program?: string }> = {};
+
 async function loadAffiliates(): Promise<void> {
   try {
     const response = await fetch(chrome.runtime.getURL('affiliates.json'));
@@ -22,6 +27,7 @@ async function loadAffiliates(): Promise<void> {
     affiliateTable = {};
   }
 }
+
 interface LicenseData {
   valid?: boolean;
   validated_at?: number;
@@ -31,10 +37,12 @@ interface LicenseData {
   trial?: boolean;
   expires_at?: number | null;
 }
+
 async function getLicense(): Promise<LicenseData | null> {
   const result = await chrome.storage.sync.get({ sd_license: null });
   return result['sd_license'] as LicenseData | null;
 }
+
 async function isLicenseValid(license?: LicenseData | null): Promise<boolean> {
   const LICENSE_TTL_MS = 48 * 60 * 60 * 1000;
   const LICENSE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -45,6 +53,7 @@ async function isLicenseValid(license?: LicenseData | null): Promise<boolean> {
   }
   return Date.now() < sd_license.validated_at + LICENSE_TTL_MS + LICENSE_GRACE_MS;
 }
+
 function resolveLink(toolName: string, fallbackLink?: string): { url: string; hasAffiliate: boolean; program: string | null } {
   const entry = affiliateTable[toolName];
   if (entry && entry.status === 'active' && entry.url) {
@@ -55,25 +64,31 @@ function resolveLink(toolName: string, fallbackLink?: string): { url: string; ha
   }
   return { url: `https://www.google.com/search?q=${encodeURIComponent(toolName)}`, hasAffiliate: false, program: null };
 }
+
 function setStatus(message: string, isError = false): void {
   const statusEl = document.getElementById('status');
   if (!statusEl) return;
   statusEl.textContent = message;
   statusEl.classList.toggle('error', Boolean(isError));
 }
+
 function renderTools(tools: Array<{ name: string; category: string; link?: string }>, locked = 0): void {
   const resultsEl = document.getElementById('results');
   if (!resultsEl) return;
   resultsEl.innerHTML = '';
+
   if (!tools || tools.length === 0) {
     resultsEl.innerHTML = '<div class="empty">No common SaaS tools detected on this page.</div>';
     if (locked > 0) appendUpgradeBanner(resultsEl, locked);
     return;
   }
+
   const fragment = document.createDocumentFragment();
+
   tools.forEach((tool) => {
     const card = document.createElement('div');
     card.className = 'card';
+
     const info = document.createElement('div');
     const name = document.createElement('h4');
     name.textContent = tool.name;
@@ -82,6 +97,7 @@ function renderTools(tools: Array<{ name: string; category: string; link?: strin
     category.textContent = tool.category;
     info.appendChild(name);
     info.appendChild(category);
+
     const { url: link, hasAffiliate, program } = resolveLink(tool.name, tool.link);
     const button = document.createElement('button');
     button.className = 'visit-btn';
@@ -95,19 +111,24 @@ function renderTools(tools: Array<{ name: string; category: string; link?: strin
       });
       chrome.tabs.create({ url: link });
     });
+
     card.appendChild(info);
     card.appendChild(button);
     fragment.appendChild(card);
   });
+
   resultsEl.appendChild(fragment);
+
   if (locked > 0) appendUpgradeBanner(resultsEl, locked);
 }
+
 function renderPlanGrid(): string {
   return STRIPE_PLANS.map((p) => {
     const badgeHtml = p.badge ? `<span class="plan-badge">${p.badge}</span>` : '';
     return `<button class="plan-btn" data-url="${p.url}" data-plan="${p.plan}" data-price="${p.price}">${p.label}<br><span class="plan-price">${p.price}</span>${badgeHtml}</button>`;
   }).join('');
 }
+
 function wirePlanButtons(banner: HTMLElement, location: string): void {
   banner.querySelectorAll<HTMLButtonElement>('.plan-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
@@ -121,6 +142,7 @@ function wirePlanButtons(banner: HTMLElement, location: string): void {
     });
   });
 }
+
 function appendUpgradeBanner(container: HTMLElement, locked: number): void {
   const banner = document.createElement('div');
   banner.className = 'upgrade-banner';
@@ -132,6 +154,7 @@ function appendUpgradeBanner(container: HTMLElement, locked: number): void {
   wirePlanButtons(banner, 'popup_banner');
   container.appendChild(banner);
 }
+
 function appendUpgradeNudge(container: HTMLElement, visibleCount: number): void {
   const banner = document.createElement('div');
   banner.className = 'upgrade-banner';
@@ -143,6 +166,7 @@ function appendUpgradeNudge(container: HTMLElement, visibleCount: number): void 
   wirePlanButtons(banner, 'popup_nudge');
   container.appendChild(banner);
 }
+
 function appendTrialBanner(container: HTMLElement, daysLeft: number, expired: boolean): void {
   const banner = document.createElement('div');
   banner.className = 'upgrade-banner';
@@ -164,10 +188,12 @@ function appendTrialBanner(container: HTMLElement, daysLeft: number, expired: bo
   }
   container.appendChild(banner);
 }
+
 interface NudgeState {
   sd_scans_with_content: number;
   sd_last_nudge_at: number;
 }
+
 async function getNudgeState(): Promise<NudgeState> {
   const result = await chrome.storage.local.get({
     sd_scans_with_content: 0,
@@ -178,15 +204,18 @@ async function getNudgeState(): Promise<NudgeState> {
     sd_last_nudge_at: result['sd_last_nudge_at'] as number,
   };
 }
+
 async function recordScanWithContent(): Promise<number> {
   const { sd_scans_with_content } = await getNudgeState();
   const next = sd_scans_with_content + 1;
   await chrome.storage.local.set({ sd_scans_with_content: next });
   return next;
 }
+
 async function markNudgeShown(): Promise<void> {
   await chrome.storage.local.set({ sd_last_nudge_at: Date.now() });
 }
+
 function sendMessageToTab(
   tabId: number
 ): Promise<{ tools?: Array<{ id: string; name: string; category: string; link?: string }> }> {
@@ -200,6 +229,7 @@ function sendMessageToTab(
     });
   });
 }
+
 async function sendScan(
   tabId: number
 ): Promise<{ tools?: Array<{ id: string; name: string; category: string; link?: string }> }> {
@@ -213,6 +243,7 @@ async function sendScan(
     throw error;
   }
 }
+
 // Run in MAIN world to access page's window globals — catches tools loaded
 // asynchronously or via tag managers that don't leave HTML fingerprints.
 async function getGlobalVarMatches(
@@ -234,46 +265,60 @@ async function getGlobalVarMatches(
     return [];
   }
 }
+
 function isHttpUrl(url?: string): boolean {
   return Boolean(url && (url.startsWith('http://') || url.startsWith('https://')));
 }
+
 async function scanPage(): Promise<void> {
   setStatus('Scanning current tab...');
   const resultsEl = document.getElementById('results');
   if (resultsEl) resultsEl.innerHTML = '';
+
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
   if (!tab || !isHttpUrl(tab.url)) {
     setStatus('Open a website tab to scan.', true);
     return;
   }
+
   try {
     const [response, globalMatches] = await Promise.all([
       sendScan(tab.id!),
       getGlobalVarMatches(tab.id!),
     ]);
+
     const htmlTools = response.tools || [];
     const htmlIds = new Set(htmlTools.map(t => t.id));
+
     // Merge: add globalVar detections not already found by HTML patterns
     const allTools = [
       ...htmlTools,
       ...globalMatches.filter(t => !htmlIds.has(t.id)),
     ];
+
     const license = await getLicense();
     const licensed = await isLicenseValid(license);
     const onTrial = Boolean(license?.trial && licensed);
     const trialExpired = Boolean(license?.trial && !licensed);
+
     let visibleTools = allTools;
     let locked = 0;
+
     if (!licensed && allTools.length > FREE_LIMIT) {
       visibleTools = allTools.slice(0, FREE_LIMIT);
       locked = allTools.length - FREE_LIMIT;
     }
+
     renderTools(visibleTools, locked);
+
     const hasContent = visibleTools.length > 0 || locked > 0;
     setStatus(hasContent ? 'Scan complete.' : 'Scan complete. Nothing detected.');
+
     const resultsAfter = document.getElementById('results');
     let nudgeShown = false;
     let trialBannerShown = false;
+
     if (onTrial && resultsAfter && typeof license?.expires_at === 'number') {
       const msLeft = license.expires_at - Date.now();
       const daysLeft = Math.max(1, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
@@ -300,6 +345,7 @@ async function scanPage(): Promise<void> {
         }
       }
     }
+
     const siteHost = (() => { try { return new URL(tab.url!).hostname; } catch { return ''; } })();
     trackEvent('scan_complete', {
       tools_detected: visibleTools.length,
@@ -317,18 +363,22 @@ async function scanPage(): Promise<void> {
     setStatus('Unable to scan this page. Please refresh and try again.', true);
   }
 }
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadAffiliates();
   trackEvent('popup_opened');
   scanPage();
+
   document.getElementById('rescanBtn')?.addEventListener('click', () => {
     trackEvent('rescan_clicked');
     scanPage();
   });
+
   document.getElementById('onboardingLink')?.addEventListener('click', (event) => {
     event.preventDefault();
     chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });
   });
+
   document.getElementById('optionsLink')?.addEventListener('click', (event) => {
     event.preventDefault();
     chrome.runtime.openOptionsPage();
