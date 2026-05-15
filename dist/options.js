@@ -160,6 +160,8 @@ function attachActivationListener(input, btn, statusEl) {
           plan: data.plan || 'Pro',
           email: data.email || '',
           validated_at: Date.now(),
+          trial: Boolean(data.trial),
+          expires_at: data.expires_at || null,
         };
         await chrome.storage.sync.set({ sd_license: licenseData });
         trackEvent('license_activated', { plan: licenseData.plan, email: licenseData.email });

@@ -116,14 +116,16 @@ async function handleWebhook(request, env) {
     await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(licenseData));
     await env.LICENSES.put(`session:${sessionId}`, JSON.stringify({ licenseKey, ...licenseData }));
     if (subscriptionId) await env.LICENSES.put(`sub:${subscriptionId}`, licenseKey);
+    if (email) await sendPurchaseEmail(env, email, licenseKey, plan);
     const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
-    const planByAmount = AMOUNT_PLAN_MAP[session.amount_total] || plan;
+    const billingPeriod = AMOUNT_PLAN_MAP[session.amount_total] || "unknown";
     const ga4ClientId = session.client_reference_id || customerId || sessionId;
     await fireGA4Event(env, ga4ClientId, "purchase", {
       transaction_id: sessionId,
       value: valueUSD,
       currency: "USD",
-      plan: planByAmount,
+      plan,
+      billing_period: billingPeriod,
       customer_id: customerId || "",
     });
   }
@@ -230,6 +232,39 @@ async function handleGetLicense(url, env) {
 __name(handleGetLicense, "handleGetLicense");
 var TRIAL_DURATION_DAYS = 7;
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+async function sendPurchaseEmail(env, email, key, plan) {
+  if (!env.RESEND_API_KEY) return { sent: false, reason: "no_api_key" };
+  const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";
+  const planLabel = PLAN_LABELS[plan] || "Pro";
+  const body = {
+    from,
+    to: [email],
+    subject: `Your SaaS Detective ${planLabel} license key`,
+    html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
+  <h1 style="font-size:22px;margin:0 0 8px;">Your ${planLabel} license is active</h1>
+  <p style="color:#475569;font-size:14px;margin:0 0 24px;">Thanks for subscribing. Your license key is below — save it somewhere safe.</p>
+  <div style="background:#0f172a;color:#f1f5f9;font-family:monospace;font-size:18px;font-weight:700;letter-spacing:.08em;padding:14px 18px;border-radius:10px;text-align:center;">${key}</div>
+  <h3 style="font-size:14px;margin:20px 0 10px;">Activate in 3 steps</h3>
+  <ol style="color:#334155;font-size:14px;line-height:1.7;padding-left:18px;margin:0 0 24px;">
+    <li>Click the SaaS Detective icon in your browser toolbar</li>
+    <li>Click <strong>Options</strong> at the bottom of the popup</li>
+    <li>Paste your key and click <strong>Activate</strong></li>
+  </ol>
+  <p style="color:#64748b;font-size:12px;">Need help? <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
+</div>`,
+  };
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return { sent: res.ok, status: res.status };
+  } catch (err) {
+    return { sent: false, reason: "fetch_failed" };
+  }
+}
+__name(sendPurchaseEmail, "sendPurchaseEmail");
 async function sendTrialEmail(env, email, key, expiresAt) {
   if (!env.RESEND_API_KEY) return { sent: false, reason: "no_api_key" };
   const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";

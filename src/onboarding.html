@@ -196,44 +196,123 @@
       color: var(--accent);
     }
 
-    .pro-card {
+    /* Trial card */
+    .trial-card {
+      background: var(--bg);
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+
+    .trial-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+
+    .trial-badge {
+      background: #16a34a;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .trial-badge-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+    .trial-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .trial-card > p { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 18px; line-height: 1.5; }
+
+    .trial-form-row { display: flex; gap: 8px; }
+
+    .trial-form-row input[type="email"] {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .trial-form-row input[type="email"]::placeholder { color: rgba(255,255,255,0.35); }
+    .trial-form-row input[type="email"]:focus { border-color: rgba(255,255,255,0.35); }
+
+    .trial-submit-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .trial-submit-btn:hover { background: var(--accent-hover); }
+    .trial-submit-btn:disabled { opacity: 0.6; cursor: default; }
+
+    .trial-status-msg { font-size: 12px; margin-top: 8px; }
+
+    .trial-key-reveal { margin-top: 4px; }
+    .trial-key-hint { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+    .trial-key-box { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+    .trial-key-text { font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; letter-spacing: 0.08em; flex: 1; color: #f1f5f9; }
+    .trial-copy-btn { background: var(--accent); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+    .trial-copy-btn:hover { background: var(--accent-hover); }
+
+    .trial-activate-steps { font-size: 13px; color: rgba(255,255,255,0.65); }
+    .trial-activate-steps ol { padding-left: 18px; line-height: 1.8; }
+    .trial-activate-steps strong { color: #fff; }
+
+    /* Plan purchase grid */
+    .upgrade-section {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 22px 24px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
+      margin-bottom: 16px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    .pro-badge {
-      background: #fef9c3;
-      color: #854d0e;
+    .upgrade-section-label {
       font-size: 11px;
       font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 20px;
+      color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      display: inline-block;
-      margin-bottom: 8px;
+      letter-spacing: 0.07em;
+      margin-bottom: 14px;
     }
 
-    .pro-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-    .pro-card p { font-size: 13px; color: var(--muted); }
+    .upgrade-plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 
-    .pro-link {
-      color: var(--accent);
+    @media (max-width: 560px) { .upgrade-plan-grid { grid-template-columns: 1fr 1fr; } }
+
+    .upgrade-plan-link {
+      display: block;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 8px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text);
       font-size: 13px;
       font-weight: 600;
-      text-decoration: none;
-      white-space: nowrap;
-      margin-left: auto;
+      line-height: 1.4;
+      transition: background 0.15s, border-color 0.15s;
+      position: relative;
     }
 
-    .pro-link:hover { text-decoration: underline; }
+    .upgrade-plan-link:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .upgrade-plan-link[data-plan="annual"] { border-color: rgba(37,99,235,0.4); background: #eff6ff; }
+    .upgrade-plan-link[data-plan="annual"]:hover { background: #dbeafe; }
+
+    .upgrade-plan-price { display: block; font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+    .upgrade-plan-badge { display: block; font-size: 9px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 3px; }
 
     .footer {
       text-align: center;
@@ -296,13 +375,56 @@
       </div>
     </div>
 
-    <div class="pro-card">
-      <div>
-        <div class="pro-badge">Pro</div>
-        <h3>Unlock deeper intelligence</h3>
-        <p>Export results, view full signature details, and get unlimited scans with SaaS Detective Pro.</p>
+    <!-- Trial card -->
+    <div class="trial-card">
+      <div class="trial-header">
+        <span class="trial-badge">7-Day Free Trial</span>
+        <span class="trial-badge-sub">No credit card required</span>
       </div>
-      <a class="pro-link" id="proLink" href="https://venom-industries.com/saas-detective.html" target="_blank">Learn about Pro →</a>
+      <h3>Try Pro free for 7 days</h3>
+      <p>Free plan shows up to 50 tools. Pro unlocks all 200+ signatures across 45 categories — CRM, sales intelligence, A/B testing, and more. Enter your email and we'll send your key instantly.</p>
+
+      <form id="trialForm">
+        <div class="trial-form-row">
+          <input id="trialEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+          <button id="trialSubmit" class="trial-submit-btn" type="submit">Get My Free Key</button>
+        </div>
+        <div id="trialStatus" class="trial-status-msg"></div>
+      </form>
+
+      <div id="trialKeySection" class="trial-key-reveal" style="display:none">
+        <p class="trial-key-hint">Your 7-day Pro trial key — also sent to your email</p>
+        <div class="trial-key-box">
+          <span id="trialKeyText" class="trial-key-text"></span>
+          <button id="copyTrialKey" class="trial-copy-btn" type="button">Copy Key</button>
+        </div>
+        <div class="trial-activate-steps">
+          <ol>
+            <li>Click the <strong>SaaS Detective</strong> icon in your toolbar</li>
+            <li>Click <strong>Options</strong> at the bottom of the popup</li>
+            <li>Paste this key and click <strong>Activate</strong></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Direct purchase options -->
+    <div class="upgrade-section">
+      <div class="upgrade-section-label">Skip the trial — subscribe directly</div>
+      <div class="upgrade-plan-grid">
+        <a class="upgrade-plan-link" href="https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00" target="_blank" data-plan="monthly" data-price="$7.99/mo">
+          Monthly<span class="upgrade-plan-price">$7.99/mo</span>
+        </a>
+        <a class="upgrade-plan-link" href="https://buy.stripe.com/3cIdRb76e9l28aQcZ51Jm04" target="_blank" data-plan="quarterly" data-price="$19.99">
+          3 Months<span class="upgrade-plan-price">$19.99</span>
+        </a>
+        <a class="upgrade-plan-link" href="https://buy.stripe.com/6oU00lduC54M0Io5wD1Jm05" target="_blank" data-plan="biannual" data-price="$34.99">
+          6 Months<span class="upgrade-plan-price">$34.99</span>
+        </a>
+        <a class="upgrade-plan-link" href="https://buy.stripe.com/8x2bJ3bmu8gYgHm1gn1Jm06" target="_blank" data-plan="annual" data-price="$59.99/yr">
+          Annual<span class="upgrade-plan-price">$59.99/yr</span><span class="upgrade-plan-badge">Best value</span>
+        </a>
+      </div>
     </div>
 
     <div class="footer">
@@ -314,6 +436,8 @@
 
 <script src="shared.js"></script>
 <script>
+  const TRIAL_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/trial/start';
+
   document.addEventListener('DOMContentLoaded', () => {
     trackEvent('onboarding_viewed');
 
@@ -321,8 +445,82 @@
       trackEvent('onboarding_completed', { cta: 'test_site' });
     });
 
-    document.getElementById('proLink')?.addEventListener('click', () => {
-      trackEvent('onboarding_cta_clicked', { cta: 'learn_pro' });
+    // Attach client_reference_id to all plan purchase links and track clicks
+    document.querySelectorAll('.upgrade-plan-link').forEach(link => {
+      attachClientRef(link);
+      link.addEventListener('click', () => {
+        trackEvent('upgrade_clicked', {
+          location: 'onboarding',
+          plan: link.dataset.plan,
+          price: link.dataset.price,
+        });
+      });
+    });
+
+    // Trial form submission
+    const form = document.getElementById('trialForm');
+    const emailInput = document.getElementById('trialEmail');
+    const submitBtn = document.getElementById('trialSubmit');
+    const statusEl = document.getElementById('trialStatus');
+    const keySection = document.getElementById('trialKeySection');
+
+    trackEvent('trial_form_shown', { location: 'onboarding' });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      if (!email) return;
+
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+      statusEl.textContent = '';
+      statusEl.style.color = '';
+
+      trackEvent('trial_form_submitted', { location: 'onboarding' });
+
+      try {
+        const clientId = await ensureClientId();
+        const res = await fetch(TRIAL_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, client_id: clientId }),
+        });
+
+        if (res.status === 409) {
+          statusEl.textContent = 'A trial key was already sent to this email — check your inbox.';
+          statusEl.style.color = '#b45309';
+          submitBtn.textContent = 'Get My Free Key';
+          submitBtn.disabled = false;
+          trackEvent('trial_duplicate_email', { location: 'onboarding' });
+          return;
+        }
+
+        if (!res.ok) throw new Error('server_error');
+
+        const data = await res.json();
+        document.getElementById('trialKeyText').textContent = data.key;
+        form.style.display = 'none';
+        keySection.style.display = 'block';
+        trackEvent('trial_key_shown', { location: 'onboarding', email_sent: data.email_sent ? 1 : 0 });
+      } catch (_) {
+        statusEl.textContent = 'Something went wrong — please try again or contact support.';
+        statusEl.style.color = '#dc2626';
+        submitBtn.textContent = 'Get My Free Key';
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Copy trial key
+    document.getElementById('copyTrialKey').addEventListener('click', () => {
+      const key = document.getElementById('trialKeyText').textContent || '';
+      navigator.clipboard.writeText(key).then(() => {
+        const btn = document.getElementById('copyTrialKey');
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.background = '#16a34a';
+        setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
+      });
+      trackEvent('trial_key_copied', { location: 'onboarding' });
     });
   });
 </script>
