@@ -160,8 +160,6 @@ function attachActivationListener(input, btn, statusEl) {
           plan: data.plan || 'Pro',
           email: data.email || '',
           validated_at: Date.now(),
-          trial: Boolean(data.trial),
-          expires_at: data.expires_at || null,
         };
         await chrome.storage.sync.set({ sd_license: licenseData });
         trackEvent('license_activated', { plan: licenseData.plan, email: licenseData.email });
@@ -191,6 +189,94 @@ function attachActivationListener(input, btn, statusEl) {
   }, { once: true });
 }
 
+function exportHistory(entry, format) {
+  let blob, filename;
+  if (format === 'csv') {
+    const rows = [['Name', 'Category', 'URL', 'Scanned At']];
+    entry.tools.forEach(t => rows.push([
+      `"${t.name.replace(/"/g, '""')}"`,
+      `"${(t.category || '').replace(/"/g, '""')}"`,
+      `"${entry.url}"`,
+      `"${new Date(entry.timestamp).toISOString()}"`,
+    ]));
+    blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' });
+    filename = `saas-detective-${entry.domain}-${Date.now()}.csv`;
+  } else {
+    blob = new Blob([JSON.stringify(entry, null, 2)], { type: 'application/json' });
+    filename = `saas-detective-${entry.domain}-${Date.now()}.json`;
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  trackEvent('history_exported', { domain: entry.domain, format, tool_count: entry.toolCount });
+}
+
+function renderHistory() {
+  chrome.storage.local.get({ sd_scan_history: [] }, ({ sd_scan_history }) => {
+    const list = document.getElementById('history-list');
+    list.innerHTML = '';
+    if (!sd_scan_history.length) {
+      list.innerHTML = '<div class="history-empty">No scans yet. Visit a site and click the extension to scan it.</div>';
+      return;
+    }
+    sd_scan_history.forEach(entry => {
+      const item = document.createElement('div');
+      item.className = 'history-item';
+
+      const date = new Date(entry.timestamp);
+      const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+      item.innerHTML = `
+        <div class="history-header">
+          <div class="history-left">
+            <span class="history-domain">${entry.domain}</span>
+            <span class="history-date">${dateStr} ${timeStr}</span>
+          </div>
+          <div class="history-right">
+            <span class="history-count">${entry.toolCount} tool${entry.toolCount !== 1 ? 's' : ''}</span>
+            <span class="history-arrow">&#9658;</span>
+          </div>
+        </div>
+        <div class="history-tools">
+          <div class="history-chip-grid">
+            ${(entry.tools || []).map(t => `<span class="history-chip">${t.name}<span class="chip-cat"> ${t.category || ''}</span></span>`).join('')}
+          </div>
+          <div class="history-export-row">
+            <button class="history-export-btn" data-fmt="csv">&#8595; CSV</button>
+            <button class="history-export-btn" data-fmt="json">&#8595; JSON</button>
+          </div>
+        </div>
+      `;
+
+      item.querySelector('.history-header').addEventListener('click', () => {
+        item.classList.toggle('open');
+      });
+      item.querySelectorAll('.history-export-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          exportHistory(entry, btn.dataset.fmt);
+        });
+      });
+
+      list.appendChild(item);
+    });
+  });
+}
+
+function clearHistory() {
+  if (!confirm('Clear all scan history? This cannot be undone.')) return;
+  chrome.storage.local.remove('sd_scan_history', () => {
+    trackEvent('history_cleared');
+    renderHistory();
+  });
+}
+
 async function init() {
   trackEvent('options_opened');
 
@@ -199,12 +285,14 @@ async function init() {
 
   document.querySelectorAll('a[data-plan]').forEach(link => {
     attachClientRef(link);
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
       trackEvent('upgrade_clicked', {
         location: 'options_pricing',
         plan: link.dataset.plan,
         price: link.dataset.price,
       });
+      chrome.tabs.create({ url: link.href });
     });
   });
 
@@ -219,7 +307,8 @@ async function init() {
     setStatus('Defaults restored');
   });
 
-
+  renderHistory();
+  document.getElementById('clear-history-btn').addEventListener('click', clearHistory);
 }
 
 document.addEventListener('DOMContentLoaded', () => { init(); initLicense(); });

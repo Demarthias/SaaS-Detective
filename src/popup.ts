@@ -4,12 +4,14 @@ import { signatures } from './signatures';
 const FREE_LIMIT = 50;
 const NUDGE_THRESHOLD_SCANS = 3;
 const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+const HISTORY_LIMIT_FREE = 5;
+const HISTORY_LIMIT_PRO = 50;
 
 const STRIPE_PLANS = [
-  { label: 'Monthly', price: '$7.99/mo', url: 'https://buy.stripe.com/aFaaEZ76edBi8aQ5wD1Jm00', plan: 'monthly' },
-  { label: '3 Months', price: '$19.99', url: 'https://buy.stripe.com/3cIdRb76e9l28aQcZ51Jm04', plan: 'quarterly' },
-  { label: '6 Months', price: '$34.99', url: 'https://buy.stripe.com/6oU00lduC54M0Io5wD1Jm05', plan: 'biannual' },
-  { label: 'Annual', price: '$59.99/yr', badge: '7-day free trial', url: 'https://buy.stripe.com/8x2bJ3bmu8gYgHm1gn1Jm06', plan: 'annual' },
+  { label: 'Monthly', price: '$7.99/mo', url: 'https://buy.stripe.com/4gMdRb8aiap6cr61gn1Jm07', plan: 'monthly' },
+  { label: '3 Months', price: '$20/3mo', url: 'https://buy.stripe.com/7sYfZjaiqfJqaiY8IP1Jm08', plan: 'quarterly' },
+  { label: '6 Months', price: '$40/6mo', url: 'https://buy.stripe.com/9B6dRbcqy40I8aQ3ov1Jm09', plan: 'biannual' },
+  { label: 'Annual', price: '$90/yr', badge: '7-day free trial', url: 'https://buy.stripe.com/28E6oJ0HQap69eUe391Jm0a', plan: 'annual' },
 ];
 
 // Compact globalVar checks passed to MAIN world script injection
@@ -148,7 +150,7 @@ function appendUpgradeBanner(container: HTMLElement, locked: number): void {
   banner.className = 'upgrade-banner';
   banner.innerHTML = `
     <div class="upgrade-count">+${locked} more tool${locked !== 1 ? 's' : ''} detected</div>
-    <div class="upgrade-sub">Upgrade to Pro to reveal all 200+ tools</div>
+    <div class="upgrade-sub">Pro reveals the full stack · Export to CSV · Save scan history</div>
     <div class="plan-grid">${renderPlanGrid()}</div>
   `;
   wirePlanButtons(banner, 'popup_banner');
@@ -160,7 +162,7 @@ function appendUpgradeNudge(container: HTMLElement, visibleCount: number): void 
   banner.className = 'upgrade-banner';
   banner.innerHTML = `
     <div class="upgrade-count">Detected ${visibleCount} tool${visibleCount !== 1 ? 's' : ''} here</div>
-    <div class="upgrade-sub">Pro unlocks all 175+ signatures — CRM, A/B testing, sales intel & more</div>
+    <div class="upgrade-sub">Export to CSV · Save scan history · 175+ signatures</div>
     <div class="plan-grid">${renderPlanGrid()}</div>
   `;
   wirePlanButtons(banner, 'popup_nudge');
@@ -187,6 +189,95 @@ function appendTrialBanner(container: HTMLElement, daysLeft: number, expired: bo
     wirePlanButtons(banner, 'popup_trial_active');
   }
   container.appendChild(banner);
+}
+
+// ─── Scan History ────────────────────────────────────────────────────────────
+interface ScanEntry {
+  url: string;
+  domain: string;
+  title: string;
+  timestamp: number;
+  toolCount: number;
+  tools: Array<{ id: string; name: string; category: string }>;
+}
+
+async function saveScanHistory(entry: ScanEntry, isPro: boolean): Promise<void> {
+  if (entry.toolCount === 0) return;
+  const limit = isPro ? HISTORY_LIMIT_PRO : HISTORY_LIMIT_FREE;
+  const result = await chrome.storage.local.get({ sd_scan_history: [] });
+  const history = (result['sd_scan_history'] as ScanEntry[]).filter(h => h.url !== entry.url);
+  await chrome.storage.local.set({ sd_scan_history: [entry, ...history].slice(0, limit) });
+}
+
+// ─── Export ───────────────────────────────────────────────────────────────────
+function exportTools(
+  tools: Array<{ name: string; category: string; link?: string }>,
+  format: 'csv' | 'json',
+  domain: string
+): void {
+  let content: string;
+  const filename = `saas-stack-${domain}-${new Date().toISOString().slice(0, 10)}`;
+
+  if (format === 'csv') {
+    const rows = [['Name', 'Category', 'Link'], ...tools.map(t => {
+      const { url } = resolveLink(t.name, t.link);
+      return [t.name, t.category, url];
+    })];
+    content = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+  } else {
+    content = JSON.stringify(tools.map(t => {
+      const { url } = resolveLink(t.name, t.link);
+      return { name: t.name, category: t.category, link: url };
+    }), null, 2);
+  }
+
+  const mimeType = format === 'csv' ? 'text/csv' : 'application/json';
+  const blob = new Blob([content], { type: mimeType });
+  const objUrl = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), {
+    href: objUrl,
+    download: `${filename}.${format}`,
+  });
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(objUrl);
+}
+
+function wireExportBar(
+  tools: Array<{ id: string; name: string; category: string; link?: string }>,
+  isPro: boolean,
+  domain: string
+): void {
+  const bar = document.getElementById('export-bar');
+  if (!bar || tools.length === 0) return;
+  bar.style.display = 'flex';
+
+  const csvBtn = document.getElementById('exportCsvBtn') as HTMLButtonElement | null;
+  const jsonBtn = document.getElementById('exportJsonBtn') as HTMLButtonElement | null;
+  const lockedBtn = document.getElementById('exportLockedBtn') as HTMLButtonElement | null;
+
+  if (isPro) {
+    if (lockedBtn) lockedBtn.style.display = 'none';
+    csvBtn?.addEventListener('click', () => {
+      exportTools(tools, 'csv', domain);
+      trackEvent('export_clicked', { format: 'csv', tool_count: tools.length });
+    });
+    jsonBtn?.addEventListener('click', () => {
+      exportTools(tools, 'json', domain);
+      trackEvent('export_clicked', { format: 'json', tool_count: tools.length });
+    });
+  } else {
+    if (csvBtn) csvBtn.style.display = 'none';
+    if (jsonBtn) jsonBtn.style.display = 'none';
+    if (lockedBtn) {
+      lockedBtn.style.display = '';
+      lockedBtn.addEventListener('click', () => {
+        trackEvent('export_locked_clicked');
+        document.querySelector<HTMLElement>('.upgrade-banner')?.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+  }
 }
 
 interface NudgeState {
@@ -347,6 +438,18 @@ async function scanPage(): Promise<void> {
     }
 
     const siteHost = (() => { try { return new URL(tab.url!).hostname; } catch { return ''; } })();
+
+    // Save scan to history and wire export bar
+    await saveScanHistory({
+      url: tab.url!,
+      domain: siteHost,
+      title: tab.title || siteHost,
+      timestamp: Date.now(),
+      toolCount: allTools.length,
+      tools: allTools.map(({ id, name, category }) => ({ id, name, category })),
+    }, licensed);
+    wireExportBar(allTools, licensed, siteHost);
+
     trackEvent('scan_complete', {
       tools_detected: visibleTools.length,
       tools_locked: locked,

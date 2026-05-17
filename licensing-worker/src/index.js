@@ -55,9 +55,9 @@ async function fetchStripeSubscription(subscriptionId, stripeKey) {
 __name(fetchStripeSubscription, "fetchStripeSubscription");
 var AMOUNT_PLAN_MAP = {
   799:  "monthly",
-  1999: "3mo",
-  3499: "6mo",
-  5999: "annual"
+  2000: "3mo",
+  4000: "6mo",
+  9000: "annual"
 };
 async function fireGA4Event(env, clientId, eventName, params) {
   const measurementId = env.GA_MEASUREMENT_ID || "G-HVECKYG478";

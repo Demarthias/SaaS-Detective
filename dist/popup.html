@@ -37,6 +37,14 @@
         .plan-price { font-size: 10px; font-weight: 400; color: rgba(255,255,255,0.6); }
         .plan-badge { display: block; font-size: 9px; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
 
+        /* Export bar */
+        #export-bar { display: none; align-items: center; gap: 6px; padding: 6px 16px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; font-size: 11px; }
+        .export-label { color: #64748b; font-weight: 600; flex-shrink: 0; }
+        .export-btn { background: #fff; color: #1e40af; border: 1px solid #bfdbfe; padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .export-btn:hover { background: #eff6ff; }
+        .export-btn-locked { color: #64748b; border-color: #cbd5e1; background: #f8fafc; }
+        .export-btn-locked:hover { background: #f1f5f9; color: #1e40af; }
+
         .footer { padding: 10px 12px 12px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e5e7eb; background: #fff; }
         .footer a { color: #2563eb; text-decoration: none; }
     </style>
@@ -51,6 +59,14 @@
     </div>
 
     <div id="status"></div>
+
+    <div id="export-bar">
+        <span class="export-label">Export:</span>
+        <button id="exportCsvBtn" class="export-btn">↓ CSV</button>
+        <button id="exportJsonBtn" class="export-btn">↓ JSON</button>
+        <button id="exportLockedBtn" class="export-btn export-btn-locked" style="display:none;">↓ Export (Pro)</button>
+    </div>
+
     <div id="results">
         <div class="empty">Initializing...</div>
     </div>

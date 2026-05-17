@@ -86,6 +86,7 @@ export const signatures: SaasSignature[] = [
   { id: 'brevo', name: 'Brevo', category: 'Email', patterns: ['sibautomation.com', 'sendinblue.com'], globalVar: ['sendinblue'] },
   { id: 'mailerlite', name: 'MailerLite', category: 'Email', patterns: ['static.mailerlite.com', 'assets.mailerlite.com'], globalVar: ['ml_account'] },
   { id: 'getresponse', name: 'GetResponse', category: 'Email', patterns: ['gr4.com/js/', 'gr-analytics.com'], globalVar: ['_gr4'] },
+  { id: 'aweber', name: 'AWeber', category: 'Email', patterns: ['forms.aweber.com', 'assets.aweber.com', 'www.aweber.com/form/'], globalVar: ['AWeber', '_aw'] },
   { id: 'customerio', name: 'Customer.io', category: 'Email', patterns: ['assets.customer.io', 'cio-tracker.js'], globalVar: ['_cio'] },
   { id: 'constantcontact', name: 'Constant Contact', category: 'Email', patterns: ['static.ctctcdn.com', 'ctctcdn.com', 'r20.rs6.net', 'constantcontact.com/signup'], globalVar: ['CTCT', '_ctct'] },
 
