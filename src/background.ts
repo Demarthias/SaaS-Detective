@@ -34,7 +34,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   const result = await chrome.storage.sync.get({ sd_license: null });
   const sd_license = result['sd_license'] as LicenseData | null;
 
-  if (!sd_license?.valid || !sd_license?.key) return;
+  if (!sd_license?.key) return;
 
   try {
     const res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(sd_license.key)}`, {

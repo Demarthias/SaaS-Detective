@@ -91,6 +91,10 @@ function renderCategories(container, options) {
   });
 }
 
+function escapeHtml(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 function isLicenseCurrentlyValid(lic) {
   if (!lic || !lic.valid || !lic.validated_at) return false;
   if (lic.trial && typeof lic.expires_at === 'number' && Date.now() > lic.expires_at) return false;
@@ -147,8 +151,12 @@ function attachActivationListener(input, btn, statusEl) {
     statusEl.style.color = '#475569';
 
     try {
-      let res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
-      if (!res.ok) res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
+      let res;
+      try {
+        res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
+      } catch (_) {
+        res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
+      }
       if (!res.ok) throw new Error(`Server error ${res.status}`);
 
       const data = await res.json();
@@ -159,6 +167,8 @@ function attachActivationListener(input, btn, statusEl) {
           valid: true,
           plan: data.plan || 'Pro',
           email: data.email || '',
+          trial: Boolean(data.trial),
+          expires_at: data.expires_at || null,
           validated_at: Date.now(),
           trial: data.trial || false,
           expires_at: data.expires_at || null,
@@ -245,7 +255,7 @@ function renderHistory() {
       item.innerHTML = `
         <div class="history-header">
           <div class="history-left">
-            <span class="history-domain">${entry.domain}</span>
+            <span class="history-domain">${escapeHtml(entry.domain)}</span>
             <span class="history-date">${dateStr} ${timeStr}</span>
           </div>
           <div class="history-right">
@@ -255,7 +265,7 @@ function renderHistory() {
         </div>
         <div class="history-tools">
           <div class="history-chip-grid">
-            ${(entry.tools || []).map(t => `<span class="history-chip">${t.name}<span class="chip-cat"> ${t.category || ''}</span></span>`).join('')}
+            ${(entry.tools || []).map(t => `<span class="history-chip">${escapeHtml(t.name)}<span class="chip-cat"> ${escapeHtml(t.category || '')}</span></span>`).join('')}
           </div>
           <div class="history-export-row">
             <button class="history-export-btn" data-fmt="csv">&#8595; CSV</button>

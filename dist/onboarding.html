@@ -466,7 +466,7 @@
 
     trackEvent('trial_form_shown', { location: 'onboarding' });
 
-    form.addEventListener('submit', async (e) => {
+    form?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = emailInput.value.trim();
       if (!email) return;
@@ -511,7 +511,7 @@
     });
 
     // Copy trial key
-    document.getElementById('copyTrialKey').addEventListener('click', () => {
+    document.getElementById('copyTrialKey')?.addEventListener('click', () => {
       const key = document.getElementById('trialKeyText').textContent || '';
       navigator.clipboard.writeText(key).then(() => {
         const btn = document.getElementById('copyTrialKey');

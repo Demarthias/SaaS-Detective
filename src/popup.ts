@@ -7,11 +7,11 @@ const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 const HISTORY_LIMIT_FREE = 5;
 const HISTORY_LIMIT_PRO = 50;
 
-const STRIPE_PLANS = [
+const STRIPE_PLANS: Array<{ label: string; price: string; url: string; plan: string; badge?: string }> = [
   { label: 'Monthly', price: '$7.99/mo', url: 'https://buy.stripe.com/4gMdRb8aiap6cr61gn1Jm07', plan: 'monthly' },
   { label: '3 Months', price: '$20/3mo', url: 'https://buy.stripe.com/7sYfZjaiqfJqaiY8IP1Jm08', plan: 'quarterly' },
   { label: '6 Months', price: '$40/6mo', url: 'https://buy.stripe.com/9B6dRbcqy40I8aQ3ov1Jm09', plan: 'biannual' },
-  { label: 'Annual', price: '$90/yr', badge: '7-day free trial', url: 'https://buy.stripe.com/28E6oJ0HQap69eUe391Jm0a', plan: 'annual' },
+  { label: 'Annual', price: '$90/yr', url: 'https://buy.stripe.com/28E6oJ0HQap69eUe391Jm0a', plan: 'annual' },
 ];
 
 // Compact globalVar checks passed to MAIN world script injection

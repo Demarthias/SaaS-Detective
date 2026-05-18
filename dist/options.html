@@ -15,6 +15,31 @@
     button { border: none; background: #2563eb; color: #fff; font-weight: 700; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
     button.secondary { background: #e2e8f0; color: #0f172a; }
     .status { margin-top: 8px; font-size: 13px; color: #475569; }
+
+    /* History viewer */
+    .history-item { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+    .history-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; cursor: pointer; user-select: none; background: #fff; }
+    .history-header:hover { background: #f8fafc; }
+    .history-left { display: flex; align-items: baseline; gap: 8px; }
+    .history-domain { font-weight: 600; font-size: 13px; color: #0f172a; }
+    .history-date { font-size: 11px; color: #94a3b8; }
+    .history-right { display: flex; align-items: center; gap: 8px; }
+    .history-count { font-size: 12px; color: #64748b; }
+    .history-arrow { font-size: 10px; color: #94a3b8; display: inline-block; transition: transform 0.15s; }
+    .history-item.open .history-arrow { transform: rotate(90deg); }
+    .history-tools { display: none; border-top: 1px solid #f1f5f9; padding: 10px 12px; background: #f8fafc; }
+    .history-item.open .history-tools { display: block; }
+    .history-chip-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .history-chip { font-size: 11px; background: #fff; border: 1px solid #e2e8f0; border-radius: 99px; padding: 3px 10px; color: #374151; }
+    .history-chip .chip-cat { color: #94a3b8; margin-left: 3px; }
+    .history-export-row { display: flex; gap: 6px; }
+    .history-export-btn { font-size: 11px; padding: 4px 10px; border-radius: 6px; background: #fff; border: 1px solid #bfdbfe; color: #1e40af; cursor: pointer; font-weight: 600; font-family: inherit; }
+    .history-export-btn:hover { background: #eff6ff; }
+    .history-empty { text-align: center; color: #94a3b8; font-size: 13px; padding: 24px 0; }
+    .history-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .history-card-header h2 { font-size: 18px; margin: 0; }
+    .btn-clear { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; font-size: 12px; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; }
+    .btn-clear:hover { background: #e2e8f0; color: #0f172a; }
   </style>
 </head>
 <body>
@@ -23,7 +48,7 @@
 
   <div class="card">
     <h2 style="font-size:18px;margin:0 0 8px">License Key</h2>
-    <p style="margin:0 0 12px;font-size:13px;color:#64748b;">Free plan detects 50 signatures. Pro and above unlocks all 200+ signatures across 25+ categories.</p>
+    <p style="margin:0 0 12px;font-size:13px;color:#64748b;">Free plan detects 50 signatures. Pro and above unlocks all 200+ signatures across 45 categories.</p>
     <div style="display:flex;gap:8px;align-items:center;">
       <input id="license-input" type="text" placeholder="Enter your license key (SD-XXXX-XXXX-XXXX-XXXX)" style="flex:1;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-family:monospace;font-size:13px;" />
       <button id="activate-btn">Activate</button>
@@ -31,9 +56,9 @@
     <p style="margin:8px 0 0;font-size:12px;color:#64748b;">
       Don't have a key? Choose a plan:
       <a href="https://buy.stripe.com/4gMdRb8aiap6cr61gn1Jm07" target="_blank" style="color:#2563eb;" data-plan="monthly" data-price="7.99">$7.99/mo</a> ·
-      <a href="https://buy.stripe.com/7sYfZjaiqfJqaiY8IP1Jm08" target="_blank" style="color:#2563eb;" data-plan="3mo" data-price="20.00">$20/3mo</a> ·
-      <a href="https://buy.stripe.com/9B6dRbcqy40I8aQ3ov1Jm09" target="_blank" style="color:#2563eb;" data-plan="6mo" data-price="40.00">$40/6mo</a> ·
-      <a href="https://buy.stripe.com/28E6oJ0HQap69eUe391Jm0a" target="_blank" style="color:#2563eb;" data-plan="yearly" data-price="90.00">$90/yr</a>
+      <a href="https://buy.stripe.com/7sYfZjaiqfJqaiY8IP1Jm08" target="_blank" style="color:#2563eb;" data-plan="quarterly" data-price="20">$20/3mo</a> ·
+      <a href="https://buy.stripe.com/9B6dRbcqy40I8aQ3ov1Jm09" target="_blank" style="color:#2563eb;" data-plan="biannual" data-price="40">$40/6mo</a> ·
+      <a href="https://buy.stripe.com/28E6oJ0HQap69eUe391Jm0a" target="_blank" style="color:#2563eb;" data-plan="annual" data-price="90">$90/yr</a>
     </p>
     <div id="license-status" style="margin-top:8px;font-size:13px;color:#475569;"></div>
   </div>
@@ -42,6 +67,15 @@
     <h2 style="font-size:18px;margin:0 0 8px">Enabled Categories</h2>
     <p style="margin:0 0 12px;font-size:13px;color:#64748b;">Toggle categories to show/hide them in detection results. Changes are saved automatically and take effect on the next scan.</p>
     <div id="category-list" class="row"></div>
+  </div>
+
+  <div class="card" id="history-card">
+    <div class="history-card-header">
+      <h2>Scan History</h2>
+      <button id="clear-history-btn" class="btn-clear">Clear all</button>
+    </div>
+    <p style="margin:0 0 12px;font-size:13px;color:#64748b;">Sites you've scanned. Pro saves up to 50, Free saves last 5.</p>
+    <div id="history-list"></div>
   </div>
 
   <div class="actions">

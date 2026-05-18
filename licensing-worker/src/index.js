@@ -74,9 +74,11 @@ async function handleWebhook(request, env) {
   const body = await request.text();
   const signature = request.headers.get("stripe-signature") || "";
   if (!await verifyStripeSignature(body, signature, env.STRIPE_WEBHOOK_SECRET)) {
+    console.log("[webhook] invalid signature rejected");
     return new Response("Invalid signature", { status: 400 });
   }
   const event = JSON.parse(body);
+  console.log(`[webhook] received event=${event.type} id=${event.id}`);
 
   // Idempotency: dedupe Stripe webhook retries by event.id (24h TTL).
   // The session.completed branch keeps its own session-keyed guard for back-compat.
@@ -116,18 +118,21 @@ async function handleWebhook(request, env) {
     await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(licenseData));
     await env.LICENSES.put(`session:${sessionId}`, JSON.stringify({ licenseKey, ...licenseData }));
     if (subscriptionId) await env.LICENSES.put(`sub:${subscriptionId}`, licenseKey);
+    console.log(`[webhook] license created key=${licenseKey} plan=${plan} email=${email} amount=${session.amount_total}`);
     if (email) await sendPurchaseEmail(env, email, licenseKey, plan);
     const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
     const billingPeriod = AMOUNT_PLAN_MAP[session.amount_total] || "unknown";
     const ga4ClientId = session.client_reference_id || customerId || sessionId;
-    await fireGA4Event(env, ga4ClientId, "purchase", {
-      transaction_id: sessionId,
-      value: valueUSD,
-      currency: "USD",
-      plan,
-      billing_period: billingPeriod,
-      customer_id: customerId || "",
-    });
+    if (session.amount_total > 0) {
+      await fireGA4Event(env, ga4ClientId, "purchase", {
+        transaction_id: sessionId,
+        value: valueUSD,
+        currency: "USD",
+        plan,
+        billing_period: billingPeriod,
+        customer_id: customerId || "",
+      });
+    }
   }
 
   // ── Checkout abandoned (session expired without payment) ─────────────────
@@ -299,7 +304,21 @@ async function sendTrialEmail(env, email, key, expiresAt) {
   }
 }
 __name(sendTrialEmail, "sendTrialEmail");
+async function checkRateLimit(env, ip, bucket, limit, windowSec) {
+  const key = `rate:${bucket}:${ip}`;
+  const raw = await env.LICENSES.get(key);
+  const count = raw ? parseInt(raw) : 0;
+  if (count >= limit) return false;
+  await env.LICENSES.put(key, String(count + 1), { expirationTtl: windowSec });
+  return true;
+}
+__name(checkRateLimit, "checkRateLimit");
 async function handleTrialStart(request, env) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  if (!await checkRateLimit(env, ip, "trial", 5, 3600)) {
+    console.log(`[trial/start] rate limited ip=${ip}`);
+    return json({ ok: false, error: "Too many trial requests. Try again in an hour." }, 429);
+  }
   let payload;
   try { payload = await request.json(); } catch { return json({ ok: false, error: "Invalid JSON" }, 400); }
   const email = String(payload?.email || "").trim().toLowerCase();
@@ -308,10 +327,8 @@ async function handleTrialStart(request, env) {
   const existingKey = await env.LICENSES.get(`trial-email:${email}`);
   if (existingKey) {
     const raw = await env.LICENSES.get(`license:${existingKey}`);
-    if (raw) {
-      const data = JSON.parse(raw);
-      return json({ ok: false, error: "Trial already issued for this email", key: existingKey, expires_at: data.expires_at }, 409);
-    }
+    const data = raw ? JSON.parse(raw) : {};
+    return json({ ok: false, error: "Trial already issued for this email", expires_at: data.expires_at || null }, 409);
   }
   const key = generateLicenseKey();
   const now = Date.now();
@@ -326,7 +343,9 @@ async function handleTrialStart(request, env) {
   };
   const trialTtlSec = TRIAL_DURATION_DAYS * 24 * 60 * 60 + 7 * 24 * 60 * 60;
   await env.LICENSES.put(`license:${key}`, JSON.stringify(license), { expirationTtl: trialTtlSec });
-  await env.LICENSES.put(`trial-email:${email}`, key, { expirationTtl: trialTtlSec });
+  // No TTL — email block is permanent so the same address can never get a second trial.
+  await env.LICENSES.put(`trial-email:${email}`, key);
+  console.log(`[trial/start] issued key=${key} email=${email} expires=${new Date(expiresAt).toISOString()}`);
   const emailResult = await sendTrialEmail(env, email, key, expiresAt);
   await fireGA4Event(env, clientId || email, "trial_started", {
     plan: "pro",
@@ -482,8 +501,10 @@ var index_default = {
       const license = JSON.parse(raw);
       const isTrial = Boolean(license.trial);
       const expired = isTrial && license.expires_at && Date.now() > license.expires_at;
+      const valid = license.active && !expired;
+      console.log(`[validate] key=${key.slice(0,8)}... valid=${valid} plan=${license.plan} trial=${isTrial} expired=${expired}`);
       return json({
-        valid: license.active && !expired,
+        valid,
         plan: license.plan,
         email: license.email,
         trial: isTrial,
