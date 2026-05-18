@@ -93,8 +93,8 @@ function renderCategories(container, options) {
 
 function isLicenseCurrentlyValid(lic) {
   if (!lic || !lic.valid || !lic.validated_at) return false;
-  const grace = Date.now() < lic.validated_at + LICENSE_TTL_MS + LICENSE_GRACE_MS;
-  return grace;
+  if (lic.trial && typeof lic.expires_at === 'number' && Date.now() > lic.expires_at) return false;
+  return Date.now() < lic.validated_at + LICENSE_TTL_MS + LICENSE_GRACE_MS;
 }
 
 async function initLicense() {
@@ -160,12 +160,22 @@ function attachActivationListener(input, btn, statusEl) {
           plan: data.plan || 'Pro',
           email: data.email || '',
           validated_at: Date.now(),
+          trial: data.trial || false,
+          expires_at: data.expires_at || null,
         };
         await chrome.storage.sync.set({ sd_license: licenseData });
-        trackEvent('license_activated', { plan: licenseData.plan, email: licenseData.email });
+        if (licenseData.trial) {
+          const msLeft = (licenseData.expires_at || 0) - Date.now();
+          const daysLeft = Math.max(1, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
+          trackEvent('trial_activated', { days_remaining: daysLeft, email: licenseData.email });
+        } else {
+          trackEvent('license_activated', { plan: licenseData.plan, email: licenseData.email });
+        }
         const plan = licenseData.plan ? ` · ${licenseData.plan}` : '';
+        const trialNote = licenseData.trial && licenseData.expires_at
+          ? ` · trial expires ${new Date(licenseData.expires_at).toLocaleDateString()}` : '';
         const email = licenseData.email ? ` (${licenseData.email})` : '';
-        statusEl.textContent = `✓ License activated${plan}${email}`;
+        statusEl.textContent = `✓ License activated${plan}${trialNote}${email}`;
         statusEl.style.color = '#16a34a';
         input.disabled = true;
         btn.textContent = 'Remove';

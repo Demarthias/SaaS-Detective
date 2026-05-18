@@ -2,7 +2,7 @@ import { trackEvent, getClientId, withClientRef } from './analytics';
 import { signatures } from './signatures';
 
 const FREE_LIMIT = 50;
-const NUDGE_THRESHOLD_SCANS = 3;
+const NUDGE_THRESHOLD_SCANS = 1;
 const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 const HISTORY_LIMIT_FREE = 5;
 const HISTORY_LIMIT_PRO = 50;
@@ -149,8 +149,8 @@ function appendUpgradeBanner(container: HTMLElement, locked: number): void {
   const banner = document.createElement('div');
   banner.className = 'upgrade-banner';
   banner.innerHTML = `
-    <div class="upgrade-count">+${locked} more tool${locked !== 1 ? 's' : ''} detected</div>
-    <div class="upgrade-sub">Pro reveals the full stack · Export to CSV · Save scan history</div>
+    <div class="upgrade-count">+${locked} tool${locked !== 1 ? 's' : ''} hidden by free limit</div>
+    <div class="upgrade-sub">Pro unlocks all 200+ signatures · CSV export · Scan history</div>
     <div class="plan-grid">${renderPlanGrid()}</div>
   `;
   wirePlanButtons(banner, 'popup_banner');
@@ -162,7 +162,7 @@ function appendUpgradeNudge(container: HTMLElement, visibleCount: number): void 
   banner.className = 'upgrade-banner';
   banner.innerHTML = `
     <div class="upgrade-count">Detected ${visibleCount} tool${visibleCount !== 1 ? 's' : ''} here</div>
-    <div class="upgrade-sub">Export to CSV · Save scan history · 175+ signatures</div>
+    <div class="upgrade-sub">Pro unlocks all 200+ signatures · CSV export · Scan history</div>
     <div class="plan-grid">${renderPlanGrid()}</div>
   `;
   wirePlanButtons(banner, 'popup_nudge');
@@ -399,6 +399,11 @@ async function scanPage(): Promise<void> {
     if (!licensed && allTools.length > FREE_LIMIT) {
       visibleTools = allTools.slice(0, FREE_LIMIT);
       locked = allTools.length - FREE_LIMIT;
+      trackEvent('tool_limit_hit', {
+        locked_count: locked,
+        visible_count: visibleTools.length,
+        top_locked: allTools.slice(FREE_LIMIT, FREE_LIMIT + 3).map(t => t.name).join(','),
+      });
     }
 
     renderTools(visibleTools, locked);
