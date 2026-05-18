@@ -170,8 +170,6 @@ function attachActivationListener(input, btn, statusEl) {
           trial: Boolean(data.trial),
           expires_at: data.expires_at || null,
           validated_at: Date.now(),
-          trial: data.trial || false,
-          expires_at: data.expires_at || null,
         };
         await chrome.storage.sync.set({ sd_license: licenseData });
         if (licenseData.trial) {
