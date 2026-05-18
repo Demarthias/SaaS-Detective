@@ -42,10 +42,10 @@
     "notes": "Replace with your Impact affiliate link for Squarespace"
   },
   "Webflow": {
-    "status": "pending",
-    "url": "",
-    "program": "Webflow Affiliate (PartnerStack)",
-    "notes": "Applied at webflow.com/affiliates — PartnerStack application submitted 2026-05-01, awaiting approval. No alternative network."
+    "status": "active",
+    "url": "https://webflow.com?r=saasdetective",
+    "program": "Webflow Affiliate",
+    "notes": "Sign up at webflow.com/affiliates"
   },
   "Framer": {
     "status": "active",
@@ -78,16 +78,16 @@
     "notes": "Sign up at pipedrive.com/en/partners — no traffic minimums, extension-friendly"
   },
   "Close CRM": {
-    "status": "pending",
-    "url": "",
-    "program": "Close Affiliate (PartnerStack)",
-    "notes": "Apply at dash.partnerstack.com/application?company=close&group=affiliatepartner — PartnerStack blocking. Retry at 200+ installs."
+    "status": "active",
+    "url": "https://close.com/partners/?ref=saasdetective",
+    "program": "Close Affiliate Program",
+    "notes": "Sign up at close.com/partners — startup-focused, strong commissions"
   },
   "Monday.com": {
-    "status": "pending",
-    "url": "",
-    "program": "Monday.com Affiliate (PartnerStack)",
-    "notes": "Apply at mondaycom.partnerstack.com — PartnerStack blocking. Retry at 200+ installs."
+    "status": "active",
+    "url": "https://monday.com/affiliates/?ref=saasdetective",
+    "program": "Monday.com Affiliate",
+    "notes": "Sign up at monday.com/affiliates — high commissions, broad appeal, no extension restrictions"
   },
   "Mailchimp": {
     "status": "active",
@@ -102,10 +102,10 @@
     "notes": "Klaviyo Solutions Partner at klaviyo.com/partners"
   },
   "ActiveCampaign": {
-    "status": "pending",
-    "url": "",
-    "program": "ActiveCampaign Affiliate (PartnerStack)",
-    "notes": "Apply at activecampaign.partnerstack.com — PartnerStack blocking. Retry at 200+ installs."
+    "status": "active",
+    "url": "https://www.activecampaign.com/?_r=saasdetective",
+    "program": "ActiveCampaign Affiliate",
+    "notes": "Sign up at activecampaign.com/affiliate"
   },
   "ConvertKit": {
     "status": "active",
@@ -150,10 +150,10 @@
     "notes": "Sign up at tidio.com/affiliate"
   },
   "Hotjar": {
-    "status": "none",
-    "url": "",
-    "program": "N/A",
-    "notes": "Hotjar acquired by Contentsquare — affiliate program discontinued. Contentsquare is enterprise/agency-only."
+    "status": "active",
+    "url": "https://www.hotjar.com/?ref=saasdetective",
+    "program": "Hotjar Affiliate",
+    "notes": "Sign up at hotjar.com/affiliates"
   },
   "Crazy Egg": {
     "status": "active",
@@ -280,12 +280,6 @@
     "url": "",
     "program": "N/A",
     "notes": "Enterprise sales only — no affiliate program."
-  },
-  "AWeber": {
-    "status": "active",
-    "url": "https://www.jdoqocy.com/click-101717325-13550032",
-    "program": "CJ (Commission Junction)",
-    "notes": "Real CJ affiliate link — approved"
   },
   "GetResponse": {
     "status": "active",
