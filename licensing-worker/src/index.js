@@ -384,7 +384,7 @@ var PLAN_LABELS = {
   enterprise: "Enterprise"
 };
 var PLAN_FEATURES = {
-  pro: "All 200+ tech signatures unlocked",
+  pro: "All 217 tech signatures unlocked",
   business: "All 200+ signatures + CSV/JSON export & scan history",
   agency: "Business features + bulk scanning, 3 seats & API access",
   enterprise: "Agency features + unlimited seats, custom signatures & white-label"

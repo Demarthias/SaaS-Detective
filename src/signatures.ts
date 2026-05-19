@@ -252,7 +252,7 @@ export const signatures: SaasSignature[] = [
   { id: 'paperform', name: 'Paperform', category: 'Forms', patterns: ['paperform.co/embed', 'f.paperform.co'], globalVar: [] },
 
   // --- A/B TESTING ---
-  { id: 'optimizely', name: 'Optimizely', category: 'A/B Testing', patterns: ['cdn.optimizely.com', 'optimizely.com/js/'], globalVar: ['optimizely', 'window.optimizely'] },
+  { id: 'optimizely', name: 'Optimizely', category: 'A/B Testing', patterns: ['cdn.optimizely.com', 'optimizely.com/js/'], globalVar: ['optimizely'] },
   { id: 'vwo', name: 'VWO', category: 'A/B Testing', patterns: ['dev.visualwebsiteoptimizer.com', 'vwo.com/j/async'], globalVar: ['VWO', '_vwo_code'] },
   { id: 'abtasty', name: 'AB Tasty', category: 'A/B Testing', patterns: ['try.abtasty.com'], globalVar: ['ABTasty', '__abtasty'] },
   { id: 'convert', name: 'Convert', category: 'A/B Testing', patterns: ['cdn-3.convertexperiments.com'], globalVar: ['_conv_q'] },

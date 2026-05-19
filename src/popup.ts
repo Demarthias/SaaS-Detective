@@ -150,7 +150,7 @@ function appendUpgradeBanner(container: HTMLElement, locked: number): void {
   banner.className = 'upgrade-banner';
   banner.innerHTML = `
     <div class="upgrade-count">+${locked} tool${locked !== 1 ? 's' : ''} hidden by free limit</div>
-    <div class="upgrade-sub">Pro unlocks all 200+ signatures · CSV export · Scan history</div>
+    <div class="upgrade-sub">Pro unlocks all ${signatures.length} signatures · CSV export · Scan history</div>
     <div class="plan-grid">${renderPlanGrid()}</div>
   `;
   wirePlanButtons(banner, 'popup_banner');
@@ -162,7 +162,7 @@ function appendUpgradeNudge(container: HTMLElement, visibleCount: number): void 
   banner.className = 'upgrade-banner';
   banner.innerHTML = `
     <div class="upgrade-count">Detected ${visibleCount} tool${visibleCount !== 1 ? 's' : ''} here</div>
-    <div class="upgrade-sub">Pro unlocks all 200+ signatures · CSV export · Scan history</div>
+    <div class="upgrade-sub">Pro unlocks all ${signatures.length} signatures · CSV export · Scan history</div>
     <div class="plan-grid">${renderPlanGrid()}</div>
   `;
   wirePlanButtons(banner, 'popup_nudge');
