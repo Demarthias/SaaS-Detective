@@ -318,6 +318,20 @@ async function init() {
 
   renderCategories(container, options);
 
+  document.getElementById('enable-all-btn').addEventListener('click', async () => {
+    Object.keys(options.enabledCategories).forEach(cat => { options.enabledCategories[cat] = true; });
+    await saveOptions(options);
+    renderCategories(container, options);
+    setStatus('All categories enabled');
+  });
+
+  document.getElementById('disable-all-btn').addEventListener('click', async () => {
+    Object.keys(options.enabledCategories).forEach(cat => { options.enabledCategories[cat] = false; });
+    await saveOptions(options);
+    renderCategories(container, options);
+    setStatus('All categories disabled');
+  });
+
   resetBtn.addEventListener('click', async () => {
     options = JSON.parse(JSON.stringify(DEFAULT_OPTIONS));
     await saveOptions(options);

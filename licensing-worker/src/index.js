@@ -59,11 +59,32 @@ var AMOUNT_PLAN_MAP = {
   4000: "6mo",
   9000: "annual"
 };
+function getBillingPeriod(sub) {
+  const price = sub?.items?.data?.[0]?.price;
+  const interval = price?.recurring?.interval;
+  const count = price?.recurring?.interval_count || 1;
+  if (interval === "month" && count === 1) return "monthly";
+  if (interval === "month" && count === 3) return "3mo";
+  if (interval === "month" && count === 6) return "6mo";
+  if (interval === "year") return "annual";
+  return "unknown";
+}
+__name(getBillingPeriod, "getBillingPeriod");
 async function fireGA4Event(env, clientId, eventName, params) {
   const measurementId = env.GA_MEASUREMENT_ID || "G-HVECKYG478";
   const apiSecret = env.GA_API_SECRET;
   if (!apiSecret) return;
   await fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ client_id: clientId, events: [{ name: eventName, params }] })
+  });
+}
+__name(fireGA4Event, "fireGA4Event");
+async function fireVenomWebGA4Event(env, clientId, eventName, params) {
+  const apiSecret = env.GA_VENOM_WEB_SECRET;
+  if (!apiSecret) return;
+  await fetch(`https://www.google-analytics.com/mp/collect?measurement_id=G-JGHX274MQ3&api_secret=${apiSecret}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ client_id: clientId, events: [{ name: eventName, params }] })
@@ -98,8 +119,9 @@ async function handleWebhook(request, env) {
     const existing = await env.LICENSES.get(`session:${sessionId}`);
     if (existing) return new Response("OK", { status: 200 });
     let plan = "pro";
+    let sub = null;
     if (subscriptionId && env.STRIPE_SECRET_KEY) {
-      const sub = await fetchStripeSubscription(subscriptionId, env.STRIPE_SECRET_KEY);
+      sub = await fetchStripeSubscription(subscriptionId, env.STRIPE_SECRET_KEY);
       if (sub) {
         const productId = sub.items?.data?.[0]?.price?.product?.id;
         plan = PRODUCT_PLAN_MAP[productId] || "pro";
@@ -121,17 +143,19 @@ async function handleWebhook(request, env) {
     console.log(`[webhook] license created key=${licenseKey} plan=${plan} email=${email} amount=${session.amount_total}`);
     if (email) await sendPurchaseEmail(env, email, licenseKey, plan);
     const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
-    const billingPeriod = AMOUNT_PLAN_MAP[session.amount_total] || "unknown";
+    const billingPeriod = sub ? getBillingPeriod(sub) : (AMOUNT_PLAN_MAP[session.amount_total] || "unknown");
     const ga4ClientId = session.client_reference_id || customerId || sessionId;
     if (session.amount_total > 0) {
-      await fireGA4Event(env, ga4ClientId, "purchase", {
+      const purchaseParams = {
         transaction_id: sessionId,
         value: valueUSD,
         currency: "USD",
         plan,
         billing_period: billingPeriod,
         customer_id: customerId || "",
-      });
+      };
+      await fireGA4Event(env, ga4ClientId, "purchase", purchaseParams);
+      await fireVenomWebGA4Event(env, ga4ClientId, "purchase", purchaseParams);
     }
   }
 

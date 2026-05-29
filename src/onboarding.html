@@ -428,6 +428,8 @@
     </div>
 
     <div class="footer">
+      <a href="#" id="skipOnboarding" style="color:#94a3b8;font-size:11px;text-decoration:none;" onmouseover="this.style.color='#64748b'" onmouseout="this.style.color='#94a3b8'">Skip for now</a>
+      &nbsp;·&nbsp;
       Powered by <a href="https://venom-industries.com" target="_blank">Venom Industries LLC</a> ·
       <a href="privacy.html" target="_blank">Privacy Policy</a>
     </div>
@@ -508,6 +510,13 @@
         submitBtn.textContent = 'Get My Free Key';
         submitBtn.disabled = false;
       }
+    });
+
+    // Skip onboarding
+    document.getElementById('skipOnboarding')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      trackEvent('onboarding_skipped');
+      window.close();
     });
 
     // Copy trial key

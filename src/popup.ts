@@ -3,7 +3,7 @@ import { signatures } from './signatures';
 
 const FREE_LIMIT = 50;
 const NUDGE_THRESHOLD_SCANS = 1;
-const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+const NUDGE_COOLDOWN_MS = 8 * 60 * 60 * 1000;
 const HISTORY_LIMIT_FREE = 5;
 const HISTORY_LIMIT_PRO = 50;
 
@@ -361,6 +361,29 @@ function isHttpUrl(url?: string): boolean {
   return Boolean(url && (url.startsWith('http://') || url.startsWith('https://')));
 }
 
+function updatePlanUI(licensed: boolean): void {
+  const badge = document.getElementById('planStatus');
+  if (badge) {
+    badge.textContent = licensed ? 'PRO' : 'FREE';
+    badge.classList.toggle('pro', licensed);
+  }
+
+  const strip = document.getElementById('upgrade-strip') as HTMLElement | null;
+  if (strip) {
+    strip.style.display = licensed ? 'none' : 'flex';
+  }
+
+  const stripLink = document.getElementById('upgradeStripLink');
+  if (stripLink && !licensed) {
+    stripLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      trackEvent('upgrade_clicked', { location: 'upgrade_strip', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price });
+      const clientId = await getClientId();
+      chrome.tabs.create({ url: withClientRef(STRIPE_PLANS[0].url, clientId) });
+    });
+  }
+}
+
 async function scanPage(): Promise<void> {
   setStatus('Scanning current tab...');
   const resultsEl = document.getElementById('results');
@@ -390,6 +413,7 @@ async function scanPage(): Promise<void> {
 
     const license = await getLicense();
     const licensed = await isLicenseValid(license);
+    updatePlanUI(licensed);
     const onTrial = Boolean(license?.trial && licensed);
     const trialExpired = Boolean(license?.trial && !licensed);
 

@@ -48,7 +48,7 @@
 
   <div class="card">
     <h2 style="font-size:18px;margin:0 0 8px">License Key</h2>
-    <p style="margin:0 0 12px;font-size:13px;color:#64748b;">Free plan detects 50 signatures. Pro and above unlocks all 217 signatures across 45 categories.</p>
+    <p style="margin:0 0 12px;font-size:13px;color:#64748b;">Free plan detects 50 signatures. Pro unlocks all 208 signatures across 45 categories.</p>
     <div style="display:flex;gap:8px;align-items:center;">
       <input id="license-input" type="text" placeholder="Enter your license key (SD-XXXX-XXXX-XXXX-XXXX)" style="flex:1;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-family:monospace;font-size:13px;" />
       <button id="activate-btn">Activate</button>
@@ -65,7 +65,11 @@
 
   <div class="card">
     <h2 style="font-size:18px;margin:0 0 8px">Enabled Categories</h2>
-    <p style="margin:0 0 12px;font-size:13px;color:#64748b;">Toggle categories to show/hide them in detection results. Changes are saved automatically and take effect on the next scan.</p>
+    <p style="margin:0 0 8px;font-size:13px;color:#64748b;">Toggle categories to show/hide them in detection results. Changes are saved automatically and take effect on the next scan.</p>
+    <div style="display:flex;gap:6px;margin-bottom:12px;">
+      <button id="enable-all-btn" class="secondary" style="font-size:12px;padding:5px 10px;">Enable All</button>
+      <button id="disable-all-btn" class="secondary" style="font-size:12px;padding:5px 10px;">Disable All</button>
+    </div>
     <div id="category-list" class="row"></div>
   </div>
 
