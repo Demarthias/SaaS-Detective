@@ -6,6 +6,14 @@
 <title>SaaS Detective — Instantly See What Tech Any Website Uses</title>
 <meta name="description" content="See every marketing tool, CRM, analytics platform, and more behind any website in one click. 200+ tools detected. Free & Pro plans." />
 <link rel="icon" href="icons/icon48.png" />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HVECKYG478"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-HVECKYG478');
+</script>
 <style>
 :root {
 --blue: #1d4ed8;
@@ -561,7 +569,7 @@ section { padding: 60px 20px; }
     <a href="#features">Features</a>
     <a href="#pricing">Pricing</a>
     <a href="#faq">FAQ</a>
-    <a href="https://chromewebstore.google.com/detail/saas-detective/efnmaomojnnbkmbhkokoflhogjphegpj" class="nav-cta" target="_blank">Add to Chrome — Free</a>
+    <a id="cta-nav" href="https://chromewebstore.google.com/detail/saas-detective/efnmaomojnnbkmbhkokoflhogjphegpj?utm_source=landing&utm_medium=nav&utm_campaign=install" class="nav-cta" target="_blank" rel="noopener noreferrer">Add to Chrome — Free</a>
   </div>
 </nav>
 
@@ -574,7 +582,7 @@ section { padding: 60px 20px; }
   <h1>Instantly See Every Tool<br/><span>Behind Any Website</span></h1>
   <p class="hero-sub">Click once on any site and SaaS Detective reveals the exact marketing, CRM, analytics, and e-commerce tools powering it — 200+ tools detected.</p>
   <div class="hero-actions">
-    <a href="https://chromewebstore.google.com/detail/saas-detective/efnmaomojnnbkmbhkokoflhogjphegpj" class="btn-primary" target="_blank">
+    <a id="cta-hero" href="https://chromewebstore.google.com/detail/saas-detective/efnmaomojnnbkmbhkokoflhogjphegpj?utm_source=landing&utm_medium=hero&utm_campaign=install" class="btn-primary" target="_blank" rel="noopener noreferrer">
       &#43; Add to Chrome — It's Free
     </a>
     <a href="#pricing" class="btn-secondary">See Pro Plans ↓</a>
@@ -781,7 +789,7 @@ section { padding: 60px 20px; }
           <li><span class="x">✗</span> Affiliate deal links</li>
           <li><span class="x">✗</span> Priority support</li>
         </ul>
-        <a href="https://chromewebstore.google.com/detail/saas-detective/efnmaomojnnbkmbhkokoflhogjphegpj" class="btn-plan btn-plan-free" target="_blank">Add to Chrome Free</a>
+        <a id="cta-pricing-free" href="https://chromewebstore.google.com/detail/saas-detective/efnmaomojnnbkmbhkokoflhogjphegpj?utm_source=landing&utm_medium=pricing&utm_campaign=install" class="btn-plan btn-plan-free" target="_blank" rel="noopener noreferrer">Add to Chrome Free</a>
       </div>
 
       <!-- MONTHLY -->
@@ -899,7 +907,7 @@ section { padding: 60px 20px; }
 <div class="final-cta">
   <h2>Your Competitors Are Using<br/><span>Tools You Don't Know About Yet.</span></h2>
   <p>Start detecting their stack for free — no account required.</p>
-  <a href="https://chromewebstore.google.com/detail/saas-detective/efnmaomojnnbkmbhkokoflhogjphegpj" class="btn-primary" target="_blank" style="display:inline-flex;">
+  <a id="cta-final" href="https://chromewebstore.google.com/detail/saas-detective/efnmaomojnnbkmbhkokoflhogjphegpj?utm_source=landing&utm_medium=final-cta&utm_campaign=install" class="btn-primary" target="_blank" rel="noopener noreferrer" style="display:inline-flex;">
     &#43; Add to Chrome — It's Free
   </a>
 </div>
@@ -925,6 +933,28 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     if (!isOpen) item.classList.add('open');
   });
 });
+</script>
+
+<script>
+(function () {
+  // Fire view_saas_detective once on page load (this is the dedicated product landing page)
+  window.addEventListener('load', function () {
+    if (typeof gtag === 'function') {
+      gtag('event', 'view_saas_detective', { page_type: 'landing', product_name: 'SaaS Detective' });
+    }
+  });
+
+  // Fire click_try_saas_detective on any CTA click
+  ['cta-nav', 'cta-hero', 'cta-pricing-free', 'cta-final'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', function () {
+      if (typeof gtag === 'function') {
+        gtag('event', 'click_try_saas_detective', { location: id, label: el.textContent.trim() });
+      }
+    }, { passive: true });
+  });
+})();
 </script>
 
 </body>
