@@ -132,6 +132,7 @@ function renderPlanGrid(): string {
 }
 
 function wirePlanButtons(banner: HTMLElement, location: string): void {
+  trackEvent('view_pricing', { location });
   banner.querySelectorAll<HTMLButtonElement>('.plan-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
       trackEvent('upgrade_clicked', {
@@ -499,6 +500,13 @@ async function scanPage(): Promise<void> {
 document.addEventListener('DOMContentLoaded', async () => {
   await loadAffiliates();
   trackEvent('popup_opened');
+
+  const firstOpenResult = await chrome.storage.local.get({ sd_first_opened: false });
+  if (!firstOpenResult['sd_first_opened']) {
+    trackEvent('first_open');
+    await chrome.storage.local.set({ sd_first_opened: true });
+  }
+
   scanPage();
 
   document.getElementById('rescanBtn')?.addEventListener('click', () => {

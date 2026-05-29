@@ -944,6 +944,18 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     }
   });
 
+  // Scroll depth at 25 / 50 / 75%
+  var _sdFired = {};
+  window.addEventListener('scroll', function () {
+    var pct = Math.round((window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100);
+    [25, 50, 75].forEach(function (m) {
+      if (!_sdFired[m] && pct >= m) {
+        _sdFired[m] = true;
+        if (typeof gtag === 'function') gtag('event', 'scroll_depth', { depth: m });
+      }
+    });
+  }, { passive: true });
+
   // Fire click_try_saas_detective on any CTA click
   ['cta-nav', 'cta-hero', 'cta-pricing-free', 'cta-final'].forEach(function (id) {
     var el = document.getElementById(id);
