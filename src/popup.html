@@ -1,86 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaaS Detective</title>
-    <style>
-        :root { --bg: #0f172a; --card: #ffffff; --text: #0f172a; --muted: #6b7280; --accent: #2563eb; --accent-hover: #1d4ed8; }
-        body { width: 360px; font-family: -apple-system, system-ui, sans-serif; padding: 0; margin: 0; background: #f8fafc; color: var(--text); }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaaS Detective</title>
+  <style>
+    :root { --bg: #0f172a; --card: #ffffff; --text: #0f172a; --muted: #6b7280; --accent: #2563eb; --border: #e5e7eb; }
+    * { box-sizing: border-box; }
+    body { width: 360px; font-family: -apple-system, system-ui, sans-serif; padding: 0; margin: 0; background: #f8fafc; color: var(--text); }
 
-        .header { background: var(--bg); color: #fff; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
-        .header-left h1 { margin: 0; font-size: 16px; font-weight: 700; }
-        .header-left p { margin: 4px 0 0; font-size: 12px; opacity: 0.8; }
-        #rescanBtn { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-        #rescanBtn:hover { background: rgba(255,255,255,0.22); }
+    .header { background: var(--bg); color: #fff; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .header-left h1 { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.2; }
+    .header-left p { margin: 4px 0 0; font-size: 11px; opacity: 0.65; }
+    .plan-status { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.65); vertical-align: middle; margin-left: 7px; }
+    .plan-status.pro { background: rgba(37,99,235,0.35); color: #93c5fd; }
 
-        #status { margin: 8px 16px 0; font-size: 12px; color: var(--muted); min-height: 16px; }
-        #status.error { color: #b91c1c; }
+    #upgrade-strip { display: none; flex-direction: column; align-items: center; padding: 8px 16px; background: #eff6ff; border-bottom: 1px solid #dbeafe; font-size: 11px; gap: 3px; }
+    .upgrade-strip-row { display: flex; align-items: center; gap: 8px; }
+    #upgrade-strip a { font-weight: 700; color: #2563eb; text-decoration: none; cursor: pointer; }
+    #upgrade-strip a:hover { text-decoration: underline; }
+    #upgrade-strip .strip-muted { color: #94a3b8; }
+    #upgrade-strip .strip-trial { font-size: 10px; color: #64748b; }
+    #upgrade-strip .strip-trial a { font-weight: 600; color: #2563eb; }
 
-        #results { padding: 12px 16px 8px; min-height: 120px; }
-        .card { background: var(--card); border: 1px solid #e5e7eb; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .card h4 { margin: 0; font-size: 14px; color: #111827; }
-        .category { font-size: 11px; color: var(--muted); margin-top: 4px; }
-        .visit-btn { background: var(--accent); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; flex-shrink: 0; }
-        .visit-btn:hover { background: var(--accent-hover); }
-        .empty { text-align: center; color: var(--muted); font-size: 13px; margin-top: 18px; }
+    #status { margin: 8px 16px 0; font-size: 12px; color: var(--muted); min-height: 16px; }
+    #status.error { color: #b91c1c; }
 
-        /* Upgrade banner */
-        .upgrade-banner { background: var(--bg); border-radius: 10px; padding: 14px 14px 12px; margin-top: 4px; }
-        .upgrade-count { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
-        .upgrade-sub { font-size: 11px; color: rgba(255,255,255,0.55); margin-bottom: 10px; }
-        .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .plan-btn { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: #fff; border-radius: 7px; padding: 8px 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; line-height: 1.3; transition: background 0.15s, border-color 0.15s; position: relative; }
-        .plan-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); }
-        .plan-btn[data-plan="annual"] { border-color: rgba(37,99,235,0.7); background: rgba(37,99,235,0.15); }
-        .plan-btn[data-plan="annual"]:hover { background: rgba(37,99,235,0.25); }
-        .plan-price { font-size: 10px; font-weight: 400; color: rgba(255,255,255,0.6); }
-        .plan-badge { display: block; font-size: 9px; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+    #export-bar { display: none; align-items: center; gap: 6px; padding: 6px 16px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; font-size: 11px; }
+    .export-label { color: #64748b; font-weight: 600; flex-shrink: 0; }
+    .export-btn { background: #fff; color: #1e40af; border: 1px solid #bfdbfe; padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .export-btn:hover { background: #eff6ff; }
+    .export-btn-locked { color: #64748b; border-color: #cbd5e1; background: #f8fafc; }
+    .export-btn-locked:hover { background: #f1f5f9; color: #1e40af; }
 
-        /* Export bar */
-        #export-bar { display: none; align-items: center; gap: 6px; padding: 6px 16px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; font-size: 11px; }
-        .export-label { color: #64748b; font-weight: 600; flex-shrink: 0; }
-        .export-btn { background: #fff; color: #1e40af; border: 1px solid #bfdbfe; padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; }
-        .export-btn:hover { background: #eff6ff; }
-        .export-btn-locked { color: #64748b; border-color: #cbd5e1; background: #f8fafc; }
-        .export-btn-locked:hover { background: #f1f5f9; color: #1e40af; }
+    #results { padding: 12px 16px 8px; min-height: 120px; }
+    .card { background: var(--card); border: 1px solid var(--border); padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .card h4 { margin: 0; font-size: 14px; color: #111827; }
+    .category { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .visit-btn { background: var(--accent); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; flex-shrink: 0; font-family: inherit; }
+    .visit-btn:hover { background: #1d4ed8; }
+    .empty { text-align: center; color: var(--muted); font-size: 13px; margin-top: 18px; }
 
-        .footer { padding: 10px 12px 12px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e5e7eb; background: #fff; }
-        .footer a { color: #2563eb; text-decoration: none; }
-    </style>
+    .upgrade-banner { background: var(--bg); border-radius: 10px; padding: 14px 14px 12px; margin-top: 4px; }
+    .upgrade-count { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .upgrade-sub { font-size: 11px; color: rgba(255,255,255,0.55); margin-bottom: 10px; }
+    .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .plan-btn { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: #fff; border-radius: 7px; padding: 8px 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; line-height: 1.3; transition: background 0.15s, border-color 0.15s; position: relative; font-family: inherit; }
+    .plan-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); }
+    .plan-btn[data-plan="annual"] { border-color: rgba(37,99,235,0.7); background: rgba(37,99,235,0.15); }
+    .plan-btn[data-plan="annual"]:hover { background: rgba(37,99,235,0.25); }
+    .plan-price { font-size: 10px; font-weight: 400; color: rgba(255,255,255,0.6); }
+    .plan-badge { display: block; font-size: 9px; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+    .banner-trial { margin-top: 8px; text-align: center; font-size: 10px; }
+    .banner-trial a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    .banner-trial a:hover { color: #fff; text-decoration: underline; }
+    .banner-guarantee { margin-top: 5px; text-align: center; font-size: 9px; color: rgba(255,255,255,0.3); }
+
+    .footer { padding: 10px 12px 12px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid var(--border); background: #fff; }
+    .footer a { color: #2563eb; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            <h1>SaaS Detective</h1>
-            <p>Scanning current site...</p>
-        </div>
-        <button id="rescanBtn">↺ Rescan</button>
+  <div class="header">
+    <div class="header-left">
+      <h1>SaaS Detective <span id="planStatus" class="plan-status"></span></h1>
+      <p>Scanning current site...</p>
     </div>
+    <button id="rescanBtn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">↺ Rescan</button>
+  </div>
 
-    <div id="status"></div>
-
-    <div id="export-bar">
-        <span class="export-label">Export:</span>
-        <button id="exportCsvBtn" class="export-btn">↓ CSV</button>
-        <button id="exportJsonBtn" class="export-btn">↓ JSON</button>
-        <button id="exportLockedBtn" class="export-btn export-btn-locked" style="display:none;">↓ Export (Pro)</button>
+  <div id="upgrade-strip">
+    <div class="upgrade-strip-row">
+      <a id="upgradeStripLink" href="#">Upgrade to Pro →</a>
+      <span class="strip-muted">Unlock all 208+ signatures</span>
     </div>
+    <div class="strip-trial">No credit card · <a id="trialStripLink" href="#">Try free for 7 days →</a></div>
+  </div>
 
-    <div id="results">
-        <div class="empty">Initializing...</div>
+  <div id="status"></div>
+
+  <div id="export-bar">
+    <span class="export-label">Export:</span>
+    <button id="exportCsvBtn" class="export-btn">↓ CSV</button>
+    <button id="exportJsonBtn" class="export-btn">↓ JSON</button>
+    <button id="exportLockedBtn" class="export-btn export-btn-locked" style="display:none;">↓ Export (Pro)</button>
+  </div>
+
+  <div id="results">
+    <div class="empty">Initializing...</div>
+  </div>
+
+  <div class="footer">
+    Powered by Venom Industries LLC
+    <a href="privacy.html" target="_blank" title="We may earn a commission from partner links." style="margin-top:4px;display:inline-block;">ⓘ Affiliate Disclosure</a>
+    <div style="margin-top:6px;">
+      <a href="#" id="onboardingLink">How it works</a> ·
+      <a href="#" id="optionsLink">Options</a> ·
+      <a href="privacy.html" target="_blank">Privacy</a>
     </div>
+  </div>
 
-    <div class="footer">
-        Powered by Venom Industries LLC
-        <div title="We may earn a commission from partner links." style="cursor: help; margin-top: 4px;">ⓘ Affiliate Disclosure</div>
-        <div style="margin-top: 6px;">
-            <a href="#" id="onboardingLink">How it works</a> ·
-            <a href="#" id="optionsLink">Options</a> ·
-            <a href="privacy.html" target="_blank">Privacy</a>
-        </div>
-    </div>
-
-    <script src="popup.js"></script>
+  <script src="popup.js"></script>
 </body>
 </html>

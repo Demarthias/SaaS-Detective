@@ -9,10 +9,10 @@ const HISTORY_LIMIT_PRO = 50;
 
 const STRIPE_PLANS: Array<{ label: string; price: string; url: string; plan: string; badge?: string }> = [
   { label: 'Monthly', price: '$7.99/mo', url: 'https://buy.stripe.com/4gMdRb8aiap6cr61gn1Jm07', plan: 'monthly' },
-  { label: '3 Months', price: '$20/3mo', url: 'https://buy.stripe.com/7sYfZjaiqfJqaiY8IP1Jm08', plan: 'quarterly' },
-  { label: '6 Months', price: '$40/6mo', url: 'https://buy.stripe.com/9B6dRbcqy40I8aQ3ov1Jm09', plan: 'biannual' },
-  { label: 'Annual', price: '$90/yr', url: 'https://buy.stripe.com/28E6oJ0HQap69eUe391Jm0a', plan: 'annual' },
+  { label: 'Annual', price: '$90/yr', url: 'https://buy.stripe.com/28E6oJ0HQap69eUe391Jm0a', plan: 'annual', badge: 'Best Value' },
 ];
+
+const TRIAL_URL = 'https://venom-industries.com/saas-detective#trialCard';
 
 // Compact globalVar checks passed to MAIN world script injection
 const globalVarChecks = signatures
@@ -144,15 +144,25 @@ function wirePlanButtons(banner: HTMLElement, location: string): void {
       chrome.tabs.create({ url: withClientRef(btn.dataset.url!, clientId) });
     });
   });
+  const trialLink = banner.querySelector<HTMLAnchorElement>('.banner-trial a');
+  if (trialLink) {
+    trialLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      trackEvent('trial_clicked', { location });
+      chrome.tabs.create({ url: TRIAL_URL });
+    });
+  }
 }
 
 function appendUpgradeBanner(container: HTMLElement, locked: number): void {
   const banner = document.createElement('div');
   banner.className = 'upgrade-banner';
   banner.innerHTML = `
-    <div class="upgrade-count">+${locked} tool${locked !== 1 ? 's' : ''} hidden by free limit</div>
-    <div class="upgrade-sub">Pro unlocks all ${signatures.length} signatures · CSV export · Scan history</div>
+    <div class="upgrade-count">You're missing ${locked} tool${locked !== 1 ? 's' : ''} on this page</div>
+    <div class="upgrade-sub">Pro reveals them all · CSV export · Scan history</div>
     <div class="plan-grid">${renderPlanGrid()}</div>
+    <div class="banner-trial"><a href="#">or try free for 7 days — no credit card</a></div>
+    <div class="banner-guarantee">30-day money-back guarantee</div>
   `;
   wirePlanButtons(banner, 'popup_banner');
   container.appendChild(banner);
@@ -165,6 +175,8 @@ function appendUpgradeNudge(container: HTMLElement, visibleCount: number): void 
     <div class="upgrade-count">Detected ${visibleCount} tool${visibleCount !== 1 ? 's' : ''} here</div>
     <div class="upgrade-sub">Pro unlocks all ${signatures.length} signatures · CSV export · Scan history</div>
     <div class="plan-grid">${renderPlanGrid()}</div>
+    <div class="banner-trial"><a href="#">or try free for 7 days — no credit card</a></div>
+    <div class="banner-guarantee">30-day money-back guarantee</div>
   `;
   wirePlanButtons(banner, 'popup_nudge');
   container.appendChild(banner);
@@ -381,6 +393,15 @@ function updatePlanUI(licensed: boolean): void {
       trackEvent('upgrade_clicked', { location: 'upgrade_strip', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price });
       const clientId = await getClientId();
       chrome.tabs.create({ url: withClientRef(STRIPE_PLANS[0].url, clientId) });
+    });
+  }
+
+  const trialStripLink = document.getElementById('trialStripLink');
+  if (trialStripLink && !licensed) {
+    trialStripLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      trackEvent('trial_clicked', { location: 'upgrade_strip' });
+      chrome.tabs.create({ url: TRIAL_URL });
     });
   }
 }
