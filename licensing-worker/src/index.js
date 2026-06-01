@@ -328,6 +328,95 @@ async function sendTrialEmail(env, email, key, expiresAt) {
   }
 }
 __name(sendTrialEmail, "sendTrialEmail");
+async function sendTrialReminderEmail(env, email, key, expiresAt) {
+  if (!env.RESEND_API_KEY) return;
+  const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";
+  const hoursLeft = Math.max(1, Math.ceil((expiresAt - Date.now()) / (60 * 60 * 1000)));
+  const timeLabel = hoursLeft <= 24 ? `${hoursLeft} hour${hoursLeft === 1 ? "" : "s"}` : "2 days";
+  const body = {
+    from,
+    to: [email],
+    subject: `Your SaaS Detective Pro trial ends in ${timeLabel}`,
+    html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
+  <h1 style="font-size:22px;margin:0 0 8px;">Your trial ends in ${timeLabel}.</h1>
+  <p style="color:#475569;font-size:14px;margin:0 0 24px;">You've been scanning sites with access to all 208+ tool signatures. In ${timeLabel} your account reverts to the free plan (50 signatures).</p>
+  <p style="color:#475569;font-size:14px;margin:0 0 28px;">Keep full access — upgrade before your trial ends.</p>
+  <a href="https://venom-industries.com/saas-detective#pricing" style="display:inline-block;background:#2563eb;color:#ffffff;font-family:'Courier New',monospace;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 28px;border-radius:7px;text-decoration:none;">Keep Pro Access — from $7.99/mo →</a>
+  <p style="color:#64748b;font-size:12px;margin-top:28px;">30-day money-back guarantee · cancel anytime · license key emailed instantly</p>
+  <p style="color:#94a3b8;font-size:12px;margin-top:16px;">— Grayson, founder · <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
+</div>`,
+  };
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch (_) {}
+}
+__name(sendTrialReminderEmail, "sendTrialReminderEmail");
+async function sendTrialExpiryEmail(env, email) {
+  if (!env.RESEND_API_KEY) return;
+  const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";
+  const body = {
+    from,
+    to: [email],
+    subject: "Your SaaS Detective Pro trial has ended",
+    html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
+  <h1 style="font-size:22px;margin:0 0 8px;">Your trial has ended.</h1>
+  <p style="color:#475569;font-size:14px;margin:0 0 16px;">Your 7-day Pro trial for SaaS Detective is over. You're back on the free plan — limited to the 50 most common tool signatures.</p>
+  <p style="color:#475569;font-size:14px;margin:0 0 28px;">If you found value in the full library during your trial, upgrading is $7.99/mo — less than a coffee. Cancel anytime.</p>
+  <a href="https://venom-industries.com/saas-detective#pricing" style="display:inline-block;background:#2563eb;color:#ffffff;font-family:'Courier New',monospace;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 28px;border-radius:7px;text-decoration:none;">Upgrade to Pro — from $7.99/mo →</a>
+  <p style="color:#64748b;font-size:12px;margin-top:28px;">30-day money-back guarantee · license key emailed instantly after checkout</p>
+  <p style="color:#94a3b8;font-size:12px;margin-top:16px;">— Grayson, founder · <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
+</div>`,
+  };
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch (_) {}
+}
+__name(sendTrialExpiryEmail, "sendTrialExpiryEmail");
+async function handleSubscribe(request, env) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  if (!await checkRateLimit(env, ip, "subscribe", 5, 3600)) {
+    return json({ ok: false, error: "Too many requests. Try again in an hour." }, 429);
+  }
+  let payload;
+  try { payload = await request.json(); } catch { return json({ ok: false, error: "Invalid JSON" }, 400); }
+  const email = String(payload?.email || "").trim().toLowerCase();
+  const clientId = String(payload?.client_id || email);
+  const source = String(payload?.source || "marketing");
+  if (!EMAIL_RE.test(email)) return json({ ok: false, error: "Invalid email" }, 400);
+  const existingKey = `subscriber:${email}`;
+  if (await env.LICENSES.get(existingKey)) return json({ ok: true, already: true });
+  await env.LICENSES.put(existingKey, JSON.stringify({ email, createdAt: new Date().toISOString(), source }));
+  if (env.RESEND_API_KEY) {
+    const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from,
+        to: [email],
+        subject: "You're on the SaaS Detective updates list",
+        html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
+  <h1 style="font-size:22px;margin:0 0 8px;">You're on the list.</h1>
+  <p style="color:#475569;font-size:14px;margin:0 0 16px;">We'll email you when we ship new tool signatures — typically a short note with what's new and why it matters.</p>
+  <p style="color:#475569;font-size:14px;margin:0 0 24px;">No spam. Unsubscribe anytime by replying "unsubscribe".</p>
+  <p style="color:#64748b;font-size:12px;">In the meantime, try the free extension if you haven't already → <a href="https://venom-industries.com/saas-detective" style="color:#2563eb;">venom-industries.com/saas-detective</a></p>
+  <p style="color:#94a3b8;font-size:12px;margin-top:16px;">— Grayson, founder · <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
+</div>`,
+      }),
+    }).catch((_) => {});
+  }
+  await fireGA4Event(env, clientId, "newsletter_subscribe", { source }).catch((_) => {});
+  return json({ ok: true });
+}
+__name(handleSubscribe, "handleSubscribe");
 async function checkRateLimit(env, ip, bucket, limit, windowSec) {
   const key = `rate:${bucket}:${ip}`;
   const raw = await env.LICENSES.get(key);
@@ -527,6 +616,24 @@ var index_default = {
       const expired = isTrial && license.expires_at && Date.now() > license.expires_at;
       const valid = license.active && !expired;
       console.log(`[validate] key=${key.slice(0,8)}... valid=${valid} plan=${license.plan} trial=${isTrial} expired=${expired}`);
+      if (license.email) {
+        if (expired) {
+          const sentKey = `trial-expiry-email-sent:${license.email}`;
+          if (!await env.LICENSES.get(sentKey)) {
+            await env.LICENSES.put(sentKey, "1");
+            await sendTrialExpiryEmail(env, license.email);
+          }
+        } else if (isTrial && license.expires_at) {
+          const remaining = license.expires_at - Date.now();
+          if (remaining > 0 && remaining < 48 * 60 * 60 * 1000) {
+            const sentKey = `trial-reminder-sent:${license.email}`;
+            if (!await env.LICENSES.get(sentKey)) {
+              await env.LICENSES.put(sentKey, "1");
+              await sendTrialReminderEmail(env, license.email, key, license.expires_at);
+            }
+          }
+        }
+      }
       return json({
         valid,
         plan: license.plan,
@@ -548,6 +655,9 @@ var index_default = {
     }
     if (url.pathname === "/track" && request.method === "POST") {
       return handleTrack(request, env);
+    }
+    if (url.pathname === "/subscribe" && request.method === "POST") {
+      return handleSubscribe(request, env);
     }
     return new Response("Not Found", { status: 404 });
   }

@@ -1,4 +1,8 @@
+declare const process: { env: { POSTHOG_PROJECT_TOKEN: string; POSTHOG_HOST: string } };
+
 const TRACK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/track';
+const POSTHOG_KEY = process.env.POSTHOG_PROJECT_TOKEN;
+const POSTHOG_URL = process.env.POSTHOG_HOST + '/capture/';
 
 export async function getClientId(): Promise<string> {
   const result = await chrome.storage.local.get('ga_client_id');
@@ -24,7 +28,21 @@ export function withClientRef(url: string, clientId: string): string {
 export async function trackEvent(name: string, params: Record<string, unknown> = {}): Promise<void> {
   try {
     const clientId = await getClientId();
-    await fetch(TRACK_URL, {
+
+    // PostHog — primary analytics
+    fetch(POSTHOG_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: POSTHOG_KEY,
+        event: name,
+        distinct_id: clientId,
+        properties: { ...params, $lib: 'chrome-extension' },
+      }),
+    });
+
+    // GA4 — kept only for Google Ads conversion tracking
+    fetch(TRACK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ client_id: clientId, events: [{ name, params }] }),
