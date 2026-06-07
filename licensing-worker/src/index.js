@@ -28,29 +28,45 @@ function generateLicenseKey() {
 }
 __name(generateLicenseKey, "generateLicenseKey");
 async function verifyStripeSignature(body, signature, secret) {
-  const parts = Object.fromEntries(signature.split(",").map((p) => p.split("=")));
-  const t = parts["t"];
-  const v1 = parts["v1"];
-  if (!t || !v1) return false;
-  const now = Math.floor(Date.now() / 1e3);
-  if (Math.abs(now - parseInt(t)) > 300) return false;
+  let timestamp = null;
+  const v1Sigs = [];
+  for (const part of signature.split(",")) {
+    const eq = part.indexOf("=");
+    if (eq === -1) continue;
+    const k = part.slice(0, eq);
+    const v = part.slice(eq + 1);
+    if (k === "t") timestamp = v;
+    else if (k === "v1") v1Sigs.push(v);
+  }
+  if (!timestamp || v1Sigs.length === 0) return false;
+  // Reject webhooks older than 5 minutes (replay attack prevention)
+  if (Math.abs(Date.now() / 1000 - parseInt(timestamp, 10)) > 300) {
+    console.log(`[webhook] signature timestamp too old ts=${timestamp}`);
+    return false;
+  }
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign"]
+    ["verify"]
   );
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${t}.${body}`));
-  const expected = Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
-  return expected === v1;
+  const payload = new TextEncoder().encode(`${timestamp}.${body}`);
+  for (const sig of v1Sigs) {
+    const sigBytes = new Uint8Array(sig.match(/../g).map((h) => parseInt(h, 16)));
+    if (await crypto.subtle.verify("HMAC", key, sigBytes, payload)) return true;
+  }
+  return false;
 }
 __name(verifyStripeSignature, "verifyStripeSignature");
 async function fetchStripeSubscription(subscriptionId, stripeKey) {
   const res = await fetch(`https://api.stripe.com/v1/subscriptions/${subscriptionId}?expand[]=items.data.price.product`, {
     headers: { Authorization: `Bearer ${stripeKey}` }
   });
-  return res.ok ? res.json() : null;
+  if (res.ok) return res.json();
+  if (res.status === 404) return null;
+  // Non-404 error is transient — throw so the webhook handler returns 500 and Stripe retries
+  throw new Error(`Stripe subscription fetch failed: ${res.status} for ${subscriptionId}`);
 }
 __name(fetchStripeSubscription, "fetchStripeSubscription");
 var AMOUNT_PLAN_MAP = {
@@ -90,7 +106,58 @@ async function fireVenomWebGA4Event(env, clientId, eventName, params) {
     body: JSON.stringify({ client_id: clientId, events: [{ name: eventName, params }] })
   });
 }
-__name(fireGA4Event, "fireGA4Event");
+__name(fireVenomWebGA4Event, "fireVenomWebGA4Event");
+async function handlePurchaseSession(session, env) {
+  const sessionId = session.id;
+  const subscriptionId = session.subscription;
+  const customerId = session.customer;
+  const email = session.customer_details?.email || session.customer_email || "";
+  if (await env.LICENSES.get(`session:${sessionId}`)) return;
+  let plan = "pro";
+  let sub = null;
+  if (subscriptionId && env.STRIPE_SECRET_KEY) {
+    sub = await fetchStripeSubscription(subscriptionId, env.STRIPE_SECRET_KEY);
+    if (sub) {
+      const productId = sub.items?.data?.[0]?.price?.product?.id;
+      if (PRODUCT_PLAN_MAP[productId]) {
+        plan = PRODUCT_PLAN_MAP[productId];
+      } else {
+        console.warn(`[webhook] unknown product id=${productId} sub=${subscriptionId}, defaulting to pro`);
+      }
+    }
+  }
+  const licenseKey = generateLicenseKey();
+  const licenseData = {
+    plan,
+    email,
+    customerId,
+    subscriptionId,
+    sessionId,
+    createdAt: (new Date()).toISOString(),
+    active: true
+  };
+  await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(licenseData));
+  await env.LICENSES.put(`session:${sessionId}`, JSON.stringify({ licenseKey, ...licenseData }));
+  if (subscriptionId) await env.LICENSES.put(`sub:${subscriptionId}`, licenseKey);
+  console.log(`[webhook] license created key=${licenseKey} plan=${plan} email=${email} amount=${session.amount_total}`);
+  if (email) await sendPurchaseEmail(env, email, licenseKey, plan);
+  const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
+  const billingPeriod = sub ? getBillingPeriod(sub) : (AMOUNT_PLAN_MAP[session.amount_total] || "unknown");
+  const ga4ClientId = session.client_reference_id || customerId || sessionId;
+  if (session.amount_total > 0) {
+    const purchaseParams = {
+      transaction_id: sessionId,
+      value: valueUSD,
+      currency: "USD",
+      plan,
+      billing_period: billingPeriod,
+      customer_id: customerId || "",
+    };
+    await fireGA4Event(env, ga4ClientId, "purchase", purchaseParams);
+    await fireVenomWebGA4Event(env, ga4ClientId, "purchase", purchaseParams);
+  }
+}
+__name(handlePurchaseSession, "handlePurchaseSession");
 async function handleWebhook(request, env) {
   const body = await request.text();
   const signature = request.headers.get("stripe-signature") || "";
@@ -101,153 +168,149 @@ async function handleWebhook(request, env) {
   const event = JSON.parse(body);
   console.log(`[webhook] received event=${event.type} id=${event.id}`);
 
-  // Idempotency: dedupe Stripe webhook retries by event.id (24h TTL).
-  // The session.completed branch keeps its own session-keyed guard for back-compat.
+  // Idempotency guard: check before processing, write AFTER success so Stripe
+  // retries are not silently swallowed if the worker crashes mid-flight.
   if (event.id) {
     const evtKey = `evt:${event.id}`;
     if (await env.LICENSES.get(evtKey)) return new Response("OK", { status: 200 });
-    await env.LICENSES.put(evtKey, "1", { expirationTtl: 86400 });
   }
 
-  // ── Successful purchase ──────────────────────────────────────────────────
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
-    const sessionId = session.id;
-    const subscriptionId = session.subscription;
-    const customerId = session.customer;
-    const email = session.customer_details?.email || session.customer_email || "";
-    const existing = await env.LICENSES.get(`session:${sessionId}`);
-    if (existing) return new Response("OK", { status: 200 });
-    let plan = "pro";
-    let sub = null;
-    if (subscriptionId && env.STRIPE_SECRET_KEY) {
-      sub = await fetchStripeSubscription(subscriptionId, env.STRIPE_SECRET_KEY);
-      if (sub) {
-        const productId = sub.items?.data?.[0]?.price?.product?.id;
-        plan = PRODUCT_PLAN_MAP[productId] || "pro";
+  try {
+    // ── Successful purchase (card) ───────────────────────────────────────────
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      // payment_status is 'unpaid' for async methods until async_payment_succeeded fires
+      if (session.payment_status !== "paid") {
+        console.log(`[webhook] skipping session ${session.id} payment_status=${session.payment_status}`);
+      } else {
+        await handlePurchaseSession(session, env);
       }
     }
-    const licenseKey = generateLicenseKey();
-    const licenseData = {
-      plan,
-      email,
-      customerId,
-      subscriptionId,
-      sessionId,
-      createdAt: (new Date()).toISOString(),
-      active: true
-    };
-    await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(licenseData));
-    await env.LICENSES.put(`session:${sessionId}`, JSON.stringify({ licenseKey, ...licenseData }));
-    if (subscriptionId) await env.LICENSES.put(`sub:${subscriptionId}`, licenseKey);
-    console.log(`[webhook] license created key=${licenseKey} plan=${plan} email=${email} amount=${session.amount_total}`);
-    if (email) await sendPurchaseEmail(env, email, licenseKey, plan);
-    const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
-    const billingPeriod = sub ? getBillingPeriod(sub) : (AMOUNT_PLAN_MAP[session.amount_total] || "unknown");
-    const ga4ClientId = session.client_reference_id || customerId || sessionId;
-    if (session.amount_total > 0) {
-      const purchaseParams = {
-        transaction_id: sessionId,
+
+    // ── Successful purchase (ACH / SEPA / bank transfer / other async) ───────
+    if (event.type === "checkout.session.async_payment_succeeded") {
+      await handlePurchaseSession(event.data.object, env);
+    }
+
+    // ── Checkout abandoned (session expired without payment) ─────────────────
+    if (event.type === "checkout.session.expired") {
+      const session = event.data.object;
+      const sessionId = session.id;
+      const customerId = session.customer || sessionId;
+      const planByAmount = AMOUNT_PLAN_MAP[session.amount_total] || "unknown";
+      const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
+      const ga4ClientId = session.client_reference_id || customerId;
+      await fireGA4Event(env, ga4ClientId, "checkout_abandoned", {
+        session_id: sessionId,
+        plan: planByAmount,
         value: valueUSD,
         currency: "USD",
-        plan,
-        billing_period: billingPeriod,
-        customer_id: customerId || "",
-      };
-      await fireGA4Event(env, ga4ClientId, "purchase", purchaseParams);
-      await fireVenomWebGA4Event(env, ga4ClientId, "purchase", purchaseParams);
-    }
-  }
-
-  // ── Checkout abandoned (session expired without payment) ─────────────────
-  if (event.type === "checkout.session.expired") {
-    const session = event.data.object;
-    const sessionId = session.id;
-    const customerId = session.customer || sessionId;
-    const planByAmount = AMOUNT_PLAN_MAP[session.amount_total] || "unknown";
-    const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
-    const ga4ClientId = session.client_reference_id || customerId;
-    await fireGA4Event(env, ga4ClientId, "checkout_abandoned", {
-      session_id: sessionId,
-      plan: planByAmount,
-      value: valueUSD,
-      currency: "USD",
-    });
-  }
-
-  // ── Card declined / payment failed at checkout ───────────────────────────
-  if (event.type === "payment_intent.payment_failed") {
-    const pi = event.data.object;
-    const error = pi.last_payment_error;
-    // Stripe Checkout doesn't auto-propagate client_reference_id to the PI.
-    // To populate pi.metadata.client_reference_id, set "Pass client_reference_id
-    // to PaymentIntent metadata" on each Payment Link in the Stripe dashboard,
-    // or set metadata when creating Sessions via API.
-    const ga4ClientId = pi.metadata?.client_reference_id || pi.customer || pi.id;
-    await fireGA4Event(env, ga4ClientId, "payment_failed", {
-      decline_code: error?.decline_code || "unknown",
-      error_code: error?.code || "unknown",
-      error_type: error?.type || "unknown",
-      amount: pi.amount ? pi.amount / 100 : 0,
-      currency: pi.currency || "usd",
-      customer_id: pi.customer || "",
-    });
-  }
-
-  // ── Recurring invoice payment failed (card expired, etc.) ────────────────
-  if (event.type === "invoice.payment_failed") {
-    const invoice = event.data.object;
-    const ga4ClientId = invoice.customer || invoice.id;
-    const licenseKey = invoice.subscription ? await env.LICENSES.get(`sub:${invoice.subscription}`) : null;
-    const raw = licenseKey ? await env.LICENSES.get(`license:${licenseKey}`) : null;
-    const licenseData = raw ? JSON.parse(raw) : {};
-    await fireGA4Event(env, ga4ClientId, "invoice_payment_failed", {
-      attempt_count: invoice.attempt_count || 1,
-      amount: invoice.amount_due ? invoice.amount_due / 100 : 0,
-      currency: invoice.currency || "usd",
-      customer_id: invoice.customer || "",
-      subscription_id: invoice.subscription || "",
-      plan: licenseData.plan || "unknown",
-    });
-  }
-
-  // ── Cancellation scheduled ───────────────────────────────────────────────
-  if (event.type === "customer.subscription.updated") {
-    const sub = event.data.object;
-    const prev = event.data.previous_attributes || {};
-    if (sub.cancel_at_period_end === true && prev.cancel_at_period_end === false) {
-      const licenseKey = await env.LICENSES.get(`sub:${sub.id}`);
-      const raw = licenseKey ? await env.LICENSES.get(`license:${licenseKey}`) : null;
-      const licenseData = raw ? JSON.parse(raw) : {};
-      await fireGA4Event(env, sub.customer || sub.id, "subscription_cancelled", {
-        plan: licenseData.plan || "unknown",
-        customer_id: sub.customer || "",
-        subscription_id: sub.id,
-        cancel_at: sub.cancel_at || 0,
       });
     }
-  }
 
-  // ── Subscription deleted (fully churned) ─────────────────────────────────
-  if (event.type === "customer.subscription.deleted") {
-    const sub = event.data.object;
-    const licenseKey = await env.LICENSES.get(`sub:${sub.id}`);
-    if (licenseKey) {
-      const raw = await env.LICENSES.get(`license:${licenseKey}`);
-      if (raw) {
-        const data = JSON.parse(raw);
-        data.active = false;
-        await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(data));
-        await fireGA4Event(env, sub.customer || sub.id, "subscription_deleted", {
-          plan: data.plan || "unknown",
+    // ── Card declined / payment failed at checkout ───────────────────────────
+    if (event.type === "payment_intent.payment_failed") {
+      const pi = event.data.object;
+      const error = pi.last_payment_error;
+      // Stripe Checkout doesn't auto-propagate client_reference_id to the PI.
+      // To populate pi.metadata.client_reference_id, set "Pass client_reference_id
+      // to PaymentIntent metadata" on each Payment Link in the Stripe dashboard,
+      // or set metadata when creating Sessions via API.
+      const ga4ClientId = pi.metadata?.client_reference_id || pi.customer || pi.id;
+      await fireGA4Event(env, ga4ClientId, "payment_failed", {
+        decline_code: error?.decline_code || "unknown",
+        error_code: error?.code || "unknown",
+        error_type: error?.type || "unknown",
+        amount: pi.amount ? pi.amount / 100 : 0,
+        currency: pi.currency || "usd",
+        customer_id: pi.customer || "",
+      });
+    }
+
+    // ── Recurring invoice paid (renewal) ────────────────────────────────────
+    if (event.type === "invoice.payment_succeeded") {
+      const invoice = event.data.object;
+      // billing_reason === 'subscription_create' is already covered by checkout.session.completed
+      if (invoice.billing_reason !== "subscription_create" && invoice.subscription) {
+        const licenseKey = await env.LICENSES.get(`sub:${invoice.subscription}`);
+        if (licenseKey) {
+          const raw = await env.LICENSES.get(`license:${licenseKey}`);
+          if (raw) {
+            const data = JSON.parse(raw);
+            data.active = true;
+            data.renewedAt = new Date().toISOString();
+            data.currentPeriodEnd = invoice.lines?.data?.[0]?.period?.end
+              ? new Date(invoice.lines.data[0].period.end * 1000).toISOString()
+              : null;
+            await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(data));
+            console.log(`[webhook] license renewed key=${licenseKey} plan=${data.plan} sub=${invoice.subscription}`);
+          }
+        }
+      }
+    }
+
+    // ── Recurring invoice payment failed (card expired, etc.) ────────────────
+    if (event.type === "invoice.payment_failed") {
+      const invoice = event.data.object;
+      const ga4ClientId = invoice.customer || invoice.id;
+      const licenseKey = invoice.subscription ? await env.LICENSES.get(`sub:${invoice.subscription}`) : null;
+      const raw = licenseKey ? await env.LICENSES.get(`license:${licenseKey}`) : null;
+      const licenseData = raw ? JSON.parse(raw) : {};
+      await fireGA4Event(env, ga4ClientId, "invoice_payment_failed", {
+        attempt_count: invoice.attempt_count || 1,
+        amount: invoice.amount_due ? invoice.amount_due / 100 : 0,
+        currency: invoice.currency || "usd",
+        customer_id: invoice.customer || "",
+        subscription_id: invoice.subscription || "",
+        plan: licenseData.plan || "unknown",
+      });
+    }
+
+    // ── Cancellation scheduled ───────────────────────────────────────────────
+    if (event.type === "customer.subscription.updated") {
+      const sub = event.data.object;
+      const prev = event.data.previous_attributes || {};
+      if (sub.cancel_at_period_end === true && prev.cancel_at_period_end === false) {
+        const licenseKey = await env.LICENSES.get(`sub:${sub.id}`);
+        const raw = licenseKey ? await env.LICENSES.get(`license:${licenseKey}`) : null;
+        const licenseData = raw ? JSON.parse(raw) : {};
+        await fireGA4Event(env, sub.customer || sub.id, "subscription_cancelled", {
+          plan: licenseData.plan || "unknown",
           customer_id: sub.customer || "",
           subscription_id: sub.id,
+          cancel_at: sub.cancel_at || 0,
         });
       }
     }
-  }
 
-  return new Response("OK", { status: 200 });
+    // ── Subscription deleted (fully churned) ─────────────────────────────────
+    if (event.type === "customer.subscription.deleted") {
+      const sub = event.data.object;
+      const licenseKey = await env.LICENSES.get(`sub:${sub.id}`);
+      if (licenseKey) {
+        const raw = await env.LICENSES.get(`license:${licenseKey}`);
+        if (raw) {
+          const data = JSON.parse(raw);
+          data.active = false;
+          await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(data));
+          await fireGA4Event(env, sub.customer || sub.id, "subscription_deleted", {
+            plan: data.plan || "unknown",
+            customer_id: sub.customer || "",
+            subscription_id: sub.id,
+          });
+        }
+      }
+    }
+
+    // Mark as processed only after all handlers succeeded
+    if (event.id) {
+      await env.LICENSES.put(`evt:${event.id}`, "1", { expirationTtl: 86400 });
+    }
+    return new Response("OK", { status: 200 });
+  } catch (err) {
+    console.error(`[webhook] processing error event=${event.type} id=${event.id}`, String(err));
+    return new Response("Internal error", { status: 500 });
+  }
 }
 __name(handleWebhook, "handleWebhook");
 async function handleGetLicense(url, env) {
@@ -422,7 +485,12 @@ async function checkRateLimit(env, ip, bucket, limit, windowSec) {
   const raw = await env.LICENSES.get(key);
   const count = raw ? parseInt(raw) : 0;
   if (count >= limit) return false;
-  await env.LICENSES.put(key, String(count + 1), { expirationTtl: windowSec });
+  // Only set TTL on the first write so the window is fixed, not sliding
+  if (count === 0) {
+    await env.LICENSES.put(key, "1", { expirationTtl: windowSec });
+  } else {
+    await env.LICENSES.put(key, String(count + 1));
+  }
   return true;
 }
 __name(checkRateLimit, "checkRateLimit");
@@ -469,6 +537,10 @@ async function handleTrialStart(request, env) {
 }
 __name(handleTrialStart, "handleTrialStart");
 async function handleTrack(request, env) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  if (!await checkRateLimit(env, ip, "track", 60, 60)) {
+    return json({ ok: false, error: "Rate limited" }, 429);
+  }
   try {
     const body = await request.json();
     const { client_id, events } = body;
@@ -607,6 +679,10 @@ var index_default = {
       return handleWebhook(request, env);
     }
     if (url.pathname === "/validate" && request.method === "GET") {
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      if (!await checkRateLimit(env, ip, "validate", 30, 60)) {
+        return json({ valid: false, error: "Rate limited" }, 429);
+      }
       const key = url.searchParams.get("key");
       if (!key) return json({ valid: false, error: "No key provided" }, 400);
       const raw = await env.LICENSES.get(`license:${key}`);
@@ -637,7 +713,6 @@ var index_default = {
       return json({
         valid,
         plan: license.plan,
-        email: license.email,
         trial: isTrial,
         expires_at: license.expires_at || null,
         reason: expired ? "trial_expired" : undefined,
