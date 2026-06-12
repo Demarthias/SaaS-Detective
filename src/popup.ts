@@ -135,13 +135,20 @@ function wirePlanButtons(banner: HTMLElement, location: string): void {
   trackEvent('view_pricing', { location });
   banner.querySelectorAll<HTMLButtonElement>('.plan-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
-      trackEvent('upgrade_clicked', {
+      trackEvent('clicked_payment_link', {
         location,
         plan: btn.dataset.plan,
         price: btn.dataset.price,
       });
       const clientId = await getClientId();
-      chrome.tabs.create({ url: withClientRef(btn.dataset.url!, clientId) });
+      const url = withClientRef(btn.dataset.url!, clientId);
+      trackEvent('checkout_begin', {
+        location,
+        plan: btn.dataset.plan,
+        price: btn.dataset.price,
+        source: 'extension',
+      });
+      chrome.tabs.create({ url });
     });
   });
   const trialLink = banner.querySelector<HTMLAnchorElement>('.banner-trial a');
@@ -390,9 +397,11 @@ function updatePlanUI(licensed: boolean): void {
   if (stripLink && !licensed) {
     stripLink.addEventListener('click', async (e) => {
       e.preventDefault();
-      trackEvent('upgrade_clicked', { location: 'upgrade_strip', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price });
+      trackEvent('clicked_payment_link', { location: 'upgrade_strip', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price });
       const clientId = await getClientId();
-      chrome.tabs.create({ url: withClientRef(STRIPE_PLANS[0].url, clientId) });
+      const url = withClientRef(STRIPE_PLANS[0].url, clientId);
+      trackEvent('checkout_begin', { location: 'upgrade_strip', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price, source: 'extension' });
+      chrome.tabs.create({ url });
     });
   }
 
