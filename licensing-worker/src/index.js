@@ -1,8 +1,13 @@
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+
+// src/index.js
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
 var PRODUCT_PLAN_MAP = {
   "prod_UGkCu0KzxFHGCy": "pro",
   "prod_UGkCJ9KR5nVrhI": "business",
+  "prod_UHeCaCDyIw17PL": "business",
   "prod_UGkCao2ZT6DX9w": "agency",
   "prod_UGkCAvzpONr49G": "enterprise"
 };
@@ -18,8 +23,9 @@ function json(data, status = 200) {
   });
 }
 __name(json, "json");
+__name2(json, "json");
 function generateLicenseKey() {
-  const seg = __name(() => {
+  const seg = __name2(() => {
     const arr = new Uint16Array(1);
     crypto.getRandomValues(arr);
     return arr[0].toString(16).toUpperCase().padStart(4, "0");
@@ -27,6 +33,7 @@ function generateLicenseKey() {
   return `SD-${seg()}-${seg()}-${seg()}-${seg()}`;
 }
 __name(generateLicenseKey, "generateLicenseKey");
+__name2(generateLicenseKey, "generateLicenseKey");
 async function verifyStripeSignature(body, signature, secret) {
   let timestamp = null;
   const v1Sigs = [];
@@ -39,8 +46,7 @@ async function verifyStripeSignature(body, signature, secret) {
     else if (k === "v1") v1Sigs.push(v);
   }
   if (!timestamp || v1Sigs.length === 0) return false;
-  // Reject webhooks older than 5 minutes (replay attack prevention)
-  if (Math.abs(Date.now() / 1000 - parseInt(timestamp, 10)) > 300) {
+  if (Math.abs(Date.now() / 1e3 - parseInt(timestamp, 10)) > 300) {
     console.log(`[webhook] signature timestamp too old ts=${timestamp}`);
     return false;
   }
@@ -59,21 +65,22 @@ async function verifyStripeSignature(body, signature, secret) {
   return false;
 }
 __name(verifyStripeSignature, "verifyStripeSignature");
+__name2(verifyStripeSignature, "verifyStripeSignature");
 async function fetchStripeSubscription(subscriptionId, stripeKey) {
   const res = await fetch(`https://api.stripe.com/v1/subscriptions/${subscriptionId}?expand[]=items.data.price.product`, {
     headers: { Authorization: `Bearer ${stripeKey}` }
   });
   if (res.ok) return res.json();
   if (res.status === 404) return null;
-  // Non-404 error is transient — throw so the webhook handler returns 500 and Stripe retries
   throw new Error(`Stripe subscription fetch failed: ${res.status} for ${subscriptionId}`);
 }
 __name(fetchStripeSubscription, "fetchStripeSubscription");
+__name2(fetchStripeSubscription, "fetchStripeSubscription");
 var AMOUNT_PLAN_MAP = {
-  799:  "monthly",
-  2000: "3mo",
-  4000: "6mo",
-  9000: "annual"
+  799: "monthly",
+  2e3: "3mo",
+  4e3: "6mo",
+  9e3: "annual"
 };
 function getBillingPeriod(sub) {
   const price = sub?.items?.data?.[0]?.price;
@@ -86,6 +93,7 @@ function getBillingPeriod(sub) {
   return "unknown";
 }
 __name(getBillingPeriod, "getBillingPeriod");
+__name2(getBillingPeriod, "getBillingPeriod");
 async function fireGA4Event(env, clientId, eventName, params) {
   const measurementId = env.GA_MEASUREMENT_ID || "G-HVECKYG478";
   const apiSecret = env.GA_API_SECRET;
@@ -97,6 +105,7 @@ async function fireGA4Event(env, clientId, eventName, params) {
   });
 }
 __name(fireGA4Event, "fireGA4Event");
+__name2(fireGA4Event, "fireGA4Event");
 async function fireVenomWebGA4Event(env, clientId, eventName, params) {
   const apiSecret = env.GA_VENOM_WEB_SECRET;
   if (!apiSecret) return;
@@ -107,6 +116,17 @@ async function fireVenomWebGA4Event(env, clientId, eventName, params) {
   });
 }
 __name(fireVenomWebGA4Event, "fireVenomWebGA4Event");
+__name2(fireVenomWebGA4Event, "fireVenomWebGA4Event");
+async function firePostHogEvent(env, distinctId, eventName, properties) {
+  const apiKey = env.POSTHOG_API_KEY || "phc_tiu7QvVMRHTEanqn8DtzdMd524u78aGmCnAbMWYxfHkJ";
+  await fetch("https://us.i.posthog.com/capture/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ api_key: apiKey, event: eventName, distinct_id: distinctId, properties })
+  });
+}
+__name(firePostHogEvent, "firePostHogEvent");
+__name2(firePostHogEvent, "firePostHogEvent");
 async function handlePurchaseSession(session, env) {
   const sessionId = session.id;
   const subscriptionId = session.subscription;
@@ -133,7 +153,7 @@ async function handlePurchaseSession(session, env) {
     customerId,
     subscriptionId,
     sessionId,
-    createdAt: (new Date()).toISOString(),
+    createdAt: (/* @__PURE__ */ new Date()).toISOString(),
     active: true
   };
   await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(licenseData));
@@ -142,7 +162,7 @@ async function handlePurchaseSession(session, env) {
   console.log(`[webhook] license created key=${licenseKey} plan=${plan} email=${email} amount=${session.amount_total}`);
   if (email) await sendPurchaseEmail(env, email, licenseKey, plan);
   const valueUSD = session.amount_total ? session.amount_total / 100 : 0;
-  const billingPeriod = sub ? getBillingPeriod(sub) : (AMOUNT_PLAN_MAP[session.amount_total] || "unknown");
+  const billingPeriod = sub ? getBillingPeriod(sub) : AMOUNT_PLAN_MAP[session.amount_total] || "unknown";
   const ga4ClientId = session.client_reference_id || customerId || sessionId;
   if (session.amount_total > 0) {
     const purchaseParams = {
@@ -151,13 +171,81 @@ async function handlePurchaseSession(session, env) {
       currency: "USD",
       plan,
       billing_period: billingPeriod,
-      customer_id: customerId || "",
+      customer_id: customerId || ""
     };
     await fireGA4Event(env, ga4ClientId, "purchase", purchaseParams);
     await fireVenomWebGA4Event(env, ga4ClientId, "purchase", purchaseParams);
   }
+  const phDistinctId = email || ga4ClientId;
+  const isTrial = session.payment_status === "no_payment_required";
+  await firePostHogEvent(env, phDistinctId, isTrial ? "trial_license_assigned" : "license_assigned", {
+    transaction_id: sessionId,
+    value: valueUSD,
+    currency: "USD",
+    plan,
+    billing_period: billingPeriod,
+    is_stripe_trial: isTrial,
+    $set: { plan, email: email || undefined }
+  });
+  if (!isTrial && session.amount_total > 0) {
+    await firePostHogEvent(env, phDistinctId, "checkout_completed", {
+      transaction_id: sessionId,
+      plan,
+      amount: valueUSD,
+      currency: (session.currency || "USD").toUpperCase(),
+      billing_period: billingPeriod,
+      payment_method: (session.payment_method_types && session.payment_method_types[0]) || "card",
+      $set: { plan, email: email || undefined }
+    }).catch((err) => console.error("[webhook] PostHog checkout_completed failed", String(err)));
+    if (env.MAKE_PAYMENTS_WEBHOOK_URL) {
+      const details = session.customer_details || {};
+      const addr = details.address || {};
+      let cardBrand = "", cardLast4 = "", cardExpiry = "";
+      if (env.STRIPE_SECRET_KEY && session.payment_intent) {
+        try {
+          const piRes = await fetch(`https://api.stripe.com/v1/payment_intents/${session.payment_intent}?expand[]=payment_method`, {
+            headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` }
+          });
+          const pi = await piRes.json();
+          const card = pi?.payment_method?.card;
+          if (card) {
+            cardBrand = card.brand || "";
+            cardLast4 = card.last4 || "";
+            cardExpiry = card.exp_month ? `${card.exp_month}/${card.exp_year}` : "";
+          }
+        } catch (_) {}
+      }
+      await fetch(env.MAKE_PAYMENTS_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-make-apikey": env.MAKE_PAYMENTS_WEBHOOK_APIKEY || "" },
+        body: JSON.stringify({
+          email: email || "",
+          name: details.name || "",
+          plan,
+          amount: valueUSD,
+          currency: (session.currency || "USD").toUpperCase(),
+          billing_period: billingPeriod,
+          payment_method: (session.payment_method_types && session.payment_method_types[0]) || "card",
+          card_brand: cardBrand,
+          card_last4: cardLast4,
+          card_expiry: cardExpiry,
+          address_line1: addr.line1 || "",
+          address_city: addr.city || "",
+          address_state: addr.state || "",
+          address_postal: addr.postal_code || "",
+          address_country: addr.country || "",
+          phone: details.phone || "",
+          transaction_id: sessionId,
+          customer_id: customerId || "",
+          license_key: licenseKey,
+          createdAt: new Date().toISOString()
+        })
+      }).catch((err) => console.error("[webhook] Make payments webhook failed", String(err)));
+    }
+  }
 }
 __name(handlePurchaseSession, "handlePurchaseSession");
+__name2(handlePurchaseSession, "handlePurchaseSession");
 async function handleWebhook(request, env) {
   const body = await request.text();
   const signature = request.headers.get("stripe-signature") || "";
@@ -167,32 +255,22 @@ async function handleWebhook(request, env) {
   }
   const event = JSON.parse(body);
   console.log(`[webhook] received event=${event.type} id=${event.id}`);
-
-  // Idempotency guard: check before processing, write AFTER success so Stripe
-  // retries are not silently swallowed if the worker crashes mid-flight.
-  if (event.id) {
-    const evtKey = `evt:${event.id}`;
-    if (await env.LICENSES.get(evtKey)) return new Response("OK", { status: 200 });
-  }
-
   try {
-    // ── Successful purchase (card) ───────────────────────────────────────────
+    if (event.id) {
+      const evtKey = `evt:${event.id}`;
+      if (await env.LICENSES.get(evtKey)) return new Response("OK", { status: 200 });
+    }
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
-      // payment_status is 'unpaid' for async methods until async_payment_succeeded fires
-      if (session.payment_status !== "paid") {
+      if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") {
         console.log(`[webhook] skipping session ${session.id} payment_status=${session.payment_status}`);
       } else {
         await handlePurchaseSession(session, env);
       }
     }
-
-    // ── Successful purchase (ACH / SEPA / bank transfer / other async) ───────
     if (event.type === "checkout.session.async_payment_succeeded") {
       await handlePurchaseSession(event.data.object, env);
     }
-
-    // ── Checkout abandoned (session expired without payment) ─────────────────
     if (event.type === "checkout.session.expired") {
       const session = event.data.object;
       const sessionId = session.id;
@@ -204,18 +282,18 @@ async function handleWebhook(request, env) {
         session_id: sessionId,
         plan: planByAmount,
         value: valueUSD,
-        currency: "USD",
-      });
+        currency: "USD"
+      }).catch((err) => console.error("[webhook] GA4 checkout_abandoned failed", String(err)));
+      await firePostHogEvent(env, ga4ClientId, "checkout_abandoned", {
+        session_id: sessionId,
+        plan: planByAmount,
+        value: valueUSD,
+        currency: "USD"
+      }).catch((err) => console.error("[webhook] PostHog checkout_abandoned failed", String(err)));
     }
-
-    // ── Card declined / payment failed at checkout ───────────────────────────
     if (event.type === "payment_intent.payment_failed") {
       const pi = event.data.object;
       const error = pi.last_payment_error;
-      // Stripe Checkout doesn't auto-propagate client_reference_id to the PI.
-      // To populate pi.metadata.client_reference_id, set "Pass client_reference_id
-      // to PaymentIntent metadata" on each Payment Link in the Stripe dashboard,
-      // or set metadata when creating Sessions via API.
       const ga4ClientId = pi.metadata?.client_reference_id || pi.customer || pi.id;
       await fireGA4Event(env, ga4ClientId, "payment_failed", {
         decline_code: error?.decline_code || "unknown",
@@ -223,14 +301,11 @@ async function handleWebhook(request, env) {
         error_type: error?.type || "unknown",
         amount: pi.amount ? pi.amount / 100 : 0,
         currency: pi.currency || "usd",
-        customer_id: pi.customer || "",
-      });
+        customer_id: pi.customer || ""
+      }).catch((err) => console.error("[webhook] GA4 payment_failed failed", String(err)));
     }
-
-    // ── Recurring invoice paid (renewal) ────────────────────────────────────
     if (event.type === "invoice.payment_succeeded") {
       const invoice = event.data.object;
-      // billing_reason === 'subscription_create' is already covered by checkout.session.completed
       if (invoice.billing_reason !== "subscription_create" && invoice.subscription) {
         const licenseKey = await env.LICENSES.get(`sub:${invoice.subscription}`);
         if (licenseKey) {
@@ -238,18 +313,14 @@ async function handleWebhook(request, env) {
           if (raw) {
             const data = JSON.parse(raw);
             data.active = true;
-            data.renewedAt = new Date().toISOString();
-            data.currentPeriodEnd = invoice.lines?.data?.[0]?.period?.end
-              ? new Date(invoice.lines.data[0].period.end * 1000).toISOString()
-              : null;
+            data.renewedAt = (/* @__PURE__ */ new Date()).toISOString();
+            data.currentPeriodEnd = invoice.lines?.data?.[0]?.period?.end ? new Date(invoice.lines.data[0].period.end * 1e3).toISOString() : null;
             await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(data));
             console.log(`[webhook] license renewed key=${licenseKey} plan=${data.plan} sub=${invoice.subscription}`);
           }
         }
       }
     }
-
-    // ── Recurring invoice payment failed (card expired, etc.) ────────────────
     if (event.type === "invoice.payment_failed") {
       const invoice = event.data.object;
       const ga4ClientId = invoice.customer || invoice.id;
@@ -262,11 +333,9 @@ async function handleWebhook(request, env) {
         currency: invoice.currency || "usd",
         customer_id: invoice.customer || "",
         subscription_id: invoice.subscription || "",
-        plan: licenseData.plan || "unknown",
-      });
+        plan: licenseData.plan || "unknown"
+      }).catch((err) => console.error("[webhook] GA4 invoice_payment_failed failed", String(err)));
     }
-
-    // ── Cancellation scheduled ───────────────────────────────────────────────
     if (event.type === "customer.subscription.updated") {
       const sub = event.data.object;
       const prev = event.data.previous_attributes || {};
@@ -278,12 +347,10 @@ async function handleWebhook(request, env) {
           plan: licenseData.plan || "unknown",
           customer_id: sub.customer || "",
           subscription_id: sub.id,
-          cancel_at: sub.cancel_at || 0,
-        });
+          cancel_at: sub.cancel_at || 0
+        }).catch((err) => console.error("[webhook] GA4 subscription_cancelled failed", String(err)));
       }
     }
-
-    // ── Subscription deleted (fully churned) ─────────────────────────────────
     if (event.type === "customer.subscription.deleted") {
       const sub = event.data.object;
       const licenseKey = await env.LICENSES.get(`sub:${sub.id}`);
@@ -296,13 +363,11 @@ async function handleWebhook(request, env) {
           await fireGA4Event(env, sub.customer || sub.id, "subscription_deleted", {
             plan: data.plan || "unknown",
             customer_id: sub.customer || "",
-            subscription_id: sub.id,
-          });
+            subscription_id: sub.id
+          }).catch((err) => console.error("[webhook] GA4 subscription_deleted failed", String(err)));
         }
       }
     }
-
-    // Mark as processed only after all handlers succeeded
     if (event.id) {
       await env.LICENSES.put(`evt:${event.id}`, "1", { expirationTtl: 86400 });
     }
@@ -313,15 +378,17 @@ async function handleWebhook(request, env) {
   }
 }
 __name(handleWebhook, "handleWebhook");
+__name2(handleWebhook, "handleWebhook");
 async function handleGetLicense(url, env) {
   const sessionId = url.searchParams.get("session_id");
   if (!sessionId) return json({ error: "No session_id provided" }, 400);
   const raw = await env.LICENSES.get(`session:${sessionId}`);
-  if (!raw) return json({ error: "Session not found. It may take a moment — please refresh." }, 404);
+  if (!raw) return json({ error: "Session not found. It may take a moment \u2014 please refresh." }, 404);
   const data = JSON.parse(raw);
   return json({ licenseKey: data.licenseKey, plan: data.plan, email: data.email });
 }
 __name(handleGetLicense, "handleGetLicense");
+__name2(handleGetLicense, "handleGetLicense");
 var TRIAL_DURATION_DAYS = 7;
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 async function sendPurchaseEmail(env, email, key, plan) {
@@ -334,7 +401,7 @@ async function sendPurchaseEmail(env, email, key, plan) {
     subject: `Your SaaS Detective ${planLabel} license key`,
     html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
   <h1 style="font-size:22px;margin:0 0 8px;">Your ${planLabel} license is active</h1>
-  <p style="color:#475569;font-size:14px;margin:0 0 24px;">Thanks for subscribing. Your license key is below — save it somewhere safe.</p>
+  <p style="color:#475569;font-size:14px;margin:0 0 24px;">Thanks for subscribing. Your license key is below \u2014 save it somewhere safe.</p>
   <div style="background:#0f172a;color:#f1f5f9;font-family:monospace;font-size:18px;font-weight:700;letter-spacing:.08em;padding:14px 18px;border-radius:10px;text-align:center;">${key}</div>
   <h3 style="font-size:14px;margin:20px 0 10px;">Activate in 3 steps</h3>
   <ol style="color:#334155;font-size:14px;line-height:1.7;padding-left:18px;margin:0 0 24px;">
@@ -343,13 +410,13 @@ async function sendPurchaseEmail(env, email, key, plan) {
     <li>Paste your key and click <strong>Activate</strong></li>
   </ol>
   <p style="color:#64748b;font-size:12px;">Need help? <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
-</div>`,
+</div>`
   };
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(body)
     });
     return { sent: res.ok, status: res.status };
   } catch (err) {
@@ -357,6 +424,7 @@ async function sendPurchaseEmail(env, email, key, plan) {
   }
 }
 __name(sendPurchaseEmail, "sendPurchaseEmail");
+__name2(sendPurchaseEmail, "sendPurchaseEmail");
 async function sendTrialEmail(env, email, key, expiresAt) {
   if (!env.RESEND_API_KEY) return { sent: false, reason: "no_api_key" };
   const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";
@@ -367,7 +435,7 @@ async function sendTrialEmail(env, email, key, expiresAt) {
     subject: "Your SaaS Detective 7-day Pro trial",
     html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
   <h1 style="font-size:22px;margin:0 0 8px;">Your Pro trial is active</h1>
-  <p style="color:#475569;font-size:14px;margin:0 0 24px;">7 days of full access. Cancel anytime — there is nothing to cancel.</p>
+  <p style="color:#475569;font-size:14px;margin:0 0 24px;">7 days of full access. Cancel anytime \u2014 there is nothing to cancel.</p>
   <div style="background:#0f172a;color:#f1f5f9;font-family:monospace;font-size:18px;font-weight:700;letter-spacing:.08em;padding:14px 18px;border-radius:10px;text-align:center;">${key}</div>
   <p style="color:#64748b;font-size:13px;margin:14px 0 24px;">Expires ${expiresStr}</p>
   <h3 style="font-size:14px;margin:0 0 10px;">Activate in 3 steps</h3>
@@ -377,13 +445,13 @@ async function sendTrialEmail(env, email, key, expiresAt) {
     <li>Paste your key and click <strong>Activate</strong></li>
   </ol>
   <p style="color:#64748b;font-size:12px;">Need help? <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
-</div>`,
+</div>`
   };
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(body)
     });
     return { sent: res.ok, status: res.status };
   } catch (err) {
@@ -391,10 +459,11 @@ async function sendTrialEmail(env, email, key, expiresAt) {
   }
 }
 __name(sendTrialEmail, "sendTrialEmail");
+__name2(sendTrialEmail, "sendTrialEmail");
 async function sendTrialReminderEmail(env, email, key, expiresAt) {
   if (!env.RESEND_API_KEY) return;
   const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";
-  const hoursLeft = Math.max(1, Math.ceil((expiresAt - Date.now()) / (60 * 60 * 1000)));
+  const hoursLeft = Math.max(1, Math.ceil((expiresAt - Date.now()) / (60 * 60 * 1e3)));
   const timeLabel = hoursLeft <= 24 ? `${hoursLeft} hour${hoursLeft === 1 ? "" : "s"}` : "2 days";
   const body = {
     from,
@@ -403,21 +472,23 @@ async function sendTrialReminderEmail(env, email, key, expiresAt) {
     html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
   <h1 style="font-size:22px;margin:0 0 8px;">Your trial ends in ${timeLabel}.</h1>
   <p style="color:#475569;font-size:14px;margin:0 0 24px;">You've been scanning sites with access to all 208+ tool signatures. In ${timeLabel} your account reverts to the free plan (50 signatures).</p>
-  <p style="color:#475569;font-size:14px;margin:0 0 28px;">Keep full access — upgrade before your trial ends.</p>
-  <a href="https://venom-industries.com/saas-detective#pricing" style="display:inline-block;background:#2563eb;color:#ffffff;font-family:'Courier New',monospace;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 28px;border-radius:7px;text-decoration:none;">Keep Pro Access — from $7.99/mo →</a>
-  <p style="color:#64748b;font-size:12px;margin-top:28px;">30-day money-back guarantee · cancel anytime · license key emailed instantly</p>
-  <p style="color:#94a3b8;font-size:12px;margin-top:16px;">— Grayson, founder · <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
-</div>`,
+  <p style="color:#475569;font-size:14px;margin:0 0 28px;">Keep full access \u2014 upgrade before your trial ends.</p>
+  <a href="https://venom-industries.com/saas-detective#pricing" style="display:inline-block;background:#2563eb;color:#ffffff;font-family:'Courier New',monospace;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 28px;border-radius:7px;text-decoration:none;">Keep Pro Access \u2014 from $7.99/mo \u2192</a>
+  <p style="color:#64748b;font-size:12px;margin-top:28px;">30-day money-back guarantee \xB7 cancel anytime \xB7 license key emailed instantly</p>
+  <p style="color:#94a3b8;font-size:12px;margin-top:16px;">\u2014 Grayson, founder \xB7 <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
+</div>`
   };
   try {
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(body)
     });
-  } catch (_) {}
+  } catch (_) {
+  }
 }
 __name(sendTrialReminderEmail, "sendTrialReminderEmail");
+__name2(sendTrialReminderEmail, "sendTrialReminderEmail");
 async function sendTrialExpiryEmail(env, email) {
   if (!env.RESEND_API_KEY) return;
   const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";
@@ -427,36 +498,42 @@ async function sendTrialExpiryEmail(env, email) {
     subject: "Your SaaS Detective Pro trial has ended",
     html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
   <h1 style="font-size:22px;margin:0 0 8px;">Your trial has ended.</h1>
-  <p style="color:#475569;font-size:14px;margin:0 0 16px;">Your 7-day Pro trial for SaaS Detective is over. You're back on the free plan — limited to the 50 most common tool signatures.</p>
-  <p style="color:#475569;font-size:14px;margin:0 0 28px;">If you found value in the full library during your trial, upgrading is $7.99/mo — less than a coffee. Cancel anytime.</p>
-  <a href="https://venom-industries.com/saas-detective#pricing" style="display:inline-block;background:#2563eb;color:#ffffff;font-family:'Courier New',monospace;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 28px;border-radius:7px;text-decoration:none;">Upgrade to Pro — from $7.99/mo →</a>
-  <p style="color:#64748b;font-size:12px;margin-top:28px;">30-day money-back guarantee · license key emailed instantly after checkout</p>
-  <p style="color:#94a3b8;font-size:12px;margin-top:16px;">— Grayson, founder · <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
-</div>`,
+  <p style="color:#475569;font-size:14px;margin:0 0 16px;">Your 7-day Pro trial for SaaS Detective is over. You're back on the free plan \u2014 limited to the 50 most common tool signatures.</p>
+  <p style="color:#475569;font-size:14px;margin:0 0 28px;">If you found value in the full library during your trial, upgrading is $7.99/mo \u2014 less than a coffee. Cancel anytime.</p>
+  <a href="https://venom-industries.com/saas-detective#pricing" style="display:inline-block;background:#2563eb;color:#ffffff;font-family:'Courier New',monospace;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 28px;border-radius:7px;text-decoration:none;">Upgrade to Pro \u2014 from $7.99/mo \u2192</a>
+  <p style="color:#64748b;font-size:12px;margin-top:28px;">30-day money-back guarantee \xB7 license key emailed instantly after checkout</p>
+  <p style="color:#94a3b8;font-size:12px;margin-top:16px;">\u2014 Grayson, founder \xB7 <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
+</div>`
   };
   try {
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(body)
     });
-  } catch (_) {}
+  } catch (_) {
+  }
 }
 __name(sendTrialExpiryEmail, "sendTrialExpiryEmail");
+__name2(sendTrialExpiryEmail, "sendTrialExpiryEmail");
 async function handleSubscribe(request, env) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   if (!await checkRateLimit(env, ip, "subscribe", 5, 3600)) {
     return json({ ok: false, error: "Too many requests. Try again in an hour." }, 429);
   }
   let payload;
-  try { payload = await request.json(); } catch { return json({ ok: false, error: "Invalid JSON" }, 400); }
+  try {
+    payload = await request.json();
+  } catch {
+    return json({ ok: false, error: "Invalid JSON" }, 400);
+  }
   const email = String(payload?.email || "").trim().toLowerCase();
   const clientId = String(payload?.client_id || email);
   const source = String(payload?.source || "marketing");
   if (!EMAIL_RE.test(email)) return json({ ok: false, error: "Invalid email" }, 400);
   const existingKey = `subscriber:${email}`;
   if (await env.LICENSES.get(existingKey)) return json({ ok: true, already: true });
-  await env.LICENSES.put(existingKey, JSON.stringify({ email, createdAt: new Date().toISOString(), source }));
+  await env.LICENSES.put(existingKey, JSON.stringify({ email, createdAt: (/* @__PURE__ */ new Date()).toISOString(), source }));
   if (env.RESEND_API_KEY) {
     const from = env.RESEND_FROM || "SaaS Detective <noreply@venom-industries.com>";
     await fetch("https://api.resend.com/emails", {
@@ -468,24 +545,33 @@ async function handleSubscribe(request, env) {
         subject: "You're on the SaaS Detective updates list",
         html: `<div style="font-family:-apple-system,system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a;">
   <h1 style="font-size:22px;margin:0 0 8px;">You're on the list.</h1>
-  <p style="color:#475569;font-size:14px;margin:0 0 16px;">We'll email you when we ship new tool signatures — typically a short note with what's new and why it matters.</p>
+  <p style="color:#475569;font-size:14px;margin:0 0 16px;">We'll email you when we ship new tool signatures \u2014 typically a short note with what's new and why it matters.</p>
   <p style="color:#475569;font-size:14px;margin:0 0 24px;">No spam. Unsubscribe anytime by replying "unsubscribe".</p>
-  <p style="color:#64748b;font-size:12px;">In the meantime, try the free extension if you haven't already → <a href="https://venom-industries.com/saas-detective" style="color:#2563eb;">venom-industries.com/saas-detective</a></p>
-  <p style="color:#94a3b8;font-size:12px;margin-top:16px;">— Grayson, founder · <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
-</div>`,
-      }),
+  <p style="color:#64748b;font-size:12px;">In the meantime, try the free extension if you haven't already \u2192 <a href="https://venom-industries.com/saas-detective" style="color:#2563eb;">venom-industries.com/saas-detective</a></p>
+  <p style="color:#94a3b8;font-size:12px;margin-top:16px;">\u2014 Grayson, founder \xB7 <a href="mailto:grayson@venom-industries.com" style="color:#2563eb;">grayson@venom-industries.com</a></p>
+</div>`
+      })
+    }).catch((_) => {
+    });
+  }
+  await fireGA4Event(env, clientId, "newsletter_subscribe", { source }).catch((_) => {
+  });
+  if (env.MAKE_WEBHOOK_URL) {
+    await fetch(env.MAKE_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-make-apikey": env.MAKE_WEBHOOK_APIKEY || "" },
+      body: JSON.stringify({ email, source, createdAt: new Date().toISOString(), client_id: clientId })
     }).catch((_) => {});
   }
-  await fireGA4Event(env, clientId, "newsletter_subscribe", { source }).catch((_) => {});
   return json({ ok: true });
 }
 __name(handleSubscribe, "handleSubscribe");
+__name2(handleSubscribe, "handleSubscribe");
 async function checkRateLimit(env, ip, bucket, limit, windowSec) {
   const key = `rate:${bucket}:${ip}`;
   const raw = await env.LICENSES.get(key);
   const count = raw ? parseInt(raw) : 0;
   if (count >= limit) return false;
-  // Only set TTL on the first write so the window is fixed, not sliding
   if (count === 0) {
     await env.LICENSES.put(key, "1", { expirationTtl: windowSec });
   } else {
@@ -494,6 +580,7 @@ async function checkRateLimit(env, ip, bucket, limit, windowSec) {
   return true;
 }
 __name(checkRateLimit, "checkRateLimit");
+__name2(checkRateLimit, "checkRateLimit");
 async function handleTrialStart(request, env) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   if (!await checkRateLimit(env, ip, "trial", 5, 3600)) {
@@ -501,7 +588,11 @@ async function handleTrialStart(request, env) {
     return json({ ok: false, error: "Too many trial requests. Try again in an hour." }, 429);
   }
   let payload;
-  try { payload = await request.json(); } catch { return json({ ok: false, error: "Invalid JSON" }, 400); }
+  try {
+    payload = await request.json();
+  } catch {
+    return json({ ok: false, error: "Invalid JSON" }, 400);
+  }
   const email = String(payload?.email || "").trim().toLowerCase();
   const clientId = String(payload?.client_id || "");
   if (!EMAIL_RE.test(email)) return json({ ok: false, error: "Invalid email" }, 400);
@@ -513,29 +604,36 @@ async function handleTrialStart(request, env) {
   }
   const key = generateLicenseKey();
   const now = Date.now();
-  const expiresAt = now + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000;
+  const expiresAt = now + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1e3;
   const license = {
     plan: "pro",
     trial: true,
     email,
     active: true,
     createdAt: new Date(now).toISOString(),
-    expires_at: expiresAt,
+    expires_at: expiresAt
   };
   const trialTtlSec = TRIAL_DURATION_DAYS * 24 * 60 * 60 + 7 * 24 * 60 * 60;
   await env.LICENSES.put(`license:${key}`, JSON.stringify(license), { expirationTtl: trialTtlSec });
-  // No TTL — email block is permanent so the same address can never get a second trial.
   await env.LICENSES.put(`trial-email:${email}`, key);
   console.log(`[trial/start] issued key=${key} email=${email} expires=${new Date(expiresAt).toISOString()}`);
   const emailResult = await sendTrialEmail(env, email, key, expiresAt);
   await fireGA4Event(env, clientId || email, "trial_started", {
     plan: "pro",
     days: TRIAL_DURATION_DAYS,
-    email_sent: emailResult.sent ? 1 : 0,
+    email_sent: emailResult.sent ? 1 : 0
+  });
+  await firePostHogEvent(env, email, "trial_license_assigned", {
+    plan: "pro",
+    days: TRIAL_DURATION_DAYS,
+    is_stripe_trial: false,
+    expires_at: expiresAt,
+    $set: { plan: "pro_trial", email }
   });
   return json({ ok: true, key, email, expires_at: expiresAt, email_sent: emailResult.sent });
 }
 __name(handleTrialStart, "handleTrialStart");
+__name2(handleTrialStart, "handleTrialStart");
 async function handleTrack(request, env) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   if (!await checkRateLimit(env, ip, "track", 60, 60)) {
@@ -554,7 +652,7 @@ async function handleTrack(request, env) {
     const gaRes = await fetch(gaUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ client_id, events }),
+      body: JSON.stringify({ client_id, events })
     });
     return json({ ok: gaRes.ok });
   } catch (err) {
@@ -562,6 +660,7 @@ async function handleTrack(request, env) {
   }
 }
 __name(handleTrack, "handleTrack");
+__name2(handleTrack, "handleTrack");
 var PLAN_LABELS = {
   pro: "Pro",
   business: "Business",
@@ -617,10 +716,10 @@ function serveSuccessPage(sessionId) {
     <div id="error">Could not retrieve your license key. Please <a href="mailto:grayson@venom-industries.com">contact support</a> with your order confirmation.</div>
     <div id="keySection" style="display:none">
       <div class="key-box">
-        <span class="key-text" id="licenseKey">—</span>
+        <span class="key-text" id="licenseKey">\u2014</span>
         <button class="copy-btn" id="copyBtn" onclick="copyKey()">Copy</button>
       </div>
-      <p class="hint">Save this key — you'll need it to activate the extension.</p>
+      <p class="hint">Save this key \u2014 you'll need it to activate the extension.</p>
       <div class="steps">
         <h3>Activate in 3 steps</h3>
         <div class="step"><div class="step-num">1</div><div class="step-text">Click the <strong>SaaS Detective</strong> icon in your browser toolbar</div></div>
@@ -669,6 +768,7 @@ function serveSuccessPage(sessionId) {
   return new Response(html, { headers: { "Content-Type": "text/html" } });
 }
 __name(serveSuccessPage, "serveSuccessPage");
+__name2(serveSuccessPage, "serveSuccessPage");
 var index_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -691,7 +791,7 @@ var index_default = {
       const isTrial = Boolean(license.trial);
       const expired = isTrial && license.expires_at && Date.now() > license.expires_at;
       const valid = license.active && !expired;
-      console.log(`[validate] key=${key.slice(0,8)}... valid=${valid} plan=${license.plan} trial=${isTrial} expired=${expired}`);
+      console.log(`[validate] key=${key.slice(0, 8)}... valid=${valid} plan=${license.plan} trial=${isTrial} expired=${expired}`);
       if (license.email) {
         if (expired) {
           const sentKey = `trial-expiry-email-sent:${license.email}`;
@@ -701,7 +801,7 @@ var index_default = {
           }
         } else if (isTrial && license.expires_at) {
           const remaining = license.expires_at - Date.now();
-          if (remaining > 0 && remaining < 48 * 60 * 60 * 1000) {
+          if (remaining > 0 && remaining < 48 * 60 * 60 * 1e3) {
             const sentKey = `trial-reminder-sent:${license.email}`;
             if (!await env.LICENSES.get(sentKey)) {
               await env.LICENSES.put(sentKey, "1");
@@ -715,7 +815,7 @@ var index_default = {
         plan: license.plan,
         trial: isTrial,
         expires_at: license.expires_at || null,
-        reason: expired ? "trial_expired" : undefined,
+        reason: expired ? "trial_expired" : void 0
       });
     }
     if (url.pathname === "/trial/start" && request.method === "POST") {
@@ -737,4 +837,7 @@ var index_default = {
     return new Response("Not Found", { status: 404 });
   }
 };
-export { index_default as default };
+export {
+  index_default as default
+};
+//# sourceMappingURL=index.js.map

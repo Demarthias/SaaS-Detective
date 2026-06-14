@@ -504,6 +504,11 @@
         form.style.display = 'none';
         keySection.style.display = 'block';
         trackEvent('trial_key_shown', { location: 'onboarding', email_sent: data.email_sent ? 1 : 0 });
+        fetch('https://saas-detective-licensing.kubegrayson.workers.dev/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, source: 'onboarding-trial', client_id: clientId }),
+        }).catch(() => {});
       } catch (_) {
         statusEl.textContent = 'Something went wrong — please try again or contact support.';
         statusEl.style.color = '#dc2626';
