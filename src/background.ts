@@ -57,6 +57,12 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
       trackEvent('license_revalidated', { plan: data.plan || sd_license.plan, trial: Boolean(data.trial) });
     } else if (data.reason === 'trial_expired') {
       trackEvent('trial_expired', { plan: sd_license.plan });
+      chrome.notifications.create('trial_expired', {
+        type: 'basic',
+        iconUrl: 'icons/icon128.png',
+        title: 'Your SaaS Detective trial has ended',
+        message: 'Upgrade to keep Pro features — scan unlimited sites and access all 200+ signatures.',
+      });
     } else {
       trackEvent('license_expired', { plan: sd_license.plan });
     }

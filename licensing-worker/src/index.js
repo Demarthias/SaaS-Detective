@@ -118,7 +118,8 @@ async function fireVenomWebGA4Event(env, clientId, eventName, params) {
 __name(fireVenomWebGA4Event, "fireVenomWebGA4Event");
 __name2(fireVenomWebGA4Event, "fireVenomWebGA4Event");
 async function firePostHogEvent(env, distinctId, eventName, properties) {
-  const apiKey = env.POSTHOG_API_KEY || "phc_tiu7QvVMRHTEanqn8DtzdMd524u78aGmCnAbMWYxfHkJ";
+  const apiKey = env.POSTHOG_API_KEY;
+  if (!apiKey) return;
   await fetch("https://us.i.posthog.com/capture/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
