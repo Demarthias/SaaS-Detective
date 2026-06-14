@@ -40,7 +40,7 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.POSTHOG_PROJECT_TOKEN': JSON.stringify(env.POSTHOG_PROJECT_TOKEN || ''),
-      'process.env.POSTHOG_HOST': JSON.stringify(env.POSTHOG_HOST || 'https://api.venom-industries.com'),
+      'process.env.POSTHOG_HOST': JSON.stringify(env.POSTHOG_HOST || 'https://us.i.posthog.com'),
     }),
   ],
 };
