@@ -141,7 +141,8 @@ function wirePlanButtons(banner: HTMLElement, location: string): void {
         price: btn.dataset.price,
       });
       const clientId = await getClientId();
-      const url = withClientRef(btn.dataset.url!, clientId);
+      const { sd_license: lic } = await chrome.storage.sync.get({ sd_license: null }) as { sd_license: LicenseData | null };
+      const url = withClientRef(btn.dataset.url!, clientId, lic?.email);
       trackEvent('checkout_begin', {
         location,
         plan: btn.dataset.plan,
@@ -399,7 +400,8 @@ function updatePlanUI(licensed: boolean): void {
       e.preventDefault();
       trackEvent('clicked_payment_link', { location: 'upgrade_strip', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price });
       const clientId = await getClientId();
-      const url = withClientRef(STRIPE_PLANS[0].url, clientId);
+      const { sd_license: lic } = await chrome.storage.sync.get({ sd_license: null }) as { sd_license: LicenseData | null };
+      const url = withClientRef(STRIPE_PLANS[0].url, clientId, lic?.email);
       trackEvent('checkout_begin', { location: 'upgrade_strip', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price, source: 'extension' });
       chrome.tabs.create({ url });
     });

@@ -13,11 +13,14 @@ export async function getClientId(): Promise<string> {
   return newId;
 }
 
-export function withClientRef(url: string, clientId: string): string {
+export function withClientRef(url: string, clientId: string, email?: string): string {
   try {
     const u = new URL(url);
     if (!u.searchParams.get('client_reference_id')) {
       u.searchParams.set('client_reference_id', clientId);
+    }
+    if (email && !u.searchParams.get('prefilled_email')) {
+      u.searchParams.set('prefilled_email', email);
     }
     return u.toString();
   } catch (_) {
