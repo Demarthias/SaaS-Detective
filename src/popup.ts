@@ -4,7 +4,7 @@ import { signatures } from './signatures';
 const FREE_LIMIT = 50;
 const NUDGE_THRESHOLD_SCANS = 3;
 const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-const HISTORY_LIMIT_FREE = 5;
+const HISTORY_LIMIT_FREE = 25;
 const HISTORY_LIMIT_PRO = 50;
 
 const STRIPE_PLANS: Array<{ label: string; price: string; url: string; plan: string; badge?: string }> = [
@@ -521,8 +521,9 @@ async function scanPage(): Promise<void> {
       top_tools: allTools.slice(0, 5).map(t => t.name).join(',').slice(0, 95),
       top_categories: [...new Set(allTools.map(t => t.category))].slice(0, 5).join(',').slice(0, 95),
     });
-  } catch (_) {
-    trackEvent('scan_error');
+  } catch (err) {
+    const errDomain = (() => { try { return new URL(tab?.url ?? '').hostname; } catch { return ''; } })();
+    trackEvent('scan_error', { error: (err as Error).message, domain: errDomain });
     setStatus('Unable to scan this page. Please refresh and try again.', true);
   }
 }
