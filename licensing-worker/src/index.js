@@ -339,16 +339,30 @@ async function handleWebhook(request, env) {
     if (event.type === "customer.subscription.updated") {
       const sub = event.data.object;
       const prev = event.data.previous_attributes || {};
+      const licenseKey = await env.LICENSES.get(`sub:${sub.id}`);
+      const raw = licenseKey ? await env.LICENSES.get(`license:${licenseKey}`) : null;
+      const licenseData = raw ? JSON.parse(raw) : null;
       if (sub.cancel_at_period_end === true && prev.cancel_at_period_end === false) {
-        const licenseKey = await env.LICENSES.get(`sub:${sub.id}`);
-        const raw = licenseKey ? await env.LICENSES.get(`license:${licenseKey}`) : null;
-        const licenseData = raw ? JSON.parse(raw) : {};
         await fireGA4Event(env, sub.customer || sub.id, "subscription_cancelled", {
-          plan: licenseData.plan || "unknown",
+          plan: licenseData?.plan || "unknown",
           customer_id: sub.customer || "",
           subscription_id: sub.id,
           cancel_at: sub.cancel_at || 0
         }).catch((err) => console.error("[webhook] GA4 subscription_cancelled failed", String(err)));
+      }
+      const newProductId = sub.items?.data?.[0]?.price?.product;
+      const newPlan = newProductId ? PRODUCT_PLAN_MAP[newProductId] : null;
+      if (newPlan && licenseData && licenseData.plan !== newPlan) {
+        const oldPlan = licenseData.plan;
+        licenseData.plan = newPlan;
+        await env.LICENSES.put(`license:${licenseKey}`, JSON.stringify(licenseData));
+        console.log(`[webhook] plan change sub=${sub.id} ${oldPlan} -> ${newPlan}`);
+        await fireGA4Event(env, sub.customer || sub.id, "subscription_plan_changed", {
+          old_plan: oldPlan,
+          new_plan: newPlan,
+          customer_id: sub.customer || "",
+          subscription_id: sub.id
+        }).catch((err) => console.error("[webhook] GA4 subscription_plan_changed failed", String(err)));
       }
     }
     if (event.type === "customer.subscription.deleted") {
@@ -615,7 +629,7 @@ async function handleTrialStart(request, env) {
   };
   const trialTtlSec = TRIAL_DURATION_DAYS * 24 * 60 * 60 + 7 * 24 * 60 * 60;
   await env.LICENSES.put(`license:${key}`, JSON.stringify(license), { expirationTtl: trialTtlSec });
-  await env.LICENSES.put(`trial-email:${email}`, key);
+  await env.LICENSES.put(`trial-email:${email}`, key, { expirationTtl: trialTtlSec });
   console.log(`[trial/start] issued key=${key} email=${email} expires=${new Date(expiresAt).toISOString()}`);
   const emailResult = await sendTrialEmail(env, email, key, expiresAt);
   await fireGA4Event(env, clientId || email, "trial_started", {

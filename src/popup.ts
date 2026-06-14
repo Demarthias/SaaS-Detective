@@ -2,8 +2,8 @@ import { trackEvent, getClientId, withClientRef } from './analytics';
 import { signatures } from './signatures';
 
 const FREE_LIMIT = 50;
-const NUDGE_THRESHOLD_SCANS = 1;
-const NUDGE_COOLDOWN_MS = 8 * 60 * 60 * 1000;
+const NUDGE_THRESHOLD_SCANS = 3;
+const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 const HISTORY_LIMIT_FREE = 5;
 const HISTORY_LIMIT_PRO = 50;
 
