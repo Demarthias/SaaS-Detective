@@ -61,7 +61,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
         type: 'basic',
         iconUrl: 'icons/icon128.png',
         title: 'Your SaaS Detective trial has ended',
-        message: 'Upgrade to keep Pro features — scan unlimited sites and access all 200+ signatures.',
+        message: 'Upgrade to keep Pro features — scan unlimited sites and access all 800+ signatures.',
       });
     } else {
       trackEvent('license_expired', { plan: sd_license.plan });

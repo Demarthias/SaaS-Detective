@@ -1,5 +1,6 @@
 import { trackEvent, getClientId, withClientRef } from './analytics';
 import { signatures } from './signatures';
+import { SIGNATURE_URLS } from './signatureUrls';
 
 const FREE_LIMIT = 50;
 const NUDGE_THRESHOLD_SCANS = 3;
@@ -56,13 +57,14 @@ async function isLicenseValid(license?: LicenseData | null): Promise<boolean> {
   return Date.now() < sd_license.validated_at + LICENSE_TTL_MS + LICENSE_GRACE_MS;
 }
 
-function resolveLink(toolName: string, fallbackLink?: string): { url: string; hasAffiliate: boolean; program: string | null } {
+function resolveLink(toolName: string, toolId?: string): { url: string; hasAffiliate: boolean; program: string | null } {
   const entry = affiliateTable[toolName];
   if (entry && entry.status === 'active' && entry.url) {
     return { url: entry.url, hasAffiliate: true, program: entry.program || null };
   }
-  if (fallbackLink && fallbackLink !== '#') {
-    return { url: fallbackLink, hasAffiliate: false, program: null };
+  const homepage = toolId ? SIGNATURE_URLS[toolId] : undefined;
+  if (homepage) {
+    return { url: homepage, hasAffiliate: false, program: null };
   }
   return { url: `https://www.google.com/search?q=${encodeURIComponent(toolName)}`, hasAffiliate: false, program: null };
 }
@@ -74,7 +76,7 @@ function setStatus(message: string, isError = false): void {
   statusEl.classList.toggle('error', Boolean(isError));
 }
 
-function renderTools(tools: Array<{ name: string; category: string; link?: string }>, locked = 0): void {
+function renderTools(tools: Array<{ id?: string; name: string; category: string }>, locked = 0): void {
   const resultsEl = document.getElementById('results');
   if (!resultsEl) return;
   resultsEl.innerHTML = '';
@@ -100,7 +102,7 @@ function renderTools(tools: Array<{ name: string; category: string; link?: strin
     info.appendChild(name);
     info.appendChild(category);
 
-    const { url: link, hasAffiliate, program } = resolveLink(tool.name, tool.link);
+    const { url: link, hasAffiliate, program } = resolveLink(tool.name, tool.id);
     const button = document.createElement('button');
     button.className = 'visit-btn';
     button.textContent = 'Visit';
@@ -232,7 +234,7 @@ async function saveScanHistory(entry: ScanEntry, isPro: boolean): Promise<void> 
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 function exportTools(
-  tools: Array<{ name: string; category: string; link?: string }>,
+  tools: Array<{ id?: string; name: string; category: string }>,
   format: 'csv' | 'json',
   domain: string
 ): void {
@@ -241,13 +243,13 @@ function exportTools(
 
   if (format === 'csv') {
     const rows = [['Name', 'Category', 'Link'], ...tools.map(t => {
-      const { url } = resolveLink(t.name, t.link);
+      const { url } = resolveLink(t.name, t.id);
       return [t.name, t.category, url];
     })];
     content = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\r\n');
   } else {
     content = JSON.stringify(tools.map(t => {
-      const { url } = resolveLink(t.name, t.link);
+      const { url } = resolveLink(t.name, t.id);
       return { name: t.name, category: t.category, link: url };
     }), null, 2);
   }
