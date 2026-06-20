@@ -18,3 +18,9 @@ DEPLOYMENT_GUIDE.md
 PUBLICATION_READY.md
 PUBLISH_NOW.md
 QUICK_REFERENCE.md
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example

@@ -8,7 +8,7 @@
 
 SaaS Detective is a Chrome extension that instantly reveals the technologies, frameworks, and SaaS tools used to build any website. Click the extension icon, and within seconds, you'll see:
 
-- 🔍 **92 Tech Signatures** - Detect tools across 30+ categories
+- 🔍 **800+ Tech Signatures** - Detect tools across 64 categories
 - 🚀 **Frameworks & Libraries** - React, Vue, Next.js, Angular, Svelte, and more
 - 💳 **Payment Processors** - Stripe, PayPal, Paddle, Klarna, Braintree, and more
 - 📊 **Analytics Platforms** - Google Analytics, Mixpanel, Amplitude, Heap, and more

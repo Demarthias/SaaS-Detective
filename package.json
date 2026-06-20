@@ -3,13 +3,16 @@
   "version": "3.0.4",
   "scripts": {
     "build": "webpack --mode production && powershell -Command \"Copy-Item src/manifest.json dist/; Copy-Item src/popup.html dist/; Copy-Item src/onboarding.html dist/; Copy-Item options.html dist/; Copy-Item privacy.html dist/; Copy-Item affiliates.json dist/; if (!(Test-Path dist/icons)) { New-Item -ItemType Directory dist/icons | Out-Null }; Copy-Item icons/icon16.png dist/icons/; Copy-Item icons/icon48.png dist/icons/; Copy-Item icons/icon128.png dist/icons/\"",
-    "watch": "webpack --mode development --watch"
+    "watch": "webpack --mode development --watch",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.36",
     "ts-loader": "^9.5.0",
     "typescript": "^5.0.0",
     "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.0"
+    "webpack-cli": "^5.1.0",
+    "wrangler": "^4.100.0"
   }
 }

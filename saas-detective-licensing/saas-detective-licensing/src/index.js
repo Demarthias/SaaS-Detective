@@ -171,6 +171,7 @@ __name2(handlePurchaseSession, "handlePurchaseSession");
 async function handleWebhook(request, env) {
   const body = await request.text();
   const signature = request.headers.get("stripe-signature") || "";
+  console.log(`[webhook] secret_prefix=${env.STRIPE_WEBHOOK_SECRET?.slice(0, 12) ?? "MISSING"} sig_prefix=${signature.slice(0, 30)}`);
   if (!await verifyStripeSignature(body, signature, env.STRIPE_WEBHOOK_SECRET)) {
     console.log("[webhook] invalid signature rejected");
     return new Response("Invalid signature", { status: 400 });
@@ -570,8 +571,8 @@ var PLAN_LABELS = {
   enterprise: "Enterprise"
 };
 var PLAN_FEATURES = {
-  pro: "All 217 tech signatures unlocked",
-  business: "All 200+ signatures + CSV/JSON export & scan history",
+  pro: "All 800+ signatures unlocked",
+  business: "All 800+ signatures + CSV/JSON export & scan history",
   agency: "Business features + bulk scanning, 3 seats & API access",
   enterprise: "Agency features + unlimited seats, custom signatures & white-label"
 };
