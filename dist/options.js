@@ -176,8 +176,10 @@ function attachActivationListener(input, btn, statusEl) {
           const msLeft = (licenseData.expires_at || 0) - Date.now();
           const daysLeft = Math.max(1, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
           trackEvent('trial_activated', { days_remaining: daysLeft, email: licenseData.email });
+          if (licenseData.email) identifyUser(licenseData.email, 'pro', true);
         } else {
           trackEvent('license_activated', { plan: licenseData.plan, email: licenseData.email });
+          if (licenseData.email) identifyUser(licenseData.email, licenseData.plan || 'pro', false);
         }
         const plan = licenseData.plan ? ` · ${licenseData.plan}` : '';
         const trialNote = licenseData.trial && licenseData.expires_at

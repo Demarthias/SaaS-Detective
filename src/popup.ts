@@ -3,7 +3,7 @@ import { signatures } from './signatures';
 import { SIGNATURE_URLS } from './signatureUrls';
 
 const FREE_LIMIT = 50;
-const NUDGE_THRESHOLD_SCANS = 3;
+const NUDGE_THRESHOLD_SCANS = 1;
 const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 const HISTORY_LIMIT_FREE = 25;
 const HISTORY_LIMIT_PRO = 50;
@@ -103,6 +103,15 @@ function renderTools(tools: Array<{ id?: string; name: string; category: string 
     info.appendChild(category);
 
     const { url: link, hasAffiliate, program } = resolveLink(tool.name, tool.id);
+
+    if (hasAffiliate) {
+      const badge = document.createElement('span');
+      badge.className = 'aff-badge';
+      badge.textContent = 'aff';
+      badge.title = 'Affiliate link — we may earn a commission at no extra cost to you';
+      category.appendChild(badge);
+    }
+
     const button = document.createElement('button');
     button.className = 'visit-btn';
     button.textContent = 'Visit';
@@ -394,6 +403,7 @@ function updatePlanUI(licensed: boolean): void {
   const strip = document.getElementById('upgrade-strip') as HTMLElement | null;
   if (strip) {
     strip.style.display = licensed ? 'none' : 'flex';
+    if (!licensed) trackEvent('view_pricing', { location: 'upgrade_strip' });
   }
 
   const stripLink = document.getElementById('upgradeStripLink');

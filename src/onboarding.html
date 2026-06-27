@@ -428,6 +428,7 @@
     </div>
 
     <div class="footer">
+      <div style="font-size:10px;color:#6b7280;margin-bottom:6px;">Some tool links in SaaS Detective are affiliate links — we may earn a commission at no extra cost to you. <a href="privacy.html" target="_blank" style="color:#2563eb;text-decoration:none;">Affiliate Disclosure</a></div>
       <a href="#" id="skipOnboarding" style="color:#94a3b8;font-size:11px;text-decoration:none;" onmouseover="this.style.color='#64748b'" onmouseout="this.style.color='#94a3b8'">Skip for now</a>
       &nbsp;·&nbsp;
       Powered by <a href="https://venom-industries.com" target="_blank">Venom Industries LLC</a> ·
@@ -504,6 +505,7 @@
         form.style.display = 'none';
         keySection.style.display = 'block';
         trackEvent('trial_key_shown', { location: 'onboarding', email_sent: data.email_sent ? 1 : 0 });
+        identifyUser(email, 'pro', true);
         fetch('https://saas-detective-licensing.kubegrayson.workers.dev/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

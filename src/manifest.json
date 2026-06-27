@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SaaS Detective",
-  "version": "3.1.1",
+  "version": "3.1.3",
   "description": "Instantly identify the tech stack and SaaS tools used by any website.",
   "permissions": [
     "activeTab",

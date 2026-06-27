@@ -1,4 +1,4 @@
-import { trackEvent } from './analytics';
+import { trackEvent, identifyUser, getClientId, invalidateLicenseCache } from './analytics';
 
 const VALIDATE_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/validate';
 const ALARM_NAME = 'license_revalidate';
@@ -55,16 +55,23 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
     if (data.valid) {
       trackEvent('license_revalidated', { plan: data.plan || sd_license.plan, trial: Boolean(data.trial) });
-    } else if (data.reason === 'trial_expired') {
-      trackEvent('trial_expired', { plan: sd_license.plan });
-      chrome.notifications.create('trial_expired', {
-        type: 'basic',
-        iconUrl: 'icons/icon128.png',
-        title: 'Your SaaS Detective trial has ended',
-        message: 'Upgrade to keep Pro features — scan unlimited sites and access all 800+ signatures.',
-      });
+      if (updated.email) {
+        const clientId = await getClientId();
+        identifyUser(clientId, updated.email, updated.plan || 'pro', Boolean(updated.trial));
+      }
     } else {
-      trackEvent('license_expired', { plan: sd_license.plan });
+      invalidateLicenseCache();
+      if (data.reason === 'trial_expired') {
+        trackEvent('trial_expired', { plan: sd_license.plan });
+        chrome.notifications.create('trial_expired', {
+          type: 'basic',
+          iconUrl: 'icons/icon128.png',
+          title: 'Your SaaS Detective trial has ended',
+          message: 'Upgrade to keep Pro features — scan unlimited sites and access all 800+ signatures.',
+        });
+      } else {
+        trackEvent('license_expired', { plan: sd_license.plan });
+      }
     }
   } catch (_) {
     // fail silently — grace period covers temporary outages
