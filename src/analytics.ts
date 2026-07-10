@@ -43,8 +43,8 @@ export function withClientRef(url: string, clientId: string, email?: string): st
     if (!u.searchParams.get('client_reference_id')) {
       u.searchParams.set('client_reference_id', clientId);
     }
-    if (email && !u.searchParams.get('prefilled_email')) {
-      u.searchParams.set('prefilled_email', email);
+    if (email && !u.searchParams.get('email')) {
+      u.searchParams.set('email', email);
     }
     return u.toString();
   } catch (_) {

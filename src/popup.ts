@@ -9,8 +9,8 @@ const HISTORY_LIMIT_FREE = 25;
 const HISTORY_LIMIT_PRO = 50;
 
 const STRIPE_PLANS: Array<{ label: string; price: string; url: string; plan: string; badge?: string }> = [
-  { label: 'Monthly', price: '$7.99/mo', url: 'https://buy.stripe.com/4gMdRb8aiap6cr61gn1Jm07', plan: 'monthly' },
-  { label: 'Annual', price: '$90/yr', url: 'https://buy.stripe.com/28E6oJ0HQap69eUe391Jm0a', plan: 'annual', badge: 'Best Value' },
+  { label: 'Monthly', price: '$7.99/mo', url: 'https://venom-industries.com/checkout.html?plan=1mo', plan: 'monthly' },
+  { label: 'Annual', price: '$90/yr', url: 'https://venom-industries.com/checkout.html?plan=12mo', plan: 'annual', badge: 'Best Value' },
 ];
 
 const TRIAL_URL = 'https://venom-industries.com/saas-detective#trialCard';
