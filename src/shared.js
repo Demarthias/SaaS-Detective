@@ -54,6 +54,9 @@ function appendClientRef(url, clientId) {
     if (!u.searchParams.get('client_reference_id')) {
       u.searchParams.set('client_reference_id', clientId);
     }
+    if (!u.searchParams.get('ga_client_id')) {
+      u.searchParams.set('ga_client_id', clientId);
+    }
     return u.toString();
   } catch (_) {
     return url;
