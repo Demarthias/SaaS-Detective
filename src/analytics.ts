@@ -43,6 +43,13 @@ export function withClientRef(url: string, clientId: string, email?: string): st
     if (!u.searchParams.get('client_reference_id')) {
       u.searchParams.set('client_reference_id', clientId);
     }
+    // clientId here IS the ga_client_id value (same chrome.storage.local key
+    // as shared.js's ensureClientId) — without this, popup-originated upgrade
+    // clicks reach checkout.html with no ga_client_id, and the webhook falls
+    // back to customerId/sessionId instead of the real GA4 client id.
+    if (!u.searchParams.get('ga_client_id')) {
+      u.searchParams.set('ga_client_id', clientId);
+    }
     if (email && !u.searchParams.get('email')) {
       u.searchParams.set('email', email);
     }

@@ -1,3 +1,4 @@
+import { getDomain } from 'tldts';
 import { trackEvent, getClientId, withClientRef } from './analytics';
 import { signatures } from './signatures';
 import { SIGNATURE_URLS } from './signatureUrls';
@@ -14,6 +15,8 @@ const STRIPE_PLANS: Array<{ label: string; price: string; url: string; plan: str
 ];
 
 const TRIAL_URL = 'https://venom-industries.com/saas-detective#trialCard';
+
+const TRUST_CHECK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/trust-check';
 
 // Compact globalVar checks passed to MAIN world script injection
 const globalVarChecks = signatures
@@ -389,6 +392,176 @@ async function getGlobalVarMatches(
   }
 }
 
+// Payments-category patterns only, matched directly against page HTML —
+// independent of the user's enabledCategories toggle in Options. If someone
+// hides "Payments" from their results view, the trust check must still see
+// the processor; otherwise a hidden category silently reads as "no processor
+// detected" and docks a legitimate checkout's trust score for no reason.
+const paymentSignatures = signatures.filter(s => s.category === 'Payments');
+
+async function getPaymentProcessor(tabId: number): Promise<string | null> {
+  try {
+    const results = await chrome.scripting.executeScript({
+      target: { tabId },
+      world: 'MAIN' as chrome.scripting.ExecutionWorld,
+      func: (paymentSigs: Array<{ name: string; patterns: string[]; globalVar: string[] }>) => {
+        const html = document.documentElement.innerHTML.toLowerCase();
+        const match = paymentSigs.find(s => {
+          const patternMatch = s.patterns.some(p => html.includes(p.toLowerCase()));
+          const globalMatch = s.globalVar.some(g => (window as any)[g] !== undefined);
+          return patternMatch || globalMatch;
+        });
+        if (match) return match.name;
+
+        // No named third-party processor matched. Browsers define standard
+        // autocomplete hints for card forms so autofill works — virtually
+        // every real checkout uses these regardless of which processor (or
+        // in-house system) sits behind it. Treat this as evidence of a
+        // genuine, self-hosted checkout rather than "nothing here at all."
+        const hasCardForm = document.querySelector(
+          'input[autocomplete="cc-number"], input[autocomplete="cc-exp"], ' +
+          'input[autocomplete="cc-exp-month"], input[autocomplete="cc-exp-year"], ' +
+          'input[autocomplete="cc-csc"], input[autocomplete="cc-name"]'
+        ) !== null;
+        return hasCardForm ? 'Self-hosted checkout' : null;
+      },
+      args: [paymentSignatures.map(s => ({ name: s.name, patterns: s.patterns || [], globalVar: s.globalVar || [] }))],
+    });
+    return (results[0]?.result as string | null) || null;
+  } catch (_) {
+    return null;
+  }
+}
+
+interface TrustCheckResult {
+  ok: boolean;
+  domain: string;
+  score: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  reasons: string[];
+  domainAgeDays: number | null;
+  cached: boolean;
+  facts: {
+    ssl: string;
+    paymentProcessor: string;
+    domainAge: string;
+  };
+  verdict: {
+    level: 'excellent' | 'ok' | 'caution' | 'high_risk' | 'danger';
+    headline: string;
+    summary: string;
+  };
+}
+
+const VERDICT_STYLES: Record<string, { bg: string; border: string; text: string }> = {
+  excellent: { bg: '#e8f5e9', border: '#2e7d32', text: '#1b5e20' },
+  ok:        { bg: '#eef7ee', border: '#43a047', text: '#2e7d32' },
+  caution:   { bg: '#fff8e1', border: '#f9a825', text: '#8d6e00' },
+  high_risk: { bg: '#ffe9e0', border: '#e65100', text: '#bf360c' },
+  danger:    { bg: '#fdecea', border: '#c62828', text: '#b71c1c' },
+};
+
+const TRUST_REASON_LABELS: Record<string, string> = {
+  no_ssl: 'No SSL/HTTPS on this page',
+  no_known_payment_processor: 'No recognized payment processor detected',
+  domain_under_3_months: 'Domain registered less than 3 months ago',
+  domain_age_unknown: 'Domain age could not be verified',
+};
+
+async function fetchTrustCheck(domain: string, sslValid: boolean, paymentProcessor: string | null): Promise<TrustCheckResult | null> {
+  try {
+    const res = await fetch(TRUST_CHECK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain, sslValid, paymentProcessor }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json() as TrustCheckResult;
+    await chrome.storage.local.set({ sd_last_trust_check: data });
+    return data;
+  } catch (err) {
+    console.error('[trust-check] request failed', err);
+    return null;
+  }
+}
+
+// Pro-only. Free users see a locked teaser and never trigger the actual
+// request — keeps the Worker/RDAP cost tied to paying usage, not free traffic.
+function riskLevelColor(riskLevel: string | null): string {
+  if (riskLevel === 'low') return '#22c55e';
+  if (riskLevel === 'medium') return '#f59e0b';
+  if (riskLevel === 'high') return '#ef4444';
+  return '#8a8a8a';
+}
+
+function renderTrustLocked(container: HTMLElement, riskLevel: string | null): void {
+  const color = riskLevelColor(riskLevel);
+  container.innerHTML = `
+    <div class="trust-teaser">
+      <div class="trust-teaser-text">
+        <span class="trust-teaser-dot" style="background:${color}"></span>
+        <div>
+          <div class="trust-teaser-title">Checkout Trust Score</div>
+          <div class="trust-teaser-sub">SSL, payment processor &amp; domain age — Pro feature</div>
+        </div>
+      </div>
+      <button class="trust-teaser-btn" type="button">Unlock</button>
+    </div>
+  `;
+  container.querySelector('.trust-teaser-btn')?.addEventListener('click', async () => {
+    trackEvent('clicked_payment_link', { location: 'trust_teaser', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price });
+    const clientId = await getClientId();
+    const { sd_license: lic } = await chrome.storage.sync.get({ sd_license: null }) as { sd_license: LicenseData | null };
+    const url = withClientRef(STRIPE_PLANS[0].url, clientId, lic?.email);
+    trackEvent('checkout_begin', { location: 'trust_teaser', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price, source: 'extension' });
+    chrome.tabs.create({ url });
+  });
+  trackEvent('trust_score_upsell_shown', { risk_level: riskLevel || 'unknown' });
+}
+
+function renderTrustChecking(container: HTMLElement): void {
+  container.innerHTML = '<div class="trust-checking">Checking trust score&hellip;</div>';
+}
+
+function renderTrustResult(container: HTMLElement, data: TrustCheckResult | null): void {
+  if (!data || !data.ok) {
+    container.innerHTML = '';
+    return;
+  }
+  const riskLabel = data.riskLevel === 'low' ? 'Low risk' : data.riskLevel === 'medium' ? 'Medium risk' : 'High risk';
+  const reasonItems = (data.reasons || [])
+    .map(r => `<li>${TRUST_REASON_LABELS[r] || r}</li>`)
+    .join('');
+  const factsList = data.facts
+    ? `
+      <ul class="trust-facts">
+        <li><strong>SSL:</strong> ${data.facts.ssl}</li>
+        <li><strong>Payment processor:</strong> ${data.facts.paymentProcessor}</li>
+        <li><strong>Domain age:</strong> ${data.facts.domainAge}</li>
+      </ul>`
+    : '';
+  const vStyle = data.verdict ? (VERDICT_STYLES[data.verdict.level] || VERDICT_STYLES.caution) : null;
+  const verdictBlock = data.verdict && vStyle
+    ? `
+      <div class="trust-verdict trust-verdict-${data.verdict.level}" style="background:${vStyle.bg}; border-left:4px solid ${vStyle.border}; color:${vStyle.text}; padding:10px 12px; border-radius:6px; margin-bottom:10px;">
+        <div style="font-weight:700; font-size:14px;">${data.verdict.headline}</div>
+        <div style="font-size:12px; margin-top:4px; opacity:0.9;">${data.verdict.summary}</div>
+      </div>`
+    : '';
+  container.innerHTML = `
+    <div class="trust-card trust-${data.riskLevel}">
+      ${verdictBlock}
+      <div class="trust-card-head">
+        <span class="trust-dot"></span>
+        <span class="trust-score-num">${data.score}</span>
+        <span class="trust-risk-label">${riskLabel}</span>
+      </div>
+      ${factsList}
+      ${reasonItems ? `<ul class="trust-reasons">${reasonItems}</ul>` : '<div class="trust-clean">No issues detected</div>'}
+    </div>
+  `;
+}
+
 function isHttpUrl(url?: string): boolean {
   return Boolean(url && (url.startsWith('http://') || url.startsWith('https://')));
 }
@@ -442,10 +615,14 @@ async function scanPage(): Promise<void> {
   }
 
   try {
-    const [response, globalMatches] = await Promise.all([
+    const [response, globalMatches, paymentProcessor] = await Promise.all([
       sendScan(tab.id!),
       getGlobalVarMatches(tab.id!),
+      getPaymentProcessor(tab.id!),
     ]);
+
+    const sslValid = tab.url!.startsWith('https://');
+    const trustDomain = (() => { try { const hostname = new URL(tab.url!).hostname; return getDomain(hostname) || hostname; } catch { return ''; } })();
 
     const htmlTools = response.tools || [];
     const htmlIds = new Set(htmlTools.map(t => t.id));
@@ -459,6 +636,33 @@ async function scanPage(): Promise<void> {
     const license = await getLicense();
     const licensed = await isLicenseValid(license);
     updatePlanUI(licensed);
+
+    const trustSectionEl = document.getElementById('trust-section');
+    if (trustSectionEl) {
+      if (!licensed) {
+        if (trustDomain) {
+          renderTrustLocked(trustSectionEl, null);
+          fetchTrustCheck(trustDomain, sslValid, paymentProcessor).then((data) => {
+            const el = document.getElementById('trust-section');
+            // Only riskLevel ever leaves this scope for free users — score,
+            // reasons, and facts are discarded here and never reach render.
+            const riskLevel = data?.ok ? data.riskLevel : null;
+            if (el) renderTrustLocked(el, riskLevel);
+          });
+        } else {
+          renderTrustLocked(trustSectionEl, null);
+        }
+      } else if (trustDomain) {
+        renderTrustChecking(trustSectionEl);
+        fetchTrustCheck(trustDomain, sslValid, paymentProcessor).then((data) => {
+          const el = document.getElementById('trust-section');
+          if (el) renderTrustResult(el, data);
+        });
+      } else {
+        trustSectionEl.innerHTML = '';
+      }
+    }
+
     const onTrial = Boolean(license?.trial && licensed);
     const trialExpired = Boolean(license?.trial && !licensed);
 

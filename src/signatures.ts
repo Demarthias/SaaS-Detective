@@ -987,6 +987,12 @@ export const signatures: SaasSignature[] = [
   { id: 'plaid', name: 'Plaid', category: 'Payments', patterns: ['cdn.plaid.com/link/v2/stable/link-initialize.js', 'cdn.plaid.com/link/stable/'], globalVar: ['Plaid'] },
   { id: 'flutterwave', name: 'Flutterwave', category: 'Payments', patterns: ['cdn.flutterwave.com', 'inline.flutterwavehosted.com'], globalVar: ['FlutterwaveCheckout'] },
 
+  // --- PAYMENTS additions (big-brand / native wallet buttons) ---
+  { id: 'amazon_pay', name: 'Amazon Pay', category: 'Payments', patterns: ['static-na.payments-amazon.com', 'payments.amazon.com/checkout.js'], globalVar: [] },
+  { id: 'apple_pay', name: 'Apple Pay', category: 'Payments', patterns: ['apple-pay-button', 'applepay-button'], globalVar: [] },
+  { id: 'google_pay', name: 'Google Pay', category: 'Payments', patterns: ['pay.google.com/gp/p/js/pay.js'], globalVar: [] },
+  { id: 'shop_pay', name: 'Shop Pay', category: 'Payments', patterns: ['shop-pay-button', 'sdks.shopifycdn.com/shop-pay'], globalVar: [] },
+
   // --- SUPPORT additions ---
   { id: 'zoho_desk', name: 'Zoho Desk', category: 'Support', patterns: ['desk.zoho.com/portal/', 'desk.zoho.eu/portal/'], globalVar: [] },
   { id: 'happyfox', name: 'HappyFox', category: 'Support', patterns: ['happyfox.com/chat/embed/', 'cdn.happyfox.com'], globalVar: [] },
