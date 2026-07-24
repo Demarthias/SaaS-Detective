@@ -1,6 +1,6 @@
 {
   "name": "saas-detective",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "scripts": {
     "build": "webpack --mode production && cp src/manifest.json dist/ && cp src/popup.html dist/ && cp src/onboarding.html dist/ && cp src/options.html dist/ && cp src/privacy.html dist/ && cp src/shared.js dist/ && cp src/options.js dist/ && cp affiliates.json dist/ && mkdir -p dist/icons && cp icons/icon16.png icons/icon48.png icons/icon128.png dist/icons/",
     "watch": "webpack --mode development --watch",
