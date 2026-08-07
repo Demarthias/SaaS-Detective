@@ -8,18 +8,18 @@ for the listing anymore.
 ## Short description (132 char limit)
 
 ```
-Instantly see the tech stack behind any website — 800+ signatures, 64 categories, plus a built-in checkout safety score.
+See any website's tech stack instantly, plus a checkout trust score — 800+ signatures, 64 categories, one click.
 ```
-(121 characters)
+(114 characters)
 
 ## Full description
 
 ```
-SaaS Detective — Instant Tech Stack Intelligence for Any Website
+SaaS Detective — Tech Stack Intelligence & Checkout Trust Score for Any Website
 
-Every website leaves a trail. SaaS Detective reads it.
+Every website leaves a trail. SaaS Detective reads it — and tells you whether you can trust what you find.
 
-One click. Any website. Under 2 seconds. SaaS Detective scans the active page and surfaces every tool, platform, and framework powering it — organized by category, labeled, and ready before the tab finishes loading. Walk into any sales call, competitive analysis, or client audit already knowing what they're running.
+One click. Any website. Under 2 seconds. SaaS Detective scans the active page and does two things at once: it surfaces every tool, platform, and framework powering the site, and it scores whether the page is safe to trust with your payment details. Walk into any sales call, competitive audit, or unfamiliar checkout already knowing what you're dealing with.
 
 No source code. No guesswork. Just answers.
 
