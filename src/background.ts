@@ -17,24 +17,47 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     trackEvent('extension_installed');
     chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });
-    chrome.alarms.create(ALARM_NAME, { delayInMinutes: 60 * 24, periodInMinutes: 60 * 24 });
+    chrome.alarms.create(ALARM_NAME, { delayInMinutes: 60 * 6, periodInMinutes: 60 * 6 });
   } else if (details.reason === 'update') {
     trackEvent('extension_updated', { version: chrome.runtime.getManifest().version });
     chrome.alarms.get(ALARM_NAME, (alarm) => {
       if (!alarm) {
-        chrome.alarms.create(ALARM_NAME, { delayInMinutes: 60 * 24, periodInMinutes: 60 * 24 });
+        chrome.alarms.create(ALARM_NAME, { delayInMinutes: 60 * 6, periodInMinutes: 60 * 6 });
       }
     });
   }
 });
 
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name !== ALARM_NAME) return;
+chrome.runtime.onStartup.addListener(() => {
+  chrome.alarms.get(ALARM_NAME, (alarm) => {
+    if (!alarm) {
+      chrome.alarms.create(ALARM_NAME, { delayInMinutes: 1, periodInMinutes: 60 * 6 });
+    }
+  });
+  revalidateLicense();
+});
 
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name !== ALARM_NAME) return;
+  revalidateLicense();
+});
+
+async function revalidateLicense(): Promise<void> {
   const result = await chrome.storage.sync.get({ sd_license: null });
   const sd_license = result['sd_license'] as LicenseData | null;
 
-  if (!sd_license?.key) return;
+  if (!sd_license) return;
+
+  // A locally-set license claiming validity with no key (or a key that
+  // doesn't match the format the server issues) can only be the result of
+  // a user editing chrome.storage.sync directly — it was never validated
+  // server-side and never will be, so the alarm-based revalidation loop
+  // below would otherwise skip it forever. Reset it rather than trust it.
+  if (!sd_license.key || !/^SD-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/.test(sd_license.key)) {
+    await chrome.storage.sync.set({ sd_license: null });
+    invalidateLicenseCache();
+    return;
+  }
 
   try {
     const res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(sd_license.key)}`, {
@@ -76,4 +99,4 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   } catch (_) {
     // fail silently — grace period covers temporary outages
   }
-});
+}

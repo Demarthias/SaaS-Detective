@@ -49,11 +49,18 @@ async function getLicense(): Promise<LicenseData | null> {
   return result['sd_license'] as LicenseData | null;
 }
 
+const LICENSE_KEY_RE = /^SD-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/;
+
 async function isLicenseValid(license?: LicenseData | null): Promise<boolean> {
   const LICENSE_TTL_MS = 48 * 60 * 60 * 1000;
   const LICENSE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
   const sd_license = license !== undefined ? license : await getLicense();
   if (!sd_license || !sd_license.valid || !sd_license.validated_at) return false;
+  // A license record must carry a key in the server-issued format. This is
+  // not unspoofable (nothing client-side ever can be, in an unobfuscated
+  // extension), but it closes the trivial "chrome.storage.sync.set" bypass
+  // and forces background.ts's periodic revalidation to actually catch it.
+  if (!sd_license.key || !LICENSE_KEY_RE.test(sd_license.key)) return false;
   if (sd_license.trial && typeof sd_license.expires_at === 'number' && Date.now() > sd_license.expires_at) {
     return false;
   }
@@ -523,37 +530,51 @@ function renderTrustChecking(container: HTMLElement): void {
   container.innerHTML = '<div class="trust-checking">Checking trust score&hellip;</div>';
 }
 
+function escapeHtml(str: unknown): string {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function renderTrustResult(container: HTMLElement, data: TrustCheckResult | null): void {
   if (!data || !data.ok) {
     container.innerHTML = '';
     return;
   }
+  // Everything below is escaped even where the worker today only ever sends
+  // fixed-vocabulary strings (verdict headline/summary, facts.ssl,
+  // facts.domainAge) — `facts.paymentProcessor` in particular is echoed by
+  // the worker from client-supplied input with no server-side allowlist, so
+  // treat all of these as untrusted rather than relying on that invariant.
   const riskLabel = data.riskLevel === 'low' ? 'Low risk' : data.riskLevel === 'medium' ? 'Medium risk' : 'High risk';
   const reasonItems = (data.reasons || [])
-    .map(r => `<li>${TRUST_REASON_LABELS[r] || r}</li>`)
+    .map(r => `<li>${escapeHtml(TRUST_REASON_LABELS[r] || r)}</li>`)
     .join('');
   const factsList = data.facts
     ? `
       <ul class="trust-facts">
-        <li><strong>SSL:</strong> ${data.facts.ssl}</li>
-        <li><strong>Payment processor:</strong> ${data.facts.paymentProcessor}</li>
-        <li><strong>Domain age:</strong> ${data.facts.domainAge}</li>
+        <li><strong>SSL:</strong> ${escapeHtml(data.facts.ssl)}</li>
+        <li><strong>Payment processor:</strong> ${escapeHtml(data.facts.paymentProcessor)}</li>
+        <li><strong>Domain age:</strong> ${escapeHtml(data.facts.domainAge)}</li>
       </ul>`
     : '';
   const vStyle = data.verdict ? (VERDICT_STYLES[data.verdict.level] || VERDICT_STYLES.caution) : null;
   const verdictBlock = data.verdict && vStyle
     ? `
-      <div class="trust-verdict trust-verdict-${data.verdict.level}" style="background:${vStyle.bg}; border-left:4px solid ${vStyle.border}; color:${vStyle.text}; padding:10px 12px; border-radius:6px; margin-bottom:10px;">
-        <div style="font-weight:700; font-size:14px;">${data.verdict.headline}</div>
-        <div style="font-size:12px; margin-top:4px; opacity:0.9;">${data.verdict.summary}</div>
+      <div class="trust-verdict trust-verdict-${escapeHtml(data.verdict.level)}" style="background:${vStyle.bg}; border-left:4px solid ${vStyle.border}; color:${vStyle.text}; padding:10px 12px; border-radius:6px; margin-bottom:10px;">
+        <div style="font-weight:700; font-size:14px;">${escapeHtml(data.verdict.headline)}</div>
+        <div style="font-size:12px; margin-top:4px; opacity:0.9;">${escapeHtml(data.verdict.summary)}</div>
       </div>`
     : '';
   container.innerHTML = `
-    <div class="trust-card trust-${data.riskLevel}">
+    <div class="trust-card trust-${escapeHtml(data.riskLevel)}">
       ${verdictBlock}
       <div class="trust-card-head">
         <span class="trust-dot"></span>
-        <span class="trust-score-num">${data.score}</span>
+        <span class="trust-score-num">${escapeHtml(data.score)}</span>
         <span class="trust-risk-label">${riskLabel}</span>
       </div>
       ${factsList}

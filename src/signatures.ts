@@ -172,7 +172,10 @@ export const signatures: SaasSignature[] = [
   // --- LIBRARY ---
   { id: 'jquery', name: 'jQuery', category: 'Library', patterns: ['jquery.min.js', 'jquery.com/jquery'], globalVar: ['jQuery'] },
   { id: 'alpine', name: 'Alpine.js', category: 'Library', patterns: ['cdn.jsdelivr.net/npm/alpinejs', 'alpinejs.dev'], globalVar: ['Alpine'] },
-  { id: 'lodash', name: 'Lodash', category: 'Library', patterns: ['lodash.min.js', 'lodash.js'], globalVar: ['_'] },
+  // globalVar intentionally omitted: '_' collides with extremely common
+  // throwaway/minified variable names on unrelated sites, causing false
+  // positives that feed straight into the free-tier upgrade-nudge logic.
+  { id: 'lodash', name: 'Lodash', category: 'Library', patterns: ['lodash.min.js', 'lodash.js'] },
 
   // --- CSS ---
   { id: 'tailwind', name: 'Tailwind CSS', category: 'CSS', patterns: ['cdn.tailwindcss.com'], globalVar: [] },
@@ -266,7 +269,9 @@ export const signatures: SaasSignature[] = [
   // --- MAPS ---
   { id: 'google_maps', name: 'Google Maps', category: 'Maps', patterns: ['maps.googleapis.com', 'maps.gstatic.com'], globalVar: ['google'] },
   { id: 'mapbox', name: 'Mapbox', category: 'Maps', patterns: ['api.mapbox.com', 'cdn.mapbox.com', 'mapbox-gl.js'], globalVar: ['mapboxgl'] },
-  { id: 'leaflet', name: 'Leaflet', category: 'Maps', patterns: ['cdn.leafletjs.com', 'leaflet.js'], globalVar: ['L'] },
+  // globalVar intentionally omitted: 'L' is a very common short variable
+  // name unrelated to this library on unrelated sites (see Lodash above).
+  { id: 'leaflet', name: 'Leaflet', category: 'Maps', patterns: ['cdn.leafletjs.com', 'leaflet.js'] },
 
   // --- REVIEWS ---
   { id: 'trustpilot', name: 'Trustpilot', category: 'Reviews', patterns: ['invitejs.trustpilot.com', 'widget.trustpilot.com'], globalVar: ['tp'] },
@@ -670,7 +675,9 @@ export const signatures: SaasSignature[] = [
 
   // --- FRAMEWORK additions ---
   { id: 'knockout', name: 'Knockout.js', category: 'Framework', patterns: ['cdnjs.cloudflare.com/ajax/libs/knockout', 'knockoutjs.com/downloads/knockout', 'knockout-min.js'], globalVar: ['ko'] },
-  { id: 'mithril', name: 'Mithril', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/mithril', 'cdnjs.cloudflare.com/ajax/libs/mithril'], globalVar: ['m'] },
+  // globalVar intentionally omitted: 'm' is a very common short variable
+  // name unrelated to this library on unrelated sites (see Lodash above).
+  { id: 'mithril', name: 'Mithril', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/mithril', 'cdnjs.cloudflare.com/ajax/libs/mithril'] },
   { id: 'alpinejs_v3', name: 'Alpine.js v3', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/alpinejs@3', 'unpkg.com/alpinejs@3'], globalVar: ['Alpine'] },
   { id: 'stimulus', name: 'Stimulus', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@hotwired/stimulus', 'stimulus.hotwire.dev', 'unpkg.com/@hotwired/stimulus'], globalVar: ['Stimulus'] },
   { id: 'turbo', name: 'Turbo (Hotwire)', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@hotwired/turbo', 'turbo.hotwired.dev'], globalVar: ['Turbo'] },
@@ -980,7 +987,12 @@ export const signatures: SaasSignature[] = [
   { id: 'netsuite', name: 'NetSuite Commerce', category: 'E-Commerce', patterns: ['system.netsuite.com', 'nlapi', '/app/site/hosting/'], globalVar: ['nlapi'] },
 
   // --- PAYMENTS additions ---
-  { id: 'zuora', name: 'Zuora', category: 'Payments', patterns: ['static-na.zuora.com', 'apisandbox.zuora.com/apps/PublicPaymentPage/'], globalVar: ['Z'] },
+  // globalVar intentionally omitted: 'Z' is a very common short variable
+  // name unrelated to this library on unrelated sites (see Lodash above).
+  // This one matters more than most — it's a Payments-category signature,
+  // and a false hit here feeds directly into Checkout Trust Score's
+  // "known payment processor detected" signal.
+  { id: 'zuora', name: 'Zuora', category: 'Payments', patterns: ['static-na.zuora.com', 'apisandbox.zuora.com/apps/PublicPaymentPage/'] },
   { id: 'authorize_net', name: 'Authorize.net', category: 'Payments', patterns: ['js.authorize.net/v1/Accept.js', 'js.authorize.net/v3/AcceptUI.js'], globalVar: ['Accept'] },
   { id: 'cybersource', name: 'Cybersource', category: 'Payments', patterns: ['flex.cybersource.com/cybersource/assets/', 'testflex.cybersource.com'], globalVar: [] },
   { id: 'verifone_2co', name: '2Checkout (Verifone)', category: 'Payments', patterns: ['www.2checkout.com/static/checkout/', 'secure.2checkout.com'], globalVar: ['TwoCoInlineCart'] },

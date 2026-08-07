@@ -1,8 +1,15 @@
-declare const process: { env: { POSTHOG_PROJECT_TOKEN: string; POSTHOG_HOST: string } };
-
 const TRACK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/track';
-const POSTHOG_KEY = process.env.POSTHOG_PROJECT_TOKEN;
-const POSTHOG_CAPTURE_URL = process.env.POSTHOG_HOST + '/capture/';
+// Hardcoded to match shared.js exactly (loaded by popup.html/options.html/
+// onboarding.html) rather than sourced from process.env.POSTHOG_HOST/
+// POSTHOG_PROJECT_TOKEN. Those env vars had no committed .env file and no
+// non-empty default, so an ordinary `npm run build` silently produced a
+// build that sent every analytics event (including post-activation emails
+// via identifyUser) straight to us.i.posthog.com instead of through the
+// api.venom-industries.com proxy — a build-time footgun with no warning.
+// This is the extension-side analytics identifier (PostHog project token),
+// not a secret: it's meant to be embedded in client code.
+const POSTHOG_KEY = 'phc_tiu7QvVMRHTEanqn8DtzdMd524u78aGmCnAbMWYxfHkJ';
+const POSTHOG_CAPTURE_URL = 'https://api.venom-industries.com/capture/';
 
 // Cached per-session to avoid a storage read on every event
 let _superPropsCache: Record<string, unknown> | null = null;

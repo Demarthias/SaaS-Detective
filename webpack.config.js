@@ -1,20 +1,9 @@
 const path = require('path');
-const fs = require('fs');
-const webpack = require('webpack');
 
-function loadEnv() {
-  try {
-    return Object.fromEntries(
-      fs.readFileSync(path.join(__dirname, '.env'), 'utf8')
-        .split('\n')
-        .filter(l => l.trim() && !l.startsWith('#'))
-        .map(l => { const i = l.indexOf('='); return [l.slice(0, i).trim(), l.slice(i + 1).trim()]; })
-        .filter(([k]) => k)
-    );
-  } catch (_) { return {}; }
-}
-const env = loadEnv();
-
+// No more DefinePlugin/.env indirection for PostHog config — analytics.ts
+// and shared.js both hardcode the same public project token and proxy URL
+// directly, so a build can no longer silently ship with the wrong host
+// (see the comment in src/analytics.ts for why that mattered).
 module.exports = {
   entry: {
     popup: './src/popup.ts',
@@ -37,10 +26,4 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env.POSTHOG_PROJECT_TOKEN': JSON.stringify(env.POSTHOG_PROJECT_TOKEN || ''),
-      'process.env.POSTHOG_HOST': JSON.stringify(env.POSTHOG_HOST || 'https://us.i.posthog.com'),
-    }),
-  ],
 };
