@@ -1,5 +1,5 @@
 import { getDomain } from 'tldts';
-import { trackEvent, getClientId, withClientRef } from './analytics';
+import { trackEvent, getClientId, withClientRef, TRUST_CHECK_SHARED_SECRET } from './analytics';
 import { signatures } from './signatures';
 import { SIGNATURE_URLS } from './signatureUrls';
 
@@ -157,7 +157,11 @@ function wirePlanButtons(banner: HTMLElement, location: string): void {
       const clientId = await getClientId();
       const { sd_license: lic } = await chrome.storage.sync.get({ sd_license: null }) as { sd_license: LicenseData | null };
       const url = withClientRef(btn.dataset.url!, clientId, lic?.email);
-      trackEvent('checkout_begin', {
+      // Named distinctly from 'checkout_begin', which is reserved for the
+      // moment a real Stripe checkout session is created (fired server-side
+      // in the licensing worker) — this is just the extension-side click
+      // that opens checkout.html.
+      trackEvent('upgrade_link_clicked', {
         location,
         plan: btn.dataset.plan,
         price: btn.dataset.price,
@@ -472,7 +476,7 @@ async function fetchTrustCheck(domain: string, sslValid: boolean, paymentProcess
   try {
     const res = await fetch(TRUST_CHECK_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-SD-Trust-Key': TRUST_CHECK_SHARED_SECRET },
       body: JSON.stringify({ domain, sslValid, paymentProcessor }),
     });
     if (!res.ok) return null;
@@ -513,10 +517,9 @@ function renderTrustLocked(container: HTMLElement, riskLevel: string | null): vo
     const clientId = await getClientId();
     const { sd_license: lic } = await chrome.storage.sync.get({ sd_license: null }) as { sd_license: LicenseData | null };
     const url = withClientRef(STRIPE_PLANS[0].url, clientId, lic?.email);
-    trackEvent('checkout_begin', { location: 'trust_teaser', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price, source: 'extension' });
+    trackEvent('upgrade_link_clicked', { location: 'trust_teaser', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price, source: 'extension' });
     chrome.tabs.create({ url });
   });
-  trackEvent('trust_score_upsell_shown', { risk_level: riskLevel || 'unknown' });
 }
 
 function renderTrustChecking(container: HTMLElement): void {
@@ -587,7 +590,7 @@ function updatePlanUI(licensed: boolean): void {
       const clientId = await getClientId();
       const { sd_license: lic } = await chrome.storage.sync.get({ sd_license: null }) as { sd_license: LicenseData | null };
       const url = withClientRef(STRIPE_PLANS[0].url, clientId, lic?.email);
-      trackEvent('checkout_begin', { location: 'upgrade_strip', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price, source: 'extension' });
+      trackEvent('upgrade_link_clicked', { location: 'upgrade_strip', plan: STRIPE_PLANS[0].plan, price: STRIPE_PLANS[0].price, source: 'extension' });
       chrome.tabs.create({ url });
     });
   }
@@ -640,18 +643,12 @@ async function scanPage(): Promise<void> {
     const trustSectionEl = document.getElementById('trust-section');
     if (trustSectionEl) {
       if (!licensed) {
-        if (trustDomain) {
-          renderTrustLocked(trustSectionEl, null);
-          fetchTrustCheck(trustDomain, sslValid, paymentProcessor).then((data) => {
-            const el = document.getElementById('trust-section');
-            // Only riskLevel ever leaves this scope for free users — score,
-            // reasons, and facts are discarded here and never reach render.
-            const riskLevel = data?.ok ? data.riskLevel : null;
-            if (el) renderTrustLocked(el, riskLevel);
-          });
-        } else {
-          renderTrustLocked(trustSectionEl, null);
-        }
+        // Free users see the locked teaser only — no backend call. The Worker/RDAP
+        // cost of a real trust-check must stay tied to paying usage; a prior version
+        // of this code fetched the real result anyway just to color the teaser dot,
+        // which billed free traffic the same as Pro traffic. See renderTrustLocked.
+        trackEvent('trust_score_upsell_shown', { risk_level: 'unknown' });
+        renderTrustLocked(trustSectionEl, null);
       } else if (trustDomain) {
         renderTrustChecking(trustSectionEl);
         fetchTrustCheck(trustDomain, sslValid, paymentProcessor).then((data) => {
