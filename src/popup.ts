@@ -3,7 +3,7 @@ import { trackEvent, getClientId, withClientRef, TRUST_CHECK_SHARED_SECRET } fro
 import { signatures } from './signatures';
 import { SIGNATURE_URLS } from './signatureUrls';
 
-const FREE_LIMIT = 50;
+const FREE_LIMIT = 8;
 const NUDGE_THRESHOLD_SCANS = 1;
 const NUDGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 const HISTORY_LIMIT_FREE = 25;
@@ -199,7 +199,7 @@ function appendUpgradeNudge(container: HTMLElement, visibleCount: number): void 
   banner.className = 'upgrade-banner';
   banner.innerHTML = `
     <div class="upgrade-count">Detected ${visibleCount} tool${visibleCount !== 1 ? 's' : ''} here</div>
-    <div class="upgrade-sub">Pro unlocks all ${signatures.length} signatures · CSV export · Scan history</div>
+    <div class="upgrade-sub">Pro adds CSV export · 50-scan history</div>
     <div class="plan-grid">${renderPlanGrid()}</div>
     <div class="banner-trial"><a href="#">or try free for 7 days — no credit card</a></div>
     <div class="banner-guarantee">30-day money-back guarantee</div>

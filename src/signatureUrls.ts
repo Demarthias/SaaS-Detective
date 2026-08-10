@@ -1,4 +1,11 @@
 export const SIGNATURE_URLS: Record<string, string> = {
+  // B2B visitor intelligence
+  koala: 'https://getkoala.com',
+  rb2b: 'https://rb2b.com',
+  warmly: 'https://warmly.ai',
+  common_room: 'https://commonroom.io',
+  cronitor_rum: 'https://cronitor.io',
+
   // Analytics
   ga: 'https://analytics.google.com',
   gtm: 'https://tagmanager.google.com',
@@ -12,7 +19,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   plausible: 'https://plausible.io',
   fathom: 'https://usefathom.com',
   posthog: 'https://posthog.com',
-  posthog_surveys: 'https://posthog.com',
   umami: 'https://umami.is',
   chartbeat: 'https://chartbeat.com',
   comscore: 'https://comscore.com',
@@ -64,11 +70,9 @@ export const SIGNATURE_URLS: Record<string, string> = {
   kameleoon: 'https://kameleoon.com',
   intellimize: 'https://intellimize.com',
   evolv: 'https://evolvai.com',
-  dynamic_yield: 'https://www.dynamicyield.com',
   dynamicyield: 'https://www.dynamicyield.com',
   monetate: 'https://monetate.com',
   statsig: 'https://statsig.com',
-  statsig_ff: 'https://statsig.com',
   eppo: 'https://geteppo.com',
   growthbook: 'https://growthbook.io',
   split_io: 'https://split.io',
@@ -77,8 +81,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   launchdarkly: 'https://launchdarkly.com',
   flagsmith: 'https://flagsmith.com',
   unleash: 'https://getunleash.io',
-  unleash_ff: 'https://getunleash.io',
-
   // CRM
   hubspot: 'https://hubspot.com',
   salesforce: 'https://salesforce.com',
@@ -152,7 +154,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   typebot: 'https://typebot.io',
   gladly: 'https://gladly.com',
   gorgias: 'https://gorgias.com',
-  re_amaze: 'https://reamaze.com',
   reamaze: 'https://reamaze.com',
   dixa: 'https://dixa.com',
   trengo: 'https://trengo.com',
@@ -176,8 +177,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   churnzero: 'https://churnzero.com',
   totango: 'https://totango.com',
   vitally: 'https://vitally.io',
-  custify: 'https://custify.com',
-
   // Push Notifications
   onesignal: 'https://onesignal.com',
   pushengage: 'https://pushengage.com',
@@ -315,7 +314,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   astro: 'https://astro.build',
   qwik: 'https://qwik.builder.io',
   qwik_city: 'https://qwik.builder.io',
-  solidjs: 'https://solidjs.com',
   solid: 'https://solidjs.com',
   preact: 'https://preactjs.com',
   ember: 'https://emberjs.com',
@@ -335,8 +333,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   alpine_morph: 'https://alpinejs.dev',
   hyperscript: 'https://hyperscript.org',
   stimulus: 'https://stimulus.hotwired.dev',
-  stimulus_js: 'https://stimulus.hotwired.dev',
-  hotwire_turbo: 'https://hotwired.dev',
   turbo: 'https://hotwired.dev',
   rails_turbo: 'https://rubyonrails.org',
   inertiajs: 'https://inertiajs.com',
@@ -375,7 +371,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   vegajs: 'https://vega.github.io/vega/',
   animejs: 'https://animejs.com',
   babylonjs: 'https://babylonjs.com',
-  pixijs: 'https://pixijs.com',
   pixi: 'https://pixijs.com',
   fabricjs: 'https://fabricjs.com',
   konvajs: 'https://konvajs.org',
@@ -434,8 +429,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   uikit: 'https://getuikit.com',
   daisyui: 'https://daisyui.com',
   open_props: 'https://open-props.style',
-  shoelace: 'https://shoelace.style',
-
   // Fonts / Icons
   google_fonts: 'https://fonts.google.com',
   fontawesome: 'https://fontawesome.com',
@@ -478,8 +471,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   fly_io: 'https://fly.io',
   render: 'https://render.com',
   render_com: 'https://render.com',
-  huggingface: 'https://huggingface.co',
-
   // Security
   auth0: 'https://auth0.com',
   okta: 'https://okta.com',
@@ -565,8 +556,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   fluent_forms: 'https://fluentforms.com',
   formidable: 'https://formidableforms.com',
   fillout: 'https://fillout.com',
-  paperform2: 'https://paperform.co',
-
   // Scheduling
   calendly: 'https://calendly.com',
   hubspot_meetings: 'https://hubspot.com',
@@ -608,7 +597,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   // Surveys
   surveymonkey: 'https://surveymonkey.com',
   qualtrics: 'https://qualtrics.com',
-  typeform_nps: 'https://typeform.com',
   survicate: 'https://survicate.com',
   delighted: 'https://delighted.com',
   forsta: 'https://forsta.com',
@@ -628,7 +616,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   maze: 'https://maze.co',
   dscout: 'https://dscout.com',
   lookback: 'https://lookback.com',
-  lookback_io: 'https://lookback.com',
   userbrain: 'https://userbrain.com',
 
   // Comments
@@ -645,7 +632,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   capterra_widget: 'https://capterra.com',
   reviews_io: 'https://reviews.io',
   yotpo: 'https://yotpo.com',
-  judge_me: 'https://judge.me',
   judgeme: 'https://judge.me',
   okendo: 'https://okendo.io',
   loox: 'https://loox.app',
@@ -679,7 +665,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   tolt: 'https://tolt.io',
   tapfiliate: 'https://tapfiliate.com',
   invitereferrals: 'https://invitereferrals.com',
-  viral_loops: 'https://viral-loops.com',
   viralloops: 'https://viral-loops.com',
 
   // Affiliate
@@ -709,7 +694,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   arcgis: 'https://esri.com',
   tomtom: 'https://developer.tomtom.com',
   what3words: 'https://what3words.com',
-  yandex_maps_sdk: 'https://yandex.com/maps-api',
   maplibre: 'https://maplibre.org',
   maptiler: 'https://maptiler.com',
 
@@ -740,8 +724,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   trackjs: 'https://trackjs.com',
   honeybadger: 'https://honeybadger.io',
   glitchtip: 'https://glitchtip.com',
-  highlight_run2: 'https://highlight.run',
-
   // Sales Intelligence
   clearbit: 'https://clearbit.com',
   leadfeeder: 'https://leadfeeder.com',
@@ -756,12 +738,9 @@ export const SIGNATURE_URLS: Record<string, string> = {
   birdeye: 'https://birdeye.com',
 
   // Personalization
-  dynamic_yield2: 'https://dynamicyield.com',
   evergage: 'https://salesforce.com/products/marketing/marketing-personalization/',
   nosto: 'https://nosto.com',
   justuno: 'https://justuno.com',
-  barilliance: 'https://barilliance.com',
-
   // Live Demo
   navattic: 'https://navattic.com',
   arcade: 'https://arcade.software',
@@ -785,7 +764,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   recruitee: 'https://recruitee.com',
   taleo: 'https://oracle.com/human-capital-management/taleo/',
   workable: 'https://workable.com',
-  workable_jobs: 'https://workable.com',
   rippling: 'https://rippling.com',
 
   // Events
@@ -894,9 +872,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   useproof: 'https://proof.com',
 
   // Database
-  directus2: 'https://directus.io',
-  appsmith2: 'https://appsmith.com',
-
   // Communications
   twilio: 'https://twilio.com',
   vonage: 'https://vonage.com',
@@ -912,7 +887,6 @@ export const SIGNATURE_URLS: Record<string, string> = {
   // Misc
   miro: 'https://miro.com',
   figma_embed: 'https://figma.com',
-  gumroad2: 'https://gumroad.com',
   memberful: 'https://memberful.com',
   memberpress: 'https://memberpress.com',
   userguiding: 'https://userguiding.com',
@@ -925,41 +899,11 @@ export const SIGNATURE_URLS: Record<string, string> = {
   qualaroo: 'https://qualaroo.com',
   sprig: 'https://sprig.com',
   freshsales: 'https://freshworks.com/crm/',
-  pipedrive2: 'https://pipedrive.com',
-  attio2: 'https://attio.com',
-  close: 'https://close.com',
-  lusha2: 'https://lusha.com',
-  picreel2: 'https://picreel.com',
-  netsuite2: 'https://netsuite.com',
   netart: 'https://netart.com',
   nordvpn: 'https://nordvpn.com',
-  hellobar2: 'https://hellobar.com',
   whatsapp_widget: 'https://business.whatsapp.com',
-  customerio2: 'https://customer.io',
   customgpt: 'https://customgpt.ai',
   kissmetrics: 'https://kissmetrics.io',
-  woopra2: 'https://woopra.com',
-  mixpanel2: 'https://mixpanel.com',
   june: 'https://june.so',
-  albacross2: 'https://albacross.com',
-  userback: 'https://userback.io',
   pendo: 'https://pendo.io',
-  appcues2: 'https://appcues.com',
-  chameleon2: 'https://chameleon.io',
-  userguiding2: 'https://userguiding.com',
-  survicate2: 'https://survicate.com',
-  hotjar2: 'https://hotjar.com',
-  mouseflow2: 'https://mouseflow.com',
-  luckyorange2: 'https://luckyorange.com',
-  microsoft_clarity2: 'https://clarity.microsoft.com',
-  glassbox2: 'https://glassbox.com',
-  quantummetric2: 'https://quantummetric.com',
-  contentful2: 'https://contentful.com',
-  sanity2: 'https://sanity.io',
-  aframe2: 'https://aframe.io',
-  drip2: 'https://drip.com',
-  savio2: 'https://savio.io',
-  elfsight2: 'https://elfsight.com',
-  disqus2: 'https://disqus.com',
-  hyvor2: 'https://hyvor.com',
 };

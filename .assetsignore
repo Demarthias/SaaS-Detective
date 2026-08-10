@@ -1,0 +1,7 @@
+# This repo is a Chrome extension, not a deployable website — nothing here
+# is meant to be served as public Cloudflare Worker assets. wrangler.jsonc's
+# assets.directory is "." (repo root), so without this file, `wrangler deploy`
+# would publish everything it finds — including .env, .git, and node_modules —
+# to the public internet. Exclude everything by default; nothing is currently
+# exempted because nothing here should be public.
+**

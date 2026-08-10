@@ -171,7 +171,7 @@ export const signatures: SaasSignature[] = [
 
   // --- LIBRARY ---
   { id: 'jquery', name: 'jQuery', category: 'Library', patterns: ['jquery.min.js', 'jquery.com/jquery'], globalVar: ['jQuery'] },
-  { id: 'alpine', name: 'Alpine.js', category: 'Library', patterns: ['cdn.jsdelivr.net/npm/alpinejs', 'alpinejs.dev'], globalVar: ['Alpine'] },
+  { id: 'alpine', name: 'Alpine.js', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/alpinejs', 'alpinejs.dev', 'unpkg.com/alpinejs', 'x-data=', 'x-bind=', 'x-on:click'], globalVar: ['Alpine'] },
   { id: 'lodash', name: 'Lodash', category: 'Library', patterns: ['lodash.min.js', 'lodash.js'], globalVar: ['_'] },
 
   // --- CSS ---
@@ -348,7 +348,9 @@ export const signatures: SaasSignature[] = [
   { id: 'medallia', name: 'Medallia', category: 'Surveys', patterns: ['resources.digital.medallia.com', 'nebula.medallia.com'], globalVar: ['KAMPYLE_ONSITE_SDK', 'kampyleReady'] },
   { id: 'survicate', name: 'Survicate', category: 'Surveys', patterns: ['survey.survicate.com', 'cdn.survicate.com'], globalVar: ['_sva'] },
   { id: 'refiner', name: 'Refiner', category: 'Surveys', patterns: ['js.refiner.io', 'cdn.refiner.io'], globalVar: ['Refiner'] },
-  { id: 'typeform_nps', name: 'Qualaroo', category: 'Surveys', patterns: ['ku.qualaroo.com', 'app.qualaroo.com/qualaroo.js'], globalVar: ['_kiq'] },
+  // This entry was mislabeled id:'typeform_nps' but was actually a Qualaroo
+  // signature (name/patterns/globalVar all match Qualaroo, not Typeform) —
+  // a duplicate of the correctly-id'd 'qualaroo' entry defined later. Removed.
 
   // --- DATABASE ---
   { id: 'supabase', name: 'Supabase', category: 'Database', patterns: ['cdn.jsdelivr.net/npm/@supabase/supabase-js', 'supabase.co', 'supabase.io/js'], globalVar: ['supabase'] },
@@ -386,7 +388,7 @@ export const signatures: SaasSignature[] = [
   { id: 'raygun', name: 'Raygun', category: 'Error Tracking', patterns: ['cdn.raygun.io/raygun4js', 'raygun.io/raygun4js'], globalVar: ['Raygun', 'rg4js'] },
   { id: 'airbrake', name: 'Airbrake', category: 'Error Tracking', patterns: ['airbrake.io/notifier.js', 'cdn.airbrake.io'], globalVar: ['AirbrakeClient'] },
   { id: 'trackjs', name: 'TrackJS', category: 'Error Tracking', patterns: ['cdn.trackjs.com', 'usage.trackjs.com'], globalVar: ['TrackJS'] },
-  { id: 'honeybadger', name: 'Honeybadger', category: 'Error Tracking', patterns: ['js.honeybadger.io'], globalVar: ['Honeybadger'] },
+  { id: 'honeybadger', name: 'Honeybadger', category: 'Error Tracking', patterns: ['js.honeybadger.io', 'cdn.honeybadger.io', 'Honeybadger.configure'], globalVar: ['Honeybadger'] },
 
   // --- ADS additions ---
   { id: 'reddit_pixel', name: 'Reddit Pixel', category: 'Ads', patterns: ['alb.reddit.com', 'ads-static.reddit.com/ads/v2.js'], globalVar: ['rdt'] },
@@ -473,7 +475,7 @@ export const signatures: SaasSignature[] = [
   { id: 'qwik', name: 'Qwik', category: 'Framework', patterns: ['qwikloader.js', '/build/q-'], globalVar: ['qwikevents'] },
   { id: 'preact', name: 'Preact', category: 'Framework', patterns: ['preact.min.js', 'cdn.jsdelivr.net/npm/preact'], globalVar: ['preact'] },
   { id: 'backbone', name: 'Backbone.js', category: 'Framework', patterns: ['backbone.min.js', 'backbone-min.js'], globalVar: ['Backbone'] },
-  { id: 'htmx', name: 'HTMX', category: 'Framework', patterns: ['unpkg.com/htmx.org', 'cdn.jsdelivr.net/npm/htmx.org', 'htmx.org/dist/'], globalVar: ['htmx'] },
+  { id: 'htmx', name: 'HTMX', category: 'Framework', patterns: ['unpkg.com/htmx.org', 'cdn.jsdelivr.net/npm/htmx.org', 'htmx.org/dist/', 'hx-get=', 'hx-post=', 'hx-trigger='], globalVar: ['htmx'] },
 
   // --- LIBRARY additions ---
   { id: 'd3', name: 'D3.js', category: 'Library', patterns: ['d3js.org/d3.v', 'cdn.jsdelivr.net/npm/d3@'], globalVar: ['d3'] },
@@ -860,8 +862,8 @@ export const signatures: SaasSignature[] = [
   { id: 'livewire', name: 'Laravel Livewire', category: 'Framework', patterns: ['/livewire/livewire.js', '/vendor/livewire/'], globalVar: ['Livewire'] },
   { id: 'phoenix_liveview', name: 'Phoenix LiveView', category: 'Framework', patterns: ['/js/app.js', 'phoenix.js', 'live_socket'], globalVar: ['liveSocket'] },
   { id: 'django_htmx', name: 'Django + HTMX', category: 'Framework', patterns: ['django-htmx', 'django_htmx'], globalVar: [] },
-  { id: 'hotwire_turbo', name: 'Turbo (Hotwire)', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@hotwired/turbo', 'turbo.hotwired.dev'], globalVar: ['Turbo'] },
-  { id: 'stimulus_js', name: 'Stimulus', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@hotwired/stimulus', 'stimulus.hotwire.dev'], globalVar: ['Stimulus'] },
+  // turbo/stimulus already defined above (ids 'turbo', 'stimulus') — these
+  // were exact-pattern duplicates under different ids. Removed.
   { id: 'blitz_js', name: 'Blitz.js', category: 'Framework', patterns: ['blitzjs.com', '/__blitz/'], globalVar: [] },
   { id: 'redwoodjs', name: 'RedwoodJS', category: 'Framework', patterns: ['redwoodjs.com', '/redwood/router'], globalVar: [] },
   { id: 'adonis_js', name: 'AdonisJS', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@adonisjs/', 'adonisjs.com'], globalVar: [] },
@@ -1097,8 +1099,9 @@ export const signatures: SaasSignature[] = [
   // --- SOCIAL PROOF additions ---
 
   // --- FEATURE FLAGS additions ---
-  { id: 'unleash_ff', name: 'Unleash', category: 'Feature Flags', patterns: ['app.unleash-hosted.com', 'getunleash.io'], globalVar: ['UnleashClient'] },
-  { id: 'statsig_ff', name: 'Statsig', category: 'Feature Flags', patterns: ['cdn.jsdelivr.net/npm/statsig-js', 'featuregates.org'], globalVar: ['statsig'] },
+  // unleash/statsig already defined above (ids 'unleash', 'statsig') — these
+  // '_ff' entries were exact-pattern duplicates under different ids, causing
+  // both tools to be reported twice per scan. Removed.
 
   // --- FEEDBACK additions ---
 
@@ -1115,14 +1118,14 @@ export const signatures: SaasSignature[] = [
   // --- TRANSLATION additions ---
 
   // --- RECRUITING additions ---
-  { id: 'workable_jobs', name: 'Workable', category: 'Recruiting', patterns: ['apply.workable.com', 'jobs.workable.com'], globalVar: [] },
+  // workable already defined above (id 'workable') — duplicate removed.
 
   // --- DOCUMENTATION additions ---
 
   // --- SOCIAL SHARING additions ---
 
   // --- USER RESEARCH additions ---
-  { id: 'lookback_io', name: 'Lookback', category: 'User Research', patterns: ['lookback.io/embed', 'cdn.lookback.io'], globalVar: [] },
+  // lookback already defined above (id 'lookback') — duplicate removed.
 
   // --- HOSTING additions ---
   { id: 'github_pages', name: 'GitHub Pages', category: 'Hosting', patterns: ['github.io', '.github.io/'], globalVar: [] },
@@ -1143,9 +1146,12 @@ export const signatures: SaasSignature[] = [
   { id: 'embedly', name: 'Embedly', category: 'Library', patterns: ['cdn.embedly.com/widgets/platform.js', 'api.embed.ly'], globalVar: ['embedly'] },
 
   // --- FRAMEWORK additions ---
-  { id: 'amp', name: 'AMP', category: 'Framework', patterns: ['cdn.ampproject.org/v0.js', 'cdn.ampproject.org/v0/', '⚡', 'data-ampdevmode'], globalVar: ['AMP'] },
-  { id: 'htmx', name: 'HTMX', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/htmx.org', 'unpkg.com/htmx.org', 'hx-get=', 'hx-post=', 'hx-trigger='], globalVar: ['htmx'] },
-  { id: 'alpine', name: 'Alpine.js', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/alpinejs', 'unpkg.com/alpinejs', 'x-data=', 'x-bind=', 'x-on:click'], globalVar: ['Alpine'] },
+  // 'amp' pattern list previously included a bare '⚡' emoji, matched against
+  // full page HTML — any page using that character in marketing copy (not
+  // just real AMP pages) was falsely flagged as running Google AMP. Removed.
+  { id: 'amp', name: 'AMP', category: 'Framework', patterns: ['cdn.ampproject.org/v0.js', 'cdn.ampproject.org/v0/', 'data-ampdevmode'], globalVar: ['AMP'] },
+  // htmx/alpine: merged into their earlier definitions above (ids were
+  // duplicated, silently shadowing one definition depending on lookup order).
 
   // --- MAPS additions ---
   { id: 'maplibre', name: 'MapLibre GL', category: 'Maps', patterns: ['cdn.jsdelivr.net/npm/maplibre-gl', 'unpkg.com/maplibre-gl/'], globalVar: ['maplibregl'] },
@@ -1156,7 +1162,7 @@ export const signatures: SaasSignature[] = [
 
   // --- ERROR TRACKING additions ---
   { id: 'glitchtip', name: 'GlitchTip', category: 'Error Tracking', patterns: ['cdn.jsdelivr.net/npm/@sentry/browser', 'glitchtip.com/js/', '/glitchtip.js'], globalVar: [] },
-  { id: 'honeybadger', name: 'Honeybadger', category: 'Error Tracking', patterns: ['js.honeybadger.io/v', 'cdn.honeybadger.io', 'Honeybadger.configure'], globalVar: ['Honeybadger'] },
+  // honeybadger: merged into its earlier definition above (duplicate id).
 
   // --- FEEDBACK additions ---
   { id: 'usersnap', name: 'Usersnap', category: 'Feedback', patterns: ['widget.usersnap.com/global/load/', 'cdn.usersnap.com'], globalVar: [] },
@@ -1176,5 +1182,17 @@ export const signatures: SaasSignature[] = [
 
   // --- OBSERVABILITY additions ---
   { id: 'opentelemetry', name: 'OpenTelemetry', category: 'Observability', patterns: ['cdn.jsdelivr.net/npm/@opentelemetry/api', 'cdn.jsdelivr.net/npm/@opentelemetry/sdk-trace-web', 'opentelemetry-js'], globalVar: [] },
+
+  // --- B2B VISITOR INTELLIGENCE ---
+  // Matched on script host only. Koala's documented global is `ko`, which
+  // Knockout.js (id 'knockout') already claims — adding it here would report
+  // Koala on every Knockout site, so this entry stays URL-only.
+  { id: 'koala', name: 'Koala', category: 'Sales Intelligence', patterns: ['cdn.getkoala.com', 'getkoala.com/v1'], globalVar: [] },
+  { id: 'rb2b', name: 'RB2B', category: 'Sales Intelligence', patterns: ['s.rb2b.com'], globalVar: ['reb2b'] },
+  { id: 'warmly', name: 'Warmly', category: 'Sales Intelligence', patterns: ['opps-widget.getwarmly.com', 'getwarmly.com/warmly.js'], globalVar: [] },
+  // Common Room's snippet exposes `signals` — far too generic to match on safely.
+  { id: 'common_room', name: 'Common Room', category: 'Sales Intelligence', patterns: ['cdn.commonroom.io', 'commonroom.io/signals'], globalVar: [] },
+
+  { id: 'cronitor_rum', name: 'Cronitor RUM', category: 'Observability', patterns: ['rum.cronitor.io'], globalVar: ['cronitor'] },
 
 ];

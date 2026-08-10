@@ -1,8 +1,19 @@
-declare const process: { env: { POSTHOG_PROJECT_TOKEN: string; POSTHOG_HOST: string } };
+declare const process: {
+  env: { POSTHOG_PROJECT_TOKEN: string; POSTHOG_HOST: string; TRUST_CHECK_SHARED_SECRET: string };
+};
 
 const TRACK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/track';
 const POSTHOG_KEY = process.env.POSTHOG_PROJECT_TOKEN;
-const POSTHOG_CAPTURE_URL = process.env.POSTHOG_HOST + '/capture/';
+// Sent as X-SD-Trust-Key on /trust-check requests — raises the bar on that
+// endpoint from "anyone can curl it" to "must extract this from the packed
+// extension." Not a substitute for real auth, just closes the zero-effort case.
+export const TRUST_CHECK_SHARED_SECRET = process.env.TRUST_CHECK_SHARED_SECRET;
+// Routed through our own domain, not us.i.posthog.com directly — matches
+// shared.js's POSTHOG_CAPTURE_URL. Posting straight to a posthog.com domain
+// gets silently dropped by uBlock/Brave/Privacy Badger, which is exactly the
+// demographic likely to install this extension; this proxy exists specifically
+// to keep checkout/trial/scan events out of ad-blocker denylists.
+const POSTHOG_CAPTURE_URL = 'https://api.venom-industries.com/capture/';
 
 // Cached per-session to avoid a storage read on every event
 let _superPropsCache: Record<string, unknown> | null = null;

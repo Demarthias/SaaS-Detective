@@ -4,8 +4,7 @@
   "scripts": {
     "build": "webpack --mode production && cp src/manifest.json dist/ && cp src/popup.html dist/ && cp src/onboarding.html dist/ && cp src/options.html dist/ && cp src/privacy.html dist/ && cp src/shared.js dist/ && cp src/options.js dist/ && cp affiliates.json dist/ && mkdir -p dist/icons && cp icons/icon16.png icons/icon48.png icons/icon128.png dist/icons/",
     "watch": "webpack --mode development --watch",
-    "deploy": "wrangler deploy",
-    "preview": "wrangler dev"
+    "check-affiliates": "node --experimental-strip-types scripts/check-affiliate-coverage.ts"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.36",

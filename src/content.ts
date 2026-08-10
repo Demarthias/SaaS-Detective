@@ -75,7 +75,11 @@ async function getEnabledCategories(): Promise<Record<string, boolean>> {
   const { sd_options } = await chrome.storage.sync.get({
     sd_options: DEFAULT_OPTIONS,
   }) as { sd_options: Options };
-  return sd_options?.enabledCategories || DEFAULT_OPTIONS.enabledCategories;
+  // Merge over the full default rather than trusting stored keys alone —
+  // any category missing from a stored options object (e.g. one written by
+  // an older/out-of-sync options.js build) must fail open as enabled, not
+  // silently vanish from detection. See options.js's "SYNC REQUIRED" note.
+  return { ...DEFAULT_OPTIONS.enabledCategories, ...(sd_options?.enabledCategories || {}) };
 }
 
 function detectTools(enabledCategories: Record<string, boolean>) {

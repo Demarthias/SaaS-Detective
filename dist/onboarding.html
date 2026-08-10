@@ -341,12 +341,13 @@
     <h1 class="welcome-title">You're ready to detect<br>any tech stack.</h1>
     <p class="welcome-sub">SaaS Detective scans any website and reveals the tools and services powering it — CRMs, analytics, payment processors, and more.</p>
 
-    <div class="cta-box">
-      <div class="cta-text">
+    <div class="cta-box" id="cta-box">
+      <div class="cta-text" id="cta-text">
         <h2>Try it right now</h2>
-        <p>Navigate to any website, then click the SaaS Detective icon in your toolbar to scan it.</p>
+        <p>Open a site, then click the <strong style="color:#fff;">🔍 SaaS Detective icon</strong> in your toolbar to scan it.</p>
+        <p style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:6px;">Don't see the icon? Click the 🧩 puzzle piece in Chrome's toolbar and pin SaaS Detective first.</p>
       </div>
-      <a class="cta-btn" id="testSiteBtn" href="https://stripe.com" target="_blank">Open a test site →</a>
+      <a class="cta-btn" id="testSiteBtn" href="https://stripe.com" target="_blank">Open stripe.com →</a>
     </div>
 
     <div class="steps-title">How it works</div>
@@ -382,7 +383,7 @@
         <span class="trial-badge-sub">No credit card required</span>
       </div>
       <h3>Try Pro free for 7 days</h3>
-      <p>Free plan shows up to 50 tools. Pro unlocks all 800+ signatures across 64 categories — CRM, sales intelligence, A/B testing, feature flags, accessibility tools, and more. Enter your email and we'll send your key instantly.</p>
+      <p>Free plan shows up to 8 tools per page. Pro unlocks all 800+ signatures across 64 categories — CRM, sales intelligence, A/B testing, feature flags, accessibility tools, and more. Enter your email and we'll send your key instantly.</p>
 
       <form id="trialForm">
         <div class="trial-form-row">
@@ -446,6 +447,21 @@
 
     document.getElementById('testSiteBtn')?.addEventListener('click', () => {
       trackEvent('onboarding_completed', { cta: 'test_site' });
+      // Update CTA box to show step 2 guidance after the new tab opens
+      setTimeout(() => {
+        const ctaText = document.getElementById('cta-text');
+        if (ctaText) {
+          ctaText.innerHTML = `
+            <h2 style="color:#4ade80;">✓ stripe.com is open</h2>
+            <p>Now <strong style="color:#fff;">click the 🔍 SaaS Detective icon</strong> in your Chrome toolbar to scan it.</p>
+            <p style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:6px;">Don't see it? Click the 🧩 puzzle piece → pin SaaS Detective → then click the icon.</p>
+          `;
+        }
+        const btn = document.getElementById('testSiteBtn');
+        if (btn) {
+          btn.textContent = 'Open another site →';
+        }
+      }, 300);
     });
 
     // Attach client_reference_id to all plan purchase links and track clicks

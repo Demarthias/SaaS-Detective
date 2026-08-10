@@ -50,6 +50,25 @@ const DEFAULT_OPTIONS = {
     'Communications': true,
     'Courses': true,
     'Community': true,
+    'Accessibility': true,
+    'Affiliate': true,
+    'Conversions': true,
+    'Database': true,
+    'Documentation': true,
+    'E-Signature': true,
+    'Events': true,
+    'Feature Flags': true,
+    'Feedback': true,
+    'Live Demo': true,
+    'Personalization': true,
+    'Recruiting': true,
+    'SEO': true,
+    'Social Proof': true,
+    'Social Sharing': true,
+    'Status Pages': true,
+    'Surveys': true,
+    'Translation': true,
+    'User Research': true,
   },
 };
 
@@ -153,9 +172,9 @@ function attachActivationListener(input, btn, statusEl) {
     try {
       let res;
       try {
-        res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
+        res = await fetch(VALIDATE_URL, { cache: 'no-store', headers: { 'X-License-Key': key } });
       } catch (_) {
-        res = await fetch(`${VALIDATE_URL}?key=${encodeURIComponent(key)}`, { cache: 'no-store' });
+        res = await fetch(VALIDATE_URL, { cache: 'no-store', headers: { 'X-License-Key': key } });
       }
       if (!res.ok) throw new Error(`Server error ${res.status}`);
 
