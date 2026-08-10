@@ -9,7 +9,7 @@
 export const signatures: SaasSignature[] = [
 
   // --- ANALYTICS ---
-  { id: 'ga', name: 'Google Analytics', category: 'Analytics', patterns: ['google-analytics.com/analytics.js', 'gtag/js?id=g-', 'ga.js'], globalVar: ['ga', 'GoogleAnalyticsObject', 'gtag'] },
+  { id: 'ga', name: 'Google Analytics', category: 'Analytics', patterns: ['google-analytics.com/analytics.js', 'gtag/js?id=g-', 'ga.js'], globalVar: ['ga', 'GoogleAnalyticsObject'] },
   { id: 'gtm', name: 'Google Tag Manager', category: 'Analytics', patterns: ['googletagmanager.com/gtm.js'], globalVar: ['google_tag_manager'] },
   { id: 'mixpanel', name: 'Mixpanel', category: 'Analytics', patterns: ['cdn.mxpnl.com', 'cdn4.mxpnl.com'], globalVar: ['mixpanel'] },
   { id: 'amplitude', name: 'Amplitude', category: 'Analytics', patterns: ['cdn.amplitude.com', 'api2.amplitude.com'], globalVar: ['amplitude'] },
@@ -46,7 +46,7 @@ export const signatures: SaasSignature[] = [
 
   // --- ADS ---
   { id: 'fb_pixel', name: 'Meta Pixel', category: 'Ads', patterns: ['connect.facebook.net/en_us/fbevents.js', 'connect.facebook.net'], globalVar: ['fbq'] },
-  { id: 'google_ads', name: 'Google Ads', category: 'Ads', patterns: ['googleadservices.com', 'googlesyndication.com/pagead'], globalVar: ['google_conversion_id', 'gtag'] },
+  { id: 'google_ads', name: 'Google Ads', category: 'Ads', patterns: ['googleadservices.com', 'googlesyndication.com/pagead'], globalVar: ['google_conversion_id'] },
   { id: 'tiktok', name: 'TikTok Pixel', category: 'Ads', patterns: ['analytics.tiktok.com'], globalVar: ['ttq', 'TiktokAnalyticsObject'] },
   { id: 'twitter_ads', name: 'X (Twitter) Pixel', category: 'Ads', patterns: ['static.ads-twitter.com'], globalVar: ['twq'] },
   { id: 'linkedin', name: 'LinkedIn Insight', category: 'Ads', patterns: ['snap.licdn.com'], globalVar: ['_linkedin_data_partner_ids'] },
@@ -245,7 +245,7 @@ export const signatures: SaasSignature[] = [
   { id: 'loom', name: 'Loom', category: 'Video', patterns: ['loom.com/embed', 'cdn.loom.com'], globalVar: [] },
 
   // --- FORMS ---
-  { id: 'typeform', name: 'Typeform', category: 'Forms', patterns: ['embed.typeform.com', 'typeform.com/to/'], globalVar: ['tf'] },
+  { id: 'typeform', name: 'Typeform', category: 'Forms', patterns: ['embed.typeform.com', 'typeform.com/to/'], globalVar: [] },
   { id: 'jotform', name: 'Jotform', category: 'Forms', patterns: ['form.jotform.com', 'js.jotform.com'], globalVar: [] },
   { id: 'surveymonkey', name: 'SurveyMonkey', category: 'Forms', patterns: ['surveymonkey.com', 'smcx.com'], globalVar: ['SMCX'] },
   { id: 'tally', name: 'Tally', category: 'Forms', patterns: ['tally.so/embed', 'tally.so/widgets'], globalVar: ['TallyConfig'] },
@@ -484,7 +484,7 @@ export const signatures: SaasSignature[] = [
   { id: 'axios', name: 'Axios', category: 'Library', patterns: ['cdn.jsdelivr.net/npm/axios', 'cdnjs.cloudflare.com/ajax/libs/axios'], globalVar: ['axios'] },
   { id: 'gsap', name: 'GSAP', category: 'Library', patterns: ['cdnjs.cloudflare.com/ajax/libs/gsap', 'cdn.jsdelivr.net/npm/gsap'], globalVar: ['gsap', 'TweenMax', 'TweenLite'] },
   { id: 'swiper', name: 'Swiper', category: 'Library', patterns: ['cdn.jsdelivr.net/npm/swiper', 'unpkg.com/swiper/'], globalVar: ['Swiper'] },
-  { id: 'lottie', name: 'Lottie', category: 'Library', patterns: ['cdnjs.cloudflare.com/ajax/libs/lottie-web', 'cdn.jsdelivr.net/npm/lottie-web'], globalVar: ['lottie', 'LottiePlayer'] },
+  { id: 'lottie', name: 'Lottie', category: 'Library', patterns: ['cdnjs.cloudflare.com/ajax/libs/lottie-web', 'cdn.jsdelivr.net/npm/lottie-web'], globalVar: ['lottie'] },
 
   // --- CSS additions ---
   { id: 'foundation', name: 'Foundation', category: 'CSS', patterns: ['cdnjs.cloudflare.com/ajax/libs/foundation', 'cdn.jsdelivr.net/npm/foundation-sites'], globalVar: ['Foundation'] },
@@ -516,7 +516,7 @@ export const signatures: SaasSignature[] = [
 
   // --- VIDEO additions ---
   { id: 'mux', name: 'Mux', category: 'Video', patterns: ['cdn.jsdelivr.net/npm/@mux/mux-player', 'stream.mux.com', 'mux.com/mux.js'], globalVar: ['mux'] },
-  { id: 'brightcove', name: 'Brightcove', category: 'Video', patterns: ['players.brightcove.net', 'brightcove.com/js/'], globalVar: ['bc', 'videojs'] },
+  { id: 'brightcove', name: 'Brightcove', category: 'Video', patterns: ['players.brightcove.net', 'brightcove.com/js/'], globalVar: ['bc'] },
   { id: 'bunny_video', name: 'Bunny.net Video', category: 'Video', patterns: ['iframe.mediadelivery.net', 'video.bunnycdn.com'], globalVar: [] },
   { id: 'jwplayer', name: 'JW Player', category: 'Video', patterns: ['cdn.jwplayer.com', 'jwpcdn.com/player/'], globalVar: ['jwplayer'] },
   { id: 'kaltura', name: 'Kaltura', category: 'Video', patterns: ['cdnapisec.kaltura.com', 'kwidget.kaltura.com'], globalVar: ['kWidget', 'Kaltura'] },
@@ -540,7 +540,7 @@ export const signatures: SaasSignature[] = [
   { id: 'activepieces', name: 'Activepieces', category: 'Automation', patterns: ['cloud.activepieces.com', 'cdn.activepieces.com'], globalVar: [] },
 
   // --- MAPS additions ---
-  { id: 'here_maps', name: 'HERE Maps', category: 'Maps', patterns: ['js.api.here.com', 'geocoder.ls.hereapi.com'], globalVar: ['H', 'here'] },
+  { id: 'here_maps', name: 'HERE Maps', category: 'Maps', patterns: ['js.api.here.com', 'geocoder.ls.hereapi.com'], globalVar: ['here'] },
   { id: 'azure_maps', name: 'Azure Maps', category: 'Maps', patterns: ['atlas.microsoft.com/sdk/javascript/mapcontrol', 'atlas.microsoft.com/sdk/javascript/'], globalVar: ['atlas'] },
   { id: 'openlayers', name: 'OpenLayers', category: 'Maps', patterns: ['cdn.jsdelivr.net/npm/ol@', 'cdnjs.cloudflare.com/ajax/libs/ol3'], globalVar: ['ol'] },
   { id: 'tomtom', name: 'TomTom Maps', category: 'Maps', patterns: ['api.tomtom.com/maps-sdk-for-web', 'cdn.jsdelivr.net/npm/@tomtom-international/'], globalVar: ['tt'] },
@@ -643,14 +643,13 @@ export const signatures: SaasSignature[] = [
   { id: 'vercel_analytics', name: 'Vercel Analytics', category: 'Analytics', patterns: ['/_vercel/insights/script.js', 'cdn.vercel-insights.com'], globalVar: ['va'] },
   { id: 'cf_web_analytics', name: 'Cloudflare Web Analytics', category: 'Analytics', patterns: ['static.cloudflareinsights.com/beacon.min.js'], globalVar: ['__cfBeacon', '__cfRl'] },
   { id: 'sprig', name: 'Sprig', category: 'Analytics', patterns: ['cdn.sprig.com', 'cdn.sprigapp.com'], globalVar: ['Sprig'] },
-  { id: 'microsoft_clarity_analytics', name: 'Microsoft Clarity', category: 'Analytics', patterns: ['www.clarity.ms/tag/'], globalVar: ['clarity'] },
   { id: 'goatcounter', name: 'GoatCounter', category: 'Analytics', patterns: ['gc.zgo.at/count.js', 'cdn.goatcounter.com'], globalVar: ['goatcounter'] },
 
   // --- CMS additions ---
   { id: 'contentstack', name: 'Contentstack', category: 'CMS', patterns: ['cdn.contentstack.io', 'cdn.contentstack.com'], globalVar: [] },
   { id: 'agility_cms', name: 'Agility CMS', category: 'CMS', patterns: ['cdn.aglty.io', 'agilitycms.com'], globalVar: [] },
   { id: 'directus', name: 'Directus', category: 'CMS', patterns: ['cdn.directus.io', 'directus.io/js/sdk'], globalVar: [] },
-  { id: 'strapi_cms', name: 'Strapi', category: 'CMS', patterns: ['/strapi/admin/', '/api/strapi/'], globalVar: [] },
+  { id: 'strapi_cms', name: 'Strapi', category: 'CMS', patterns: ['/strapi/admin/', '/api/strapi/', '/_strapi/'], globalVar: [] },
 
   // --- REVIEWS / TESTIMONIALS additions ---
   { id: 'testimonial_to', name: 'Testimonial.to', category: 'Reviews', patterns: ['cdn.testimonial.to', 'widget.testimonial.to'], globalVar: [] },
@@ -659,7 +658,7 @@ export const signatures: SaasSignature[] = [
   { id: 'reviews_io', name: 'Reviews.io', category: 'Reviews', patterns: ['widget.reviews.io', 'cdn.reviews.io'], globalVar: ['ReviewsWidget'] },
 
   // --- CHAT additions ---
-  { id: 'fb_messenger', name: 'Facebook Messenger Plugin', category: 'Chat', patterns: ['connect.facebook.net/en_US/sdk/xfbml.customerchat.js', 'connect.facebook.net/en_GB/sdk/xfbml.customerchat.js'], globalVar: ['FB'] },
+  { id: 'fb_messenger', name: 'Facebook Messenger Plugin', category: 'Chat', patterns: ['connect.facebook.net/en_US/sdk/xfbml.customerchat.js', 'connect.facebook.net/en_GB/sdk/xfbml.customerchat.js'], globalVar: [] },
   { id: 'whatsapp_widget', name: 'WhatsApp Business Widget', category: 'Chat', patterns: ['static.whatsapp.net', 'wa.me/send?', 'api.whatsapp.com/send'], globalVar: [] },
   { id: 'smartsupp', name: 'Smartsupp', category: 'Chat', patterns: ['www.smartsupp.com/loader.js', 'smartsupp.com/widget/'], globalVar: ['smartsupp', '_smartsupp'] },
   { id: 'pure_chat', name: 'Pure Chat', category: 'Chat', patterns: ['cdn.purechat.com', 'purechat.com/widget'], globalVar: ['$_Tawk_id'] },
@@ -667,13 +666,12 @@ export const signatures: SaasSignature[] = [
   // --- SECURITY additions ---
   { id: 'frontegg', name: 'Frontegg', category: 'Security', patterns: ['cdn.frontegg.com', 'authkit.frontegg.com'], globalVar: ['frontegg'] },
   { id: 'descope', name: 'Descope', category: 'Security', patterns: ['cdn.jsdelivr.net/npm/@descope/web-js-sdk', 'auth.descope.com'], globalVar: ['Descope'] },
-  { id: 'firebase_auth', name: 'Firebase Auth', category: 'Security', patterns: ['www.gstatic.com/firebasejs', 'firebase.googleapis.com/firebase-js-sdk'], globalVar: ['firebase'] },
-  { id: 'cognito', name: 'AWS Cognito', category: 'Security', patterns: ['cognito-identity.amazonaws.com', 'cognito-idp.amazonaws.com'], globalVar: ['AmazonCognitoIdentity'] },
+  { id: 'firebase_auth', name: 'Firebase Auth', category: 'Security', patterns: ['www.gstatic.com/firebasejs', 'firebase.googleapis.com/firebase-js-sdk'], globalVar: [] },
+  { id: 'cognito', name: 'AWS Cognito', category: 'Security', patterns: ['cognito-identity.amazonaws.com', 'cognito-idp.amazonaws.com', 'cdn.jsdelivr.net/npm/amazon-cognito-identity-js'], globalVar: ['AmazonCognitoIdentity'] },
 
   // --- FRAMEWORK additions ---
   { id: 'knockout', name: 'Knockout.js', category: 'Framework', patterns: ['cdnjs.cloudflare.com/ajax/libs/knockout', 'knockoutjs.com/downloads/knockout', 'knockout-min.js'], globalVar: ['ko'] },
   { id: 'mithril', name: 'Mithril', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/mithril', 'cdnjs.cloudflare.com/ajax/libs/mithril'], globalVar: ['m'] },
-  { id: 'alpinejs_v3', name: 'Alpine.js v3', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/alpinejs@3', 'unpkg.com/alpinejs@3'], globalVar: ['Alpine'] },
   { id: 'stimulus', name: 'Stimulus', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@hotwired/stimulus', 'stimulus.hotwire.dev', 'unpkg.com/@hotwired/stimulus'], globalVar: ['Stimulus'] },
   { id: 'turbo', name: 'Turbo (Hotwire)', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@hotwired/turbo', 'turbo.hotwired.dev'], globalVar: ['Turbo'] },
 
@@ -857,7 +855,7 @@ export const signatures: SaasSignature[] = [
   { id: 'qwik_city', name: 'Qwik City', category: 'Framework', patterns: ['/q-data.json', '/build/q-manifest.json'], globalVar: [] },
   { id: 'tanstack_start', name: 'TanStack Start', category: 'Framework', patterns: ['/__vite/browser/', 'tanstack.com'], globalVar: [] },
   // Utility / hybrid patterns
-  { id: 'alpine_morph', name: 'Alpine.js (Morph)', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@alpinejs/morph', 'cdn.jsdelivr.net/npm/@alpinejs/focus'], globalVar: ['Alpine'] },
+  { id: 'alpine_morph', name: 'Alpine.js (Morph)', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@alpinejs/morph', 'cdn.jsdelivr.net/npm/@alpinejs/focus'], globalVar: [] },
   { id: 'inertiajs', name: 'Inertia.js', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@inertiajs/core', 'cdn.jsdelivr.net/npm/@inertiajs/react'], globalVar: ['Inertia'] },
   { id: 'livewire', name: 'Laravel Livewire', category: 'Framework', patterns: ['/livewire/livewire.js', '/vendor/livewire/'], globalVar: ['Livewire'] },
   { id: 'phoenix_liveview', name: 'Phoenix LiveView', category: 'Framework', patterns: ['/js/app.js', 'phoenix.js', 'live_socket'], globalVar: ['liveSocket'] },
@@ -867,7 +865,6 @@ export const signatures: SaasSignature[] = [
   { id: 'blitz_js', name: 'Blitz.js', category: 'Framework', patterns: ['blitzjs.com', '/__blitz/'], globalVar: [] },
   { id: 'redwoodjs', name: 'RedwoodJS', category: 'Framework', patterns: ['redwoodjs.com', '/redwood/router'], globalVar: [] },
   { id: 'adonis_js', name: 'AdonisJS', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/@adonisjs/', 'adonisjs.com'], globalVar: [] },
-  { id: 'alpinejs_v2', name: 'Alpine.js v2', category: 'Framework', patterns: ['cdn.jsdelivr.net/npm/alpinejs@2', 'unpkg.com/alpinejs@2'], globalVar: ['Alpine'] },
   { id: 'hyperscript', name: '_hyperscript', category: 'Framework', patterns: ['unpkg.com/hyperscript.org', 'cdn.jsdelivr.net/npm/hyperscript.org'], globalVar: ['_hyperscript'] },
 
   // --- LIBRARY additions — comprehensive ---
@@ -906,7 +903,7 @@ export const signatures: SaasSignature[] = [
   { id: 'datatables', name: 'DataTables', category: 'Library', patterns: ['cdn.datatables.net', 'cdn.jsdelivr.net/npm/datatables'], globalVar: ['DataTable'] },
   { id: 'aggrid', name: 'AG Grid', category: 'Library', patterns: ['cdn.jsdelivr.net/npm/ag-grid-community', 'cdnjs.cloudflare.com/ajax/libs/ag-grid'], globalVar: ['agGrid'] },
   { id: 'fullcalendar', name: 'FullCalendar', category: 'Library', patterns: ['cdn.jsdelivr.net/npm/fullcalendar', 'cdnjs.cloudflare.com/ajax/libs/fullcalendar'], globalVar: ['FullCalendar'] },
-  { id: 'tensorflowjs', name: 'TensorFlow.js', category: 'Library', patterns: ['cdn.jsdelivr.net/npm/@tensorflow/tfjs', 'cdn.jsdelivr.net/npm/@tensorflow-models/'], globalVar: ['tf'] },
+  { id: 'tensorflowjs', name: 'TensorFlow.js', category: 'Library', patterns: ['cdn.jsdelivr.net/npm/@tensorflow/tfjs', 'cdn.jsdelivr.net/npm/@tensorflow-models/'], globalVar: [] },
   { id: 'howlerjs', name: 'Howler.js', category: 'Library', patterns: ['cdnjs.cloudflare.com/ajax/libs/howler', 'cdn.jsdelivr.net/npm/howler'], globalVar: ['Howler'] },
   { id: 'wavesurfer', name: 'WaveSurfer.js', category: 'Library', patterns: ['cdnjs.cloudflare.com/ajax/libs/wavesurfer.js', 'cdn.jsdelivr.net/npm/wavesurfer.js'], globalVar: ['WaveSurfer'] },
   { id: 'konvajs', name: 'Konva.js', category: 'Library', patterns: ['cdn.jsdelivr.net/npm/konva', 'cdnjs.cloudflare.com/ajax/libs/konva'], globalVar: ['Konva'] },
@@ -928,7 +925,6 @@ export const signatures: SaasSignature[] = [
   { id: 'arkose_labs', name: 'Arkose Labs', category: 'Security', patterns: ['client-api.arkoselabs.com', 'api.arkoselabs.com'], globalVar: ['ArkoseEnforcement'] },
   { id: 'imperva', name: 'Imperva', category: 'Security', patterns: ['incapsula.com', '/_Incapsula_Resource'], globalVar: ['_imp_apg_r_'] },
   { id: 'akamai_bot', name: 'Akamai Bot Manager', category: 'Security', patterns: ['/_akam/ak_bmsc'], globalVar: ['bmak'] },
-  { id: 'aws_cognito', name: 'AWS Cognito', category: 'Security', patterns: ['cognito-identity.amazonaws.com', 'cdn.jsdelivr.net/npm/amazon-cognito-identity-js'], globalVar: ['AmazonCognitoIdentity'] },
 
   // --- CHAT additions ---
   { id: 'jivochat', name: 'JivoChat', category: 'Chat', patterns: ['code.jivosite.com/widget', 'cdn.jivosite.com'], globalVar: ['jivo_config'] },
@@ -1004,7 +1000,6 @@ export const signatures: SaasSignature[] = [
   { id: 'sharpspring', name: 'SharpSpring', category: 'Marketing Auto', patterns: ['sharpspring.com/lead/js/', 'ds.sharpspring.com'], globalVar: [] },
   { id: 'act_on', name: 'Act-On', category: 'Marketing Auto', patterns: ['actonsoftware.com/acton/bn/', 'actonsoftware.com/acton/fs/'], globalVar: [] },
   { id: 'kartra', name: 'Kartra', category: 'Marketing Auto', patterns: ['capi.kartra.com/js/kartra_tracking.js', 'kartra.com/tracker'], globalVar: [] },
-  { id: 'moosend_auto', name: 'Moosend', category: 'Marketing Auto', patterns: ['resources.moosend.com/trk/js/', 'cdn.moosend.com/trk/'], globalVar: [] },
 
   // --- EMAIL additions ---
   { id: 'mailmodo', name: 'Mailmodo', category: 'Email', patterns: ['cdn.mailmodo.com/widgets/', 'app.mailmodo.com/embed/'], globalVar: [] },
@@ -1025,7 +1020,6 @@ export const signatures: SaasSignature[] = [
   { id: 'kentico', name: 'Kentico', category: 'CMS', patterns: ['/CMSFiles/', '/CMSPages/', 'kentico.com'], globalVar: [] },
   { id: 'sitefinity_cms', name: 'Sitefinity', category: 'CMS', patterns: ['/sfres/', '/SFRes/', '/sitefinity/'], globalVar: [] },
   { id: 'episerver', name: 'Optimizely CMS', category: 'CMS', patterns: ['/EPiServer/', '/episerver/cms/'], globalVar: ['epi'] },
-  { id: 'strapi_pattern', name: 'Strapi', category: 'CMS', patterns: ['/strapi/admin/', '/api/strapi/', '/_strapi/'], globalVar: [] },
 
   // --- STORAGE additions ---
   { id: 'transloadit', name: 'Transloadit / Uppy', category: 'Storage', patterns: ['assets.transloadit.com/v3/uppy.min.js', 'cdn.jsdelivr.net/npm/@uppy/core'], globalVar: ['Uppy'] },
@@ -1135,14 +1129,13 @@ export const signatures: SaasSignature[] = [
   { id: 'glitch_hosting', name: 'Glitch', category: 'Hosting', patterns: ['glitch.me', 'cdn.glitch.global'], globalVar: [] },
   { id: 'railway', name: 'Railway', category: 'Hosting', patterns: ['up.railway.app', 'railway.app'], globalVar: [] },
   { id: 'fly_io', name: 'Fly.io', category: 'Hosting', patterns: ['fly.dev', '.fly.io/'], globalVar: [] },
-  { id: 'render_com', name: 'Render', category: 'Hosting', patterns: ['.onrender.com', 'cdn.onrender.com'], globalVar: [] },
 
   // --- LIBRARY additions ---
   { id: 'pubnub', name: 'PubNub', category: 'Library', patterns: ['cdn.pubnub.com', 'ps.pndsn.com', 'pubnub.com/sdk/javascript'], globalVar: ['PubNub'] },
   { id: 'ably', name: 'Ably', category: 'Library', patterns: ['cdn.ably.io/lib/ably.min.js', 'cdn.ably.com/lib/ably.min.js'], globalVar: ['Ably'] },
   { id: 'rive', name: 'Rive', category: 'Library', patterns: ['cdn.rive.app/runtime/latest/rive.min.js', 'unpkg.com/@rive-app/canvas'], globalVar: ['rive', 'Rive'] },
   { id: 'spline', name: 'Spline 3D', category: 'Library', patterns: ['unpkg.com/@splinetool/runtime', 'cdn.jsdelivr.net/npm/@splinetool/'], globalVar: [] },
-  { id: 'lottiefiles', name: 'LottieFiles', category: 'Library', patterns: ['unpkg.com/@lottiefiles/lottie-player', 'cdn.lottiefiles.com', 'cdnjs.cloudflare.com/ajax/libs/bodymovin/'], globalVar: ['lottie', 'LottiePlayer'] },
+  { id: 'lottiefiles', name: 'LottieFiles', category: 'Library', patterns: ['unpkg.com/@lottiefiles/lottie-player', 'cdn.lottiefiles.com', 'cdnjs.cloudflare.com/ajax/libs/bodymovin/'], globalVar: ['LottiePlayer'] },
   { id: 'embedly', name: 'Embedly', category: 'Library', patterns: ['cdn.embedly.com/widgets/platform.js', 'api.embed.ly'], globalVar: ['embedly'] },
 
   // --- FRAMEWORK additions ---
@@ -1158,7 +1151,7 @@ export const signatures: SaasSignature[] = [
   { id: 'maptiler', name: 'MapTiler', category: 'Maps', patterns: ['cdn.maptiler.com/maptiler-sdk-js/', 'api.maptiler.com/maps/'], globalVar: ['maptilersdk'] },
 
   // --- SESSION REPLAY additions ---
-  { id: 'highlight_run', name: 'Highlight.run', category: 'Session Replay', patterns: ['cdn.highlight.run/index.js', 'pub.highlight.run/', 'highlight.run/init'], globalVar: ['H', 'firstload'] },
+  { id: 'highlight_run', name: 'Highlight.run', category: 'Session Replay', patterns: ['cdn.highlight.run/index.js', 'pub.highlight.run/', 'highlight.run/init'], globalVar: ['firstload'] },
 
   // --- ERROR TRACKING additions ---
   { id: 'glitchtip', name: 'GlitchTip', category: 'Error Tracking', patterns: ['cdn.jsdelivr.net/npm/@sentry/browser', 'glitchtip.com/js/', '/glitchtip.js'], globalVar: [] },
@@ -1194,5 +1187,11 @@ export const signatures: SaasSignature[] = [
   { id: 'common_room', name: 'Common Room', category: 'Sales Intelligence', patterns: ['cdn.commonroom.io', 'commonroom.io/signals'], globalVar: [] },
 
   { id: 'cronitor_rum', name: 'Cronitor RUM', category: 'Observability', patterns: ['rum.cronitor.io'], globalVar: ['cronitor'] },
+
+  // --- ANALYTICS / CONVERSIONS / CHAT additions ---
+  { id: 'simple_analytics', name: 'Simple Analytics', category: 'Analytics', patterns: ['scripts.simpleanalyticscdn.com', 'queue.simpleanalyticscdn.com'], globalVar: ['sa_event', 'sa_pageview'] },
+  { id: 'usermaven', name: 'Usermaven', category: 'Analytics', patterns: ['t.usermaven.com/lib.js', 'events.usermaven.com'], globalVar: ['usermaven', 'usermavenQ'] },
+  { id: 'dub', name: 'Dub', category: 'Conversions', patterns: ['dubcdn.com/analytics/script.js'], globalVar: ['_dubAnalytics'] },
+  { id: 'chatbase', name: 'Chatbase', category: 'Chat', patterns: ['chatbase.co/embed.min.js'], globalVar: ['chatbase', 'embeddedChatbotConfig'] },
 
 ];
