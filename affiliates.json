@@ -233,144 +233,814 @@
     "program": "Impact — publisher ID 6918744",
     "notes": "Replace slug with real Impact link"
   },
-
-  "Intercom": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise sales only." },
-  "Zendesk": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise sales only." },
-  "Mixpanel": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Amplitude": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Heap Analytics": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Stripe": { "status": "none", "url": "", "program": "N/A", "notes": "Partner program is agency/tech-only, no commissions." },
-  "Tawk.to": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Free product." },
-  "Drift": { "status": "none", "url": "", "program": "N/A", "notes": "Acquired by Salesloft — program discontinued." },
-  "Sentry": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "FullStory": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise sales only." },
-  "LogRocket": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Datadog": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise sales only." },
-  "New Relic": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise sales only." },
-  "OneTrust": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise sales only." },
-
-  "Brevo": { "status": "pending", "url": "", "program": "CJ — publisher ID 101717325", "notes": "Pays on free signups that convert." },
-  "MailerLite": { "status": "pending", "url": "", "program": "MailerLite Affiliate", "notes": "30% recurring." },
-  "Moosend": { "status": "pending", "url": "", "program": "Moosend Affiliate", "notes": "30% recurring." },
-  "Omnisend": { "status": "pending", "url": "", "program": "Omnisend Affiliate", "notes": "" },
-  "AWeber": { "status": "pending", "url": "", "program": "AWeber Affiliate", "notes": "30% recurring." },
-  "EmailOctopus": { "status": "pending", "url": "", "program": "EmailOctopus Affiliate", "notes": "30% recurring." },
-  "Beehiiv": { "status": "pending", "url": "", "program": "Beehiiv Affiliate", "notes": "Newsletter-focused, good fit." },
-  "Flodesk": { "status": "pending", "url": "", "program": "Flodesk Affiliate", "notes": "Flat $19/mo per referral." },
-  "Freshchat": { "status": "pending", "url": "", "program": "Freshworks Affiliate", "notes": "Covers all Freshworks products." },
-  "Freshdesk": { "status": "pending", "url": "", "program": "Freshworks Affiliate", "notes": "Same program as Freshchat." },
-  "JivoChat": { "status": "pending", "url": "", "program": "JivoChat Affiliate", "notes": "30% recurring." },
-  "Smartsupp": { "status": "pending", "url": "", "program": "Smartsupp Affiliate", "notes": "" },
-  "HelpCrunch": { "status": "pending", "url": "", "program": "HelpCrunch Affiliate", "notes": "30% recurring." },
-  "Landbot": { "status": "pending", "url": "", "program": "Landbot Affiliate", "notes": "" },
-  "Help Scout": { "status": "pending", "url": "", "program": "Help Scout Affiliate", "notes": "" },
-  "VWO": { "status": "pending", "url": "", "program": "VWO Affiliate", "notes": "A/B testing — strong commissions." },
-  "Convert": { "status": "pending", "url": "", "program": "Convert Affiliate", "notes": "30% recurring." },
-  "Zoho CRM": { "status": "pending", "url": "", "program": "Zoho Affiliate", "notes": "Covers all Zoho products." },
-  "Keap": { "status": "pending", "url": "", "program": "Keap Affiliate", "notes": "Strong SMB CRM commissions." },
-  "Ontraport": { "status": "pending", "url": "", "program": "Ontraport Affiliate", "notes": "" },
-  "Unbounce": { "status": "pending", "url": "", "program": "Impact — publisher ID 6918744", "notes": "20% recurring." },
-  "Instapage": { "status": "pending", "url": "", "program": "Instapage Affiliate", "notes": "50% first payment." },
-  "Leadpages": { "status": "pending", "url": "", "program": "Leadpages Affiliate", "notes": "10-40% recurring." },
-  "Carrd": { "status": "pending", "url": "", "program": "Carrd Referral", "notes": "" },
-  "Duda": { "status": "pending", "url": "", "program": "Duda Partner", "notes": "" },
-  "Typeform": { "status": "pending", "url": "", "program": "Typeform Affiliate", "notes": "20% recurring." },
-  "Jotform": { "status": "pending", "url": "", "program": "Jotform Affiliate", "notes": "Pays per signup." },
-  "Gravity Forms": { "status": "pending", "url": "", "program": "Gravity Forms Affiliate", "notes": "20% per sale." },
-  "WPForms": { "status": "pending", "url": "", "program": "WPForms Affiliate", "notes": "20% per sale." },
-  "Formstack": { "status": "pending", "url": "", "program": "Formstack Partner", "notes": "" },
-  "DocuSign": { "status": "pending", "url": "", "program": "CJ — publisher ID 101717325", "notes": "Large brand, good conversion." },
-  "PandaDoc": { "status": "pending", "url": "", "program": "PandaDoc Affiliate", "notes": "30% recurring." },
-  "Dropbox Sign": { "status": "pending", "url": "", "program": "Impact (Dropbox)", "notes": "" },
-  "SignNow": { "status": "pending", "url": "", "program": "SignNow Affiliate", "notes": "" },
-  "Teachable": { "status": "pending", "url": "", "program": "Teachable Affiliate", "notes": "30% recurring." },
-  "Thinkific": { "status": "pending", "url": "", "program": "Thinkific Affiliate", "notes": "30% recurring." },
-  "Kajabi": { "status": "pending", "url": "", "program": "Kajabi Affiliate", "notes": "30% recurring — strong AOV." },
-  "Podia": { "status": "pending", "url": "", "program": "Podia Affiliate", "notes": "30% recurring." },
-  "LearnWorlds": { "status": "pending", "url": "", "program": "LearnWorlds Affiliate", "notes": "30% recurring." },
-  "Circle": { "status": "pending", "url": "", "program": "Circle Affiliate", "notes": "25% recurring." },
-  "Mighty Networks": { "status": "pending", "url": "", "program": "Mighty Networks Affiliate", "notes": "" },
-  "Skool": { "status": "pending", "url": "", "program": "Skool Affiliate", "notes": "40% recurring." },
-  "Lemon Squeezy": { "status": "pending", "url": "", "program": "Lemon Squeezy Affiliate", "notes": "Popular with indie devs." },
-  "ThriveCart": { "status": "pending", "url": "", "program": "ThriveCart Affiliate", "notes": "Lifetime deal — high CPA." },
-  "SamCart": { "status": "pending", "url": "", "program": "SamCart Affiliate", "notes": "" },
-  "Payhip": { "status": "pending", "url": "", "program": "Payhip Affiliate", "notes": "" },
-  "FastSpring": { "status": "pending", "url": "", "program": "FastSpring Partner", "notes": "" },
-  "Gumroad": { "status": "pending", "url": "", "program": "Gumroad Referral", "notes": "" },
-  "DigitalOcean": { "status": "pending", "url": "", "program": "DigitalOcean Affiliate", "notes": "$25 credit per referred customer." },
-  "Vimeo": { "status": "pending", "url": "", "program": "Vimeo Affiliate", "notes": "Pays per subscription." },
-  "SurveyMonkey": { "status": "pending", "url": "", "program": "CJ — publisher ID 101717325", "notes": "" },
-  "Zapier": { "status": "pending", "url": "", "program": "Zapier Affiliate", "notes": "25% recurring for 1 year." },
-  "Make": { "status": "pending", "url": "", "program": "Make Affiliate", "notes": "20% recurring." },
-  "PartnerStack": { "status": "pending", "url": "", "program": "PartnerStack Affiliate", "notes": "" },
-  "Tapfiliate": { "status": "pending", "url": "", "program": "Tapfiliate Affiliate", "notes": "20% recurring." },
-  "Rewardful": { "status": "pending", "url": "", "program": "Rewardful Affiliate", "notes": "25% recurring." },
-  "GoAffPro": { "status": "pending", "url": "", "program": "GoAffPro Affiliate", "notes": "" },
-  "Refersion": { "status": "pending", "url": "", "program": "Refersion Partner", "notes": "" },
-  "Storyblok": { "status": "pending", "url": "", "program": "Storyblok Affiliate", "notes": "" },
-  "Prismic": { "status": "pending", "url": "", "program": "Prismic Partner", "notes": "" },
-  "GitBook": { "status": "pending", "url": "", "program": "GitBook Affiliate", "notes": "" },
-  "Plausible": { "status": "pending", "url": "", "program": "Plausible Affiliate", "notes": "Privacy-first GA alternative — good conversion." },
-  "Mouseflow": { "status": "pending", "url": "", "program": "Mouseflow Affiliate", "notes": "20% per referral." },
-  "Lucky Orange": { "status": "pending", "url": "", "program": "Lucky Orange Affiliate", "notes": "" },
-  "Smartlook": { "status": "pending", "url": "", "program": "Smartlook Affiliate", "notes": "" },
-  "CookieYes": { "status": "pending", "url": "", "program": "CookieYes Affiliate", "notes": "20% recurring." },
-  "Iubenda": { "status": "pending", "url": "", "program": "Iubenda Affiliate", "notes": "30% recurring." },
-  "Complianz": { "status": "pending", "url": "", "program": "Complianz Affiliate", "notes": "WordPress compliance plugin." },
-  "Breezy HR": { "status": "pending", "url": "", "program": "Breezy HR Partner", "notes": "" },
-  "JazzHR": { "status": "pending", "url": "", "program": "JazzHR Partner", "notes": "" },
-  "Recruitee": { "status": "pending", "url": "", "program": "Recruitee Partner", "notes": "" },
-  "GoToWebinar": { "status": "pending", "url": "", "program": "CJ — publisher ID 101717325", "notes": "" },
-  "Acuity Scheduling": { "status": "pending", "url": "", "program": "Impact (Squarespace/Acuity)", "notes": "" },
-  "Matomo": { "status": "pending", "url": "", "program": "Matomo Affiliate", "notes": "GA alternative — privacy angle." },
-  "Ecwid": { "status": "pending", "url": "", "program": "Ecwid / Lightspeed Partner", "notes": "" },
-  "PrestaShop": { "status": "pending", "url": "", "program": "PrestaShop Affiliate", "notes": "EU-focused." },
-  "Zoho": { "status": "pending", "url": "", "program": "Zoho Affiliate", "notes": "Covers all Zoho products." },
-
-  "Mintlify": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Netlify": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Vercel": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Auth0": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise / Okta." },
-  "Okta": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise." },
-  "PostHog": { "status": "none", "url": "", "program": "N/A", "notes": "Open source / usage-based." },
-  "Algolia": { "status": "none", "url": "", "program": "N/A", "notes": "Developer-focused, usage-based." },
-  "Chargebee": { "status": "none", "url": "", "program": "N/A", "notes": "Partner program is agency/ISV — no commissions." },
-  "Recurly": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise billing." },
-  "Salesforce": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise." },
-  "Segment": { "status": "none", "url": "", "program": "N/A", "notes": "Twilio / enterprise." },
-  "Eventbrite": { "status": "none", "url": "", "program": "N/A", "notes": "Marketplace model." },
-  "Cloudflare CDN": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Mapbox": { "status": "none", "url": "", "program": "N/A", "notes": "Usage-based API." },
-  "Supabase": { "status": "none", "url": "", "program": "N/A", "notes": "Open source." },
-  "Contentful": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Sanity": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Twilio": { "status": "none", "url": "", "program": "N/A", "notes": "Developer / API." },
-  "SendGrid": { "status": "none", "url": "", "program": "N/A", "notes": "Twilio subsidiary." },
-  "PayPal": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Square": { "status": "none", "url": "", "program": "N/A", "notes": "" },
-  "Braintree": { "status": "none", "url": "", "program": "N/A", "notes": "PayPal subsidiary." },
-  "Adyen": { "status": "none", "url": "", "program": "N/A", "notes": "Enterprise." },
-
-  "Google Analytics": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Google — free." },
-  "Google Tag Manager": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Google — free." },
-  "Google Ads": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Google." },
-  "Google Maps": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Google." },
-  "Google Fonts": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Google — free." },
-  "Meta Pixel": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Meta." },
-  "Facebook SDK": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Meta." },
-  "YouTube": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Google." },
-  "Microsoft Clarity": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Microsoft — free." },
-  "Microsoft Ads": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Microsoft." },
-  "Firebase": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Google." },
-  "React": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "Vue.js": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "jQuery": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "Bootstrap": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "Tailwind CSS": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "Socket.io": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "Next.js": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "Gatsby": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "Nuxt.js": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "Svelte": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source." },
-  "Angular": { "status": "ineligible", "url": "", "program": "N/A", "notes": "Open source / Google." }
+  "Intercom": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only."
+  },
+  "Zendesk": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only."
+  },
+  "Mixpanel": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Amplitude": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Heap Analytics": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Stripe": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Partner program is agency/tech-only, no commissions."
+  },
+  "Tawk.to": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Free product."
+  },
+  "Drift": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Acquired by Salesloft — program discontinued."
+  },
+  "Sentry": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "FullStory": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only."
+  },
+  "LogRocket": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Datadog": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only."
+  },
+  "New Relic": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only."
+  },
+  "OneTrust": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise sales only."
+  },
+  "Brevo": {
+    "status": "pending",
+    "url": "",
+    "program": "CJ — publisher ID 101717325",
+    "notes": "Pays on free signups that convert."
+  },
+  "MailerLite": {
+    "status": "pending",
+    "url": "",
+    "program": "MailerLite Affiliate",
+    "notes": "30% recurring."
+  },
+  "Moosend": {
+    "status": "pending",
+    "url": "",
+    "program": "Moosend Affiliate",
+    "notes": "30% recurring."
+  },
+  "Omnisend": {
+    "status": "pending",
+    "url": "",
+    "program": "Omnisend Affiliate",
+    "notes": ""
+  },
+  "AWeber": {
+    "status": "pending",
+    "url": "",
+    "program": "AWeber Affiliate",
+    "notes": "30% recurring."
+  },
+  "EmailOctopus": {
+    "status": "pending",
+    "url": "",
+    "program": "EmailOctopus Affiliate",
+    "notes": "30% recurring."
+  },
+  "Beehiiv": {
+    "status": "pending",
+    "url": "",
+    "program": "Beehiiv Affiliate",
+    "notes": "Newsletter-focused, good fit."
+  },
+  "Flodesk": {
+    "status": "pending",
+    "url": "",
+    "program": "Flodesk Affiliate",
+    "notes": "Flat $19/mo per referral."
+  },
+  "Freshchat": {
+    "status": "pending",
+    "url": "",
+    "program": "Freshworks Affiliate",
+    "notes": "Covers all Freshworks products."
+  },
+  "Freshdesk": {
+    "status": "pending",
+    "url": "",
+    "program": "Freshworks Affiliate",
+    "notes": "Same program as Freshchat."
+  },
+  "JivoChat": {
+    "status": "pending",
+    "url": "",
+    "program": "JivoChat Affiliate",
+    "notes": "30% recurring."
+  },
+  "Smartsupp": {
+    "status": "pending",
+    "url": "",
+    "program": "Smartsupp Affiliate",
+    "notes": ""
+  },
+  "HelpCrunch": {
+    "status": "pending",
+    "url": "",
+    "program": "HelpCrunch Affiliate",
+    "notes": "30% recurring."
+  },
+  "Landbot": {
+    "status": "pending",
+    "url": "",
+    "program": "Landbot Affiliate",
+    "notes": ""
+  },
+  "Help Scout": {
+    "status": "pending",
+    "url": "",
+    "program": "Help Scout Affiliate",
+    "notes": ""
+  },
+  "VWO": {
+    "status": "pending",
+    "url": "",
+    "program": "VWO Affiliate",
+    "notes": "A/B testing — strong commissions."
+  },
+  "Convert": {
+    "status": "pending",
+    "url": "",
+    "program": "Convert Affiliate",
+    "notes": "30% recurring."
+  },
+  "Zoho CRM": {
+    "status": "pending",
+    "url": "",
+    "program": "Zoho Affiliate",
+    "notes": "Covers all Zoho products; one Zoho Affiliate program serves both entries."
+  },
+  "Keap": {
+    "status": "pending",
+    "url": "",
+    "program": "Keap Affiliate",
+    "notes": "Strong SMB CRM commissions."
+  },
+  "Ontraport": {
+    "status": "pending",
+    "url": "",
+    "program": "Ontraport Affiliate",
+    "notes": ""
+  },
+  "Unbounce": {
+    "status": "pending",
+    "url": "",
+    "program": "Impact — publisher ID 6918744",
+    "notes": "20% recurring."
+  },
+  "Instapage": {
+    "status": "pending",
+    "url": "",
+    "program": "Instapage Affiliate",
+    "notes": "50% first payment."
+  },
+  "Leadpages": {
+    "status": "pending",
+    "url": "",
+    "program": "Leadpages Affiliate",
+    "notes": "10-40% recurring."
+  },
+  "Carrd": {
+    "status": "pending",
+    "url": "",
+    "program": "Carrd Referral",
+    "notes": ""
+  },
+  "Duda": {
+    "status": "pending",
+    "url": "",
+    "program": "Duda Partner",
+    "notes": ""
+  },
+  "Typeform": {
+    "status": "pending",
+    "url": "",
+    "program": "Typeform Affiliate",
+    "notes": "20% recurring."
+  },
+  "Jotform": {
+    "status": "pending",
+    "url": "",
+    "program": "Jotform Affiliate",
+    "notes": "Pays per signup."
+  },
+  "Gravity Forms": {
+    "status": "pending",
+    "url": "",
+    "program": "Gravity Forms Affiliate",
+    "notes": "20% per sale."
+  },
+  "WPForms": {
+    "status": "pending",
+    "url": "",
+    "program": "WPForms Affiliate",
+    "notes": "20% per sale."
+  },
+  "Formstack": {
+    "status": "pending",
+    "url": "",
+    "program": "Formstack Partner",
+    "notes": ""
+  },
+  "DocuSign": {
+    "status": "pending",
+    "url": "",
+    "program": "CJ — publisher ID 101717325",
+    "notes": "Large brand, good conversion."
+  },
+  "PandaDoc": {
+    "status": "pending",
+    "url": "",
+    "program": "PandaDoc Affiliate",
+    "notes": "30% recurring."
+  },
+  "Dropbox Sign": {
+    "status": "pending",
+    "url": "",
+    "program": "Impact (Dropbox)",
+    "notes": ""
+  },
+  "SignNow": {
+    "status": "pending",
+    "url": "",
+    "program": "SignNow Affiliate",
+    "notes": ""
+  },
+  "Teachable": {
+    "status": "pending",
+    "url": "",
+    "program": "Teachable Affiliate",
+    "notes": "30% recurring."
+  },
+  "Thinkific": {
+    "status": "pending",
+    "url": "",
+    "program": "Thinkific Affiliate",
+    "notes": "30% recurring."
+  },
+  "Kajabi": {
+    "status": "pending",
+    "url": "",
+    "program": "Kajabi Affiliate",
+    "notes": "30% recurring — strong AOV."
+  },
+  "Podia": {
+    "status": "pending",
+    "url": "",
+    "program": "Podia Affiliate",
+    "notes": "30% recurring."
+  },
+  "LearnWorlds": {
+    "status": "pending",
+    "url": "",
+    "program": "LearnWorlds Affiliate",
+    "notes": "30% recurring."
+  },
+  "Circle": {
+    "status": "pending",
+    "url": "",
+    "program": "Circle Affiliate",
+    "notes": "25% recurring."
+  },
+  "Mighty Networks": {
+    "status": "pending",
+    "url": "",
+    "program": "Mighty Networks Affiliate",
+    "notes": ""
+  },
+  "Skool": {
+    "status": "pending",
+    "url": "",
+    "program": "Skool Affiliate",
+    "notes": "40% recurring."
+  },
+  "Lemon Squeezy": {
+    "status": "pending",
+    "url": "",
+    "program": "Lemon Squeezy Affiliate",
+    "notes": "Popular with indie devs."
+  },
+  "ThriveCart": {
+    "status": "pending",
+    "url": "",
+    "program": "ThriveCart Affiliate",
+    "notes": "Lifetime deal — high CPA."
+  },
+  "SamCart": {
+    "status": "pending",
+    "url": "",
+    "program": "SamCart Affiliate",
+    "notes": ""
+  },
+  "Payhip": {
+    "status": "pending",
+    "url": "",
+    "program": "Payhip Affiliate",
+    "notes": ""
+  },
+  "FastSpring": {
+    "status": "pending",
+    "url": "",
+    "program": "FastSpring Partner",
+    "notes": ""
+  },
+  "Gumroad": {
+    "status": "pending",
+    "url": "",
+    "program": "Gumroad Referral",
+    "notes": ""
+  },
+  "DigitalOcean": {
+    "status": "pending",
+    "url": "",
+    "program": "DigitalOcean Affiliate",
+    "notes": "$25 credit per referred customer."
+  },
+  "Vimeo": {
+    "status": "pending",
+    "url": "",
+    "program": "Vimeo Affiliate",
+    "notes": "Pays per subscription."
+  },
+  "SurveyMonkey": {
+    "status": "pending",
+    "url": "",
+    "program": "CJ — publisher ID 101717325",
+    "notes": ""
+  },
+  "Zapier": {
+    "status": "pending",
+    "url": "",
+    "program": "Zapier Affiliate",
+    "notes": "25% recurring for 1 year."
+  },
+  "Make": {
+    "status": "pending",
+    "url": "",
+    "program": "Make Affiliate",
+    "notes": "20% recurring."
+  },
+  "PartnerStack": {
+    "status": "pending",
+    "url": "",
+    "program": "PartnerStack Affiliate",
+    "notes": ""
+  },
+  "Tapfiliate": {
+    "status": "pending",
+    "url": "",
+    "program": "Tapfiliate Affiliate",
+    "notes": "20% recurring."
+  },
+  "Rewardful": {
+    "status": "pending",
+    "url": "",
+    "program": "Rewardful Affiliate",
+    "notes": "25% recurring."
+  },
+  "GoAffPro": {
+    "status": "pending",
+    "url": "",
+    "program": "GoAffPro Affiliate",
+    "notes": ""
+  },
+  "Refersion": {
+    "status": "pending",
+    "url": "",
+    "program": "Refersion Partner",
+    "notes": ""
+  },
+  "Storyblok": {
+    "status": "pending",
+    "url": "",
+    "program": "Storyblok Affiliate",
+    "notes": ""
+  },
+  "Prismic": {
+    "status": "pending",
+    "url": "",
+    "program": "Prismic Partner",
+    "notes": ""
+  },
+  "GitBook": {
+    "status": "pending",
+    "url": "",
+    "program": "GitBook Affiliate",
+    "notes": ""
+  },
+  "Plausible": {
+    "status": "pending",
+    "url": "",
+    "program": "Plausible Affiliate",
+    "notes": "Privacy-first GA alternative — good conversion."
+  },
+  "Mouseflow": {
+    "status": "pending",
+    "url": "",
+    "program": "Mouseflow Affiliate",
+    "notes": "20% per referral."
+  },
+  "Lucky Orange": {
+    "status": "pending",
+    "url": "",
+    "program": "Lucky Orange Affiliate",
+    "notes": ""
+  },
+  "Smartlook": {
+    "status": "pending",
+    "url": "",
+    "program": "Smartlook Affiliate",
+    "notes": ""
+  },
+  "CookieYes": {
+    "status": "pending",
+    "url": "",
+    "program": "CookieYes Affiliate",
+    "notes": "20% recurring."
+  },
+  "Iubenda": {
+    "status": "pending",
+    "url": "",
+    "program": "Iubenda Affiliate",
+    "notes": "30% recurring."
+  },
+  "Complianz": {
+    "status": "pending",
+    "url": "",
+    "program": "Complianz Affiliate",
+    "notes": "WordPress compliance plugin."
+  },
+  "Breezy HR": {
+    "status": "pending",
+    "url": "",
+    "program": "Breezy HR Partner",
+    "notes": ""
+  },
+  "JazzHR": {
+    "status": "pending",
+    "url": "",
+    "program": "JazzHR Partner",
+    "notes": ""
+  },
+  "Recruitee": {
+    "status": "pending",
+    "url": "",
+    "program": "Recruitee Partner",
+    "notes": ""
+  },
+  "GoToWebinar": {
+    "status": "pending",
+    "url": "",
+    "program": "CJ — publisher ID 101717325",
+    "notes": ""
+  },
+  "Acuity Scheduling": {
+    "status": "pending",
+    "url": "",
+    "program": "Impact (Squarespace/Acuity)",
+    "notes": ""
+  },
+  "Matomo": {
+    "status": "pending",
+    "url": "",
+    "program": "Matomo Affiliate",
+    "notes": "GA alternative — privacy angle."
+  },
+  "Ecwid": {
+    "status": "pending",
+    "url": "",
+    "program": "Ecwid / Lightspeed Partner",
+    "notes": ""
+  },
+  "PrestaShop": {
+    "status": "pending",
+    "url": "",
+    "program": "PrestaShop Affiliate",
+    "notes": "EU-focused."
+  },
+  "Mintlify": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Netlify": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Vercel": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Auth0": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise / Okta."
+  },
+  "Okta": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise."
+  },
+  "PostHog": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source / usage-based."
+  },
+  "Algolia": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Developer-focused, usage-based."
+  },
+  "Chargebee": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Partner program is agency/ISV — no commissions."
+  },
+  "Recurly": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise billing."
+  },
+  "Salesforce": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise."
+  },
+  "Segment": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Twilio / enterprise."
+  },
+  "Eventbrite": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Marketplace model."
+  },
+  "Cloudflare CDN": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Mapbox": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Usage-based API."
+  },
+  "Supabase": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Contentful": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Sanity": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Twilio": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Developer / API."
+  },
+  "PayPal": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Square": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": ""
+  },
+  "Braintree": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "PayPal subsidiary."
+  },
+  "Adyen": {
+    "status": "none",
+    "url": "",
+    "program": "N/A",
+    "notes": "Enterprise."
+  },
+  "Google Analytics": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Google — free."
+  },
+  "Google Tag Manager": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Google — free."
+  },
+  "Google Ads": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Google."
+  },
+  "Google Maps": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Google."
+  },
+  "Google Fonts": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Google — free."
+  },
+  "Meta Pixel": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Meta."
+  },
+  "Facebook SDK": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Meta."
+  },
+  "YouTube": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Google."
+  },
+  "Microsoft Clarity": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Microsoft — free."
+  },
+  "Microsoft Ads": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Microsoft."
+  },
+  "Firebase": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Google."
+  },
+  "React": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Vue.js": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "jQuery": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Bootstrap": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Tailwind CSS": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Socket.io": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Next.js": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Gatsby": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Nuxt.js": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Svelte": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source."
+  },
+  "Angular": {
+    "status": "ineligible",
+    "url": "",
+    "program": "N/A",
+    "notes": "Open source / Google."
+  },
+  "Zoho Desk": {
+    "status": "pending",
+    "url": "",
+    "program": "Zoho Affiliate",
+    "notes": "Covers all Zoho products; one Zoho Affiliate program serves both entries."
+  }
 }
