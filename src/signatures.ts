@@ -493,7 +493,10 @@ export const signatures: SaasSignature[] = [
 
   // --- CSS additions ---
   { id: 'foundation', name: 'Foundation', category: 'CSS', patterns: ['cdnjs.cloudflare.com/ajax/libs/foundation', 'cdn.jsdelivr.net/npm/foundation-sites'], globalVar: ['Foundation'] },
-  { id: 'materialize', name: 'Materialize', category: 'CSS', patterns: ['cdnjs.cloudflare.com/ajax/libs/materialize', 'materializecss.com/js/'], globalVar: ['M', 'Materialize'] },
+  // globalVar 'M' intentionally omitted: a single capital letter is a very
+  // common minified variable name on unrelated sites (see Lodash above).
+  // 'Materialize' is distinctive enough to keep.
+  { id: 'materialize', name: 'Materialize', category: 'CSS', patterns: ['cdnjs.cloudflare.com/ajax/libs/materialize', 'materializecss.com/js/'], globalVar: ['Materialize'] },
   { id: 'uikit', name: 'UIkit', category: 'CSS', patterns: ['cdn.jsdelivr.net/npm/uikit', 'cdnjs.cloudflare.com/ajax/libs/uikit'], globalVar: ['UIkit'] },
 
   // --- STORAGE additions ---
@@ -607,7 +610,11 @@ export const signatures: SaasSignature[] = [
   { id: 'partnerstack', name: 'PartnerStack', category: 'Affiliate', patterns: ['p.partnrapp.com', 'cdn.partnrapp.com', 'app.partnerstack.com/partner'], globalVar: ['growsumo', 'gs'] },
   { id: 'shareasale', name: 'ShareASale', category: 'Affiliate', patterns: ['www.shareasale.com/sale.cfm', 'shareasale.com/image/pixel/'], globalVar: [] },
   { id: 'goaffpro', name: 'GoAffPro', category: 'Affiliate', patterns: ['widget.goaffpro.com', 'cdn.goaffpro.com'], globalVar: ['goaffpro'] },
-  { id: 'refersion', name: 'Refersion', category: 'Affiliate', patterns: ['cdn.refersion.com', 'refersion.com/js/v3/'], globalVar: ['_refersion', 'r'] },
+  // globalVar 'r' intentionally omitted: it is probably the single most
+  // common minified variable name there is (see Lodash above), and this is
+  // an Affiliate-category signature, so a false hit renders an affiliate
+  // badge on a site with no such relationship. '_refersion' is unambiguous.
+  { id: 'refersion', name: 'Refersion', category: 'Affiliate', patterns: ['cdn.refersion.com', 'refersion.com/js/v3/'], globalVar: ['_refersion'] },
   { id: 'everflow', name: 'Everflow', category: 'Affiliate', patterns: ['www.eftrack.net', 'click.evyy.net'], globalVar: [] },
   { id: 'tune', name: 'TUNE', category: 'Affiliate', patterns: ['sdk.tune.com', 'track.tune.com'], globalVar: [] },
 
