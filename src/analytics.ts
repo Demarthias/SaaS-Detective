@@ -1,12 +1,24 @@
-declare const process: {
-  env: { POSTHOG_PROJECT_TOKEN: string; POSTHOG_HOST: string; TRUST_CHECK_SHARED_SECRET: string };
-};
+// Only TRUST_CHECK_SHARED_SECRET still comes through webpack's DefinePlugin.
+// The PostHog values below are hardcoded deliberately (see next comment); this
+// one cannot be, because it is an actual secret rather than a public client id.
+declare const process: { env: { TRUST_CHECK_SHARED_SECRET: string } };
 
 const TRACK_URL = 'https://saas-detective-licensing.kubegrayson.workers.dev/track';
-const POSTHOG_KEY = process.env.POSTHOG_PROJECT_TOKEN;
+// Hardcoded to match shared.js exactly (loaded by popup.html/options.html/
+// onboarding.html) rather than sourced from process.env.POSTHOG_HOST/
+// POSTHOG_PROJECT_TOKEN. Those env vars had no committed .env file and no
+// non-empty default, so an ordinary `npm run build` silently produced a
+// build that sent every analytics event (including post-activation emails
+// via identifyUser) straight to us.i.posthog.com instead of through the
+// api.venom-industries.com proxy — a build-time footgun with no warning.
+// This is the extension-side analytics identifier (PostHog project token),
+// not a secret: it's meant to be embedded in client code.
+const POSTHOG_KEY = 'phc_tiu7QvVMRHTEanqn8DtzdMd524u78aGmCnAbMWYxfHkJ';
 // Sent as X-SD-Trust-Key on /trust-check requests — raises the bar on that
 // endpoint from "anyone can curl it" to "must extract this from the packed
 // extension." Not a substitute for real auth, just closes the zero-effort case.
+// Unlike POSTHOG_KEY this is a genuine shared secret, so it stays in .env and
+// is injected at build time; an empty value fails every trust check closed.
 export const TRUST_CHECK_SHARED_SECRET = process.env.TRUST_CHECK_SHARED_SECRET;
 // Routed through our own domain, not us.i.posthog.com directly — matches
 // shared.js's POSTHOG_CAPTURE_URL. Posting straight to a posthog.com domain

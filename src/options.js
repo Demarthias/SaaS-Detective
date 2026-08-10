@@ -114,8 +114,11 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+const LICENSE_KEY_RE = /^SD-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/;
+
 function isLicenseCurrentlyValid(lic) {
   if (!lic || !lic.valid || !lic.validated_at) return false;
+  if (!lic.key || !LICENSE_KEY_RE.test(lic.key)) return false;
   if (lic.trial && typeof lic.expires_at === 'number' && Date.now() > lic.expires_at) return false;
   return Date.now() < lic.validated_at + LICENSE_TTL_MS + LICENSE_GRACE_MS;
 }

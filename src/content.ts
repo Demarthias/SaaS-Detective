@@ -110,7 +110,13 @@ function detectTools(enabledCategories: Record<string, boolean>) {
   return tools;
 }
 
-chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // No `externally_connectable` is declared in the manifest, so MV3 already
+  // restricts senders to this extension's own contexts — this check is
+  // belt-and-suspenders in case that ever changes.
+  if (sender.id !== chrome.runtime.id) {
+    return false;
+  }
   if (request.action !== 'SCAN_PAGE') {
     return false;
   }
