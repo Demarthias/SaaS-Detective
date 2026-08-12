@@ -36,13 +36,23 @@ async function getSuperProps(): Promise<Record<string, unknown>> {
     const result = await chrome.storage.sync.get({ sd_license: null });
     const lic = result['sd_license'] as { plan?: string; valid?: boolean; trial?: boolean } | null;
     _superPropsCache = {
+      // Stamped on every event so extension and website traffic stay separable
+      // in PostHog. Without it the two surfaces share one event namespace and
+      // the funnel reads as impossible (site-side view_pricing outnumbering
+      // popup_opened, etc). Deliberately NOT called `source` — the website
+      // already uses that name for referrer ("direct", a utm value), so reusing
+      // it here would collide with different semantics on the same property.
+      surface: 'extension',
       extension_version: chrome.runtime?.getManifest?.()?.version || '',
       plan: lic?.plan || 'free',
       is_licensed: Boolean(lic?.valid),
       is_trial: Boolean(lic?.trial),
     };
   } catch (_) {
-    _superPropsCache = { extension_version: chrome.runtime?.getManifest?.()?.version || '' };
+    _superPropsCache = {
+      surface: 'extension',
+      extension_version: chrome.runtime?.getManifest?.()?.version || '',
+    };
   }
   return _superPropsCache;
 }

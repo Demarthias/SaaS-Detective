@@ -33,13 +33,19 @@ async function getSuperProps() {
   try {
     const { sd_license } = await chrome.storage.sync.get({ sd_license: null });
     _superPropsCache = {
+      // Keep in sync with analytics.ts's getSuperProps — see the comment there
+      // for why this is `surface` and not `source`.
+      surface: 'extension',
       extension_version: chrome.runtime?.getManifest?.()?.version || '',
       plan: sd_license?.plan || 'free',
       is_licensed: Boolean(sd_license?.valid),
       is_trial: Boolean(sd_license?.trial),
     };
   } catch (_) {
-    _superPropsCache = { extension_version: chrome.runtime?.getManifest?.()?.version || '' };
+    _superPropsCache = {
+      surface: 'extension',
+      extension_version: chrome.runtime?.getManifest?.()?.version || '',
+    };
   }
   return _superPropsCache;
 }
